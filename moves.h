@@ -1,0 +1,2611 @@
+#pragma once
+#include <stdint.h>
+#include "dex.h"
+
+// GENERADO por tools/gen_moves.py desde tools/dex_moves.py - no editar
+
+// Categoria. No hay IV de ataque especial: los movimientos
+// especiales usan ivAtk/trAtk contra bSpA de la especie, y la
+// defensa especial ivDef/trDef contra bSpD. El reparto
+// fisico/especial vive en la especie, no en el individuo.
+enum : uint8_t { MC_PHYS = 0, MC_SPEC = 1, MC_STATUS = 2 };
+
+// Efectos. param lleva la carga util de cada uno.
+enum : uint8_t {
+  EF_NONE = 0,
+  EF_STAGE,       // statMask + stages sobre target
+  EF_RECOIL,      // param = denominador (3 -> 1/3 del dano hecho)
+  EF_DRAIN,       // param = % del dano hecho que se cura
+  EF_FIXED_LVL,   // dano = nivel del atacante, ignora stats
+  EF_FIXED,       // param = dano fijo
+  EF_PRIORITY,    // param = prioridad, actua antes
+  EF_NEVER_MISS,  // no tira precision
+  EF_MULTI,       // 2-5 golpes, power es por golpe
+  EF_HEAL,        // param = % de vitalidad maxima curada
+  EF_RECHARGE,    // pierde el turno siguiente, expuesto
+  EF_CHARGE,      // turno 1 carga; param 1 = invulnerable mientras
+  EF_STAGE_HIT,   // damaging move: apply statMask/stages after a hit
+  EF_ALWAYS_CRIT, // every successful hit is critical
+  EF_HIGH_CRIT,   // increased critical-hit rate
+  EF_STEAL_STAGE, // steal the foe's positive stat stages before damage
+};
+
+// Mascara de stats para EF_STAGE: un solo delta se aplica a
+// todos los bits activos (DRAGON DANCE = ATK|SPE +1).
+enum : uint8_t { ST_ATK = 1, ST_DEF = 2, ST_SPA = 4, ST_SPD = 8, ST_SPE = 16 };
+enum : uint8_t { TG_SELF = 0, TG_FOE = 1 };
+
+// Status ailments. Battle-only: they live in the battle state and
+// clear when it ends, so nothing is written to the pet or replayed
+// by the RTC offline catch-up.
+enum : uint8_t {
+  AIL_NONE = 0, AIL_PARA = 1, AIL_BURN = 2, AIL_POISON = 3,
+  AIL_SLEEP = 4, AIL_FREEZE = 5, AIL_CONFUSE = 6,
+};
+
+struct MoveEntry {
+  const char *name;
+  uint8_t type;      // PkType
+  uint8_t cat;       // MC_*
+  uint8_t power;     // 0 en estado y en dano fijo
+  uint8_t acc;       // porcentaje; 0 = no puede fallar
+  uint8_t effect;    // EF_*
+  int8_t  param;     // carga util del efecto
+  uint8_t statMask;  // ST_* (solo EF_STAGE)
+  int8_t  stages;    // +/- niveles (solo EF_STAGE)
+  uint8_t target;    // TG_*
+  uint8_t ailment;   // AIL_*, 0 = none
+  uint8_t ailChance; // percent, 0 = never
+};
+
+enum MoveId : uint8_t {
+  MV_NONE = 0,
+  MV_TACKLE,
+  MV_SCRATCH,
+  MV_POUND,
+  MV_FURY_ATTACK,
+  MV_QUICK_ATTACK,
+  MV_SWIFT,
+  MV_BODY_SLAM,
+  MV_DOUBLE_EDGE,
+  MV_HYPER_BEAM,
+  MV_PECK,
+  MV_EMBER,
+  MV_FIRE_PUNCH,
+  MV_FLAMETHROWER,
+  MV_FIRE_BLAST,
+  MV_BUBBLE,
+  MV_WATER_GUN,
+  MV_WATERFALL,
+  MV_SURF,
+  MV_HYDRO_PUMP,
+  MV_SPARK,
+  MV_THUNDERSHOCK,
+  MV_THUNDERPUNCH,
+  MV_THUNDERBOLT,
+  MV_THUNDER,
+  MV_ABSORB,
+  MV_VINE_WHIP,
+  MV_RAZOR_LEAF,
+  MV_MEGA_DRAIN,
+  MV_SOLAR_BEAM,
+  MV_AURORA_BEAM,
+  MV_ICE_PUNCH,
+  MV_ICE_BEAM,
+  MV_BLIZZARD,
+  MV_KARATE_CHOP,
+  MV_SEISMIC_TOSS,
+  MV_SUBMISSION,
+  MV_HI_JUMP_KICK,
+  MV_POISON_STING,
+  MV_ACID,
+  MV_SLUDGE,
+  MV_SLUDGE_BOMB,
+  MV_BONE_CLUB,
+  MV_DIG,
+  MV_EARTHQUAKE,
+  MV_WING_ATTACK,
+  MV_DRILL_PECK,
+  MV_FLY,
+  MV_PSYWAVE,
+  MV_CONFUSION,
+  MV_PSYBEAM,
+  MV_PSYCHIC,
+  MV_BUG_BITE,
+  MV_PIN_MISSILE,
+  MV_LEECH_LIFE,
+  MV_MEGAHORN,
+  MV_BUG_BUZZ,
+  MV_X_SCISSOR,
+  MV_ROCK_SMASH,
+  MV_ROCK_THROW,
+  MV_ROCK_SLIDE,
+  MV_ANCIENTPOWER,
+  MV_LICK,
+  MV_NIGHT_SHADE,
+  MV_SHADOW_BALL,
+  MV_DRAGON_RAGE,
+  MV_DRAGON_CLAW,
+  MV_OUTRAGE,
+  MV_BITE,
+  MV_CRUNCH,
+  MV_IRON_HEAD,
+  MV_FLASH_CANNON,
+  MV_DAZZLE_GLEAM,
+  MV_PLAY_ROUGH,
+  MV_MOONBLAST,
+  MV_SWORDS_DANCE,
+  MV_AGILITY,
+  MV_BARRIER,
+  MV_AMNESIA,
+  MV_NASTY_PLOT,
+  MV_DRAGON_DANCE,
+  MV_BULK_UP,
+  MV_GROWL,
+  MV_LEER,
+  MV_SCREECH,
+  MV_STRING_SHOT,
+  MV_RECOVER,
+  MV_SOFT_BOILED,
+  MV_STRUGGLE,
+  MV_DARK_PULSE,
+  MV_VOLT_TACKLE,
+  MV_SACRED_FIRE,
+  MV_AEROBLAST,
+  MV_ORIGIN_PULSE,
+  MV_PRECIPICE_BLADES,
+  MV_ROAR_OF_TIME,
+  MV_SPACIAL_REND,
+  MV_SHADOW_FORCE,
+  MV_PSYSTRIKE,
+  MV_FUSION_FLARE,
+  MV_FUSION_BOLT,
+  MV_SECRET_SWORD,
+  MV_GEOMANCY,
+  MV_OBLIVION_WING,
+  MV_SUNSTEEL_STRIKE,
+  MV_MOONGEIST_BEAM,
+  MV_SPECTRAL_THIEF,
+  MV_DRUM_BEATING,
+  MV_PYRO_BALL,
+  MV_SNIPE_SHOT,
+  MV_FLOWER_TRICK,
+  MV_TORCH_SONG,
+  MV_AQUA_STEP,
+  MV_LUMINA_CRASH,
+  MV_THUNDER_CAGE,
+  MV_DRAGON_ENERGY,
+  MV_DIRE_CLAW,
+  MV_SPRINGTIDE_STORM,
+  MV_POPULATION_BOMB,
+  MV_SALT_CURE,
+  MV_ARMOR_CANNON,
+  MV_BITTER_BLADE,
+  MV_KOWTOW_CLEAVE,
+  MV_MAKE_IT_RAIN,
+  MV_DIGI_PULSE, MV_DIGI_FLARE, MV_DIGI_TIDE, MV_DIGI_VOLT,
+  MV_DIGI_BLOOM, MV_DIGI_FROST, MV_DIGI_IMPACT, MV_DIGI_TOXIN,
+  MV_DIGI_QUAKE, MV_DIGI_GALE, MV_DIGI_MIND, MV_DIGI_SWARM,
+  MV_DIGI_CRAG, MV_DIGI_PHANTOM, MV_DIGI_DRACO, MV_DIGI_NIGHT,
+  MV_DIGI_ALLOY, MV_DIGI_LIGHT,
+};
+#define MOVE_COUNT 142
+
+static const MoveEntry MOVE_TBL[MOVE_COUNT] = {
+  { "-", T_NORMAL, MC_STATUS, 0, 0, EF_NONE, 0, 0, 0, TG_SELF, AIL_NONE, 0 },  // 0: sin usar
+  { "TACKLE", T_NORMAL, MC_PHYS, 40, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 1
+  { "SCRATCH", T_NORMAL, MC_PHYS, 40, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 2
+  { "POUND", T_NORMAL, MC_PHYS, 40, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 3
+  { "FURY ATTACK", T_NORMAL, MC_PHYS, 15, 85, EF_MULTI, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 4
+  { "QUICK ATTACK", T_NORMAL, MC_PHYS, 40, 100, EF_PRIORITY, 1, 0, 0, TG_FOE, AIL_NONE, 0 },  // 5
+  { "SWIFT", T_NORMAL, MC_SPEC, 60, 0, EF_NEVER_MISS, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 6
+  { "BODY SLAM", T_NORMAL, MC_PHYS, 85, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 7
+  { "DOUBLE-EDGE", T_NORMAL, MC_PHYS, 120, 100, EF_RECOIL, 3, 0, 0, TG_FOE, AIL_NONE, 0 },  // 8
+  { "HYPER BEAM", T_NORMAL, MC_SPEC, 150, 90, EF_RECHARGE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 9
+  { "PECK", T_FLYING, MC_PHYS, 35, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 10
+  { "EMBER", T_FIRE, MC_SPEC, 40, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_BURN, 10 },  // 11
+  { "FIRE PUNCH", T_FIRE, MC_PHYS, 75, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_BURN, 10 },  // 12
+  { "FLAMETHROWER", T_FIRE, MC_SPEC, 90, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_BURN, 10 },  // 13
+  { "FIRE BLAST", T_FIRE, MC_SPEC, 110, 85, EF_NONE, 0, 0, 0, TG_FOE, AIL_BURN, 10 },  // 14
+  { "BUBBLE", T_WATER, MC_SPEC, 30, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 15
+  { "WATER GUN", T_WATER, MC_SPEC, 40, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 16
+  { "WATERFALL", T_WATER, MC_PHYS, 80, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 17
+  { "SURF", T_WATER, MC_SPEC, 90, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 18
+  { "HYDRO PUMP", T_WATER, MC_SPEC, 110, 80, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 19
+  { "SPARK", T_ELECTRIC, MC_PHYS, 35, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_PARA, 20 },  // 20
+  { "THUNDERSHOCK", T_ELECTRIC, MC_SPEC, 40, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_PARA, 10 },  // 21
+  { "THUNDERPUNCH", T_ELECTRIC, MC_PHYS, 75, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_PARA, 10 },  // 22
+  { "THUNDERBOLT", T_ELECTRIC, MC_SPEC, 90, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_PARA, 10 },  // 23
+  { "THUNDER", T_ELECTRIC, MC_SPEC, 110, 70, EF_NONE, 0, 0, 0, TG_FOE, AIL_PARA, 30 },  // 24
+  { "ABSORB", T_GRASS, MC_SPEC, 20, 100, EF_DRAIN, 50, 0, 0, TG_FOE, AIL_NONE, 0 },  // 25
+  { "VINE WHIP", T_GRASS, MC_PHYS, 45, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 26
+  { "RAZOR LEAF", T_GRASS, MC_PHYS, 55, 95, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 27
+  { "MEGA DRAIN", T_GRASS, MC_SPEC, 40, 100, EF_DRAIN, 50, 0, 0, TG_FOE, AIL_NONE, 0 },  // 28
+  { "SOLAR BEAM", T_GRASS, MC_SPEC, 120, 100, EF_CHARGE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 29
+  { "AURORA BEAM", T_ICE, MC_SPEC, 65, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 30
+  { "ICE PUNCH", T_ICE, MC_PHYS, 75, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_FREEZE, 10 },  // 31
+  { "ICE BEAM", T_ICE, MC_SPEC, 90, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_FREEZE, 10 },  // 32
+  { "BLIZZARD", T_ICE, MC_SPEC, 110, 70, EF_NONE, 0, 0, 0, TG_FOE, AIL_FREEZE, 10 },  // 33
+  { "KARATE CHOP", T_FIGHTING, MC_PHYS, 50, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 34
+  { "SEISMIC TOSS", T_FIGHTING, MC_PHYS, 0, 100, EF_FIXED_LVL, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 35
+  { "SUBMISSION", T_FIGHTING, MC_PHYS, 80, 80, EF_RECOIL, 4, 0, 0, TG_FOE, AIL_NONE, 0 },  // 36
+  { "HI JUMP KICK", T_FIGHTING, MC_PHYS, 100, 90, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 37
+  { "POISON STING", T_POISON, MC_PHYS, 15, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_POISON, 30 },  // 38
+  { "ACID", T_POISON, MC_SPEC, 40, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_POISON, 10 },  // 39
+  { "SLUDGE", T_POISON, MC_SPEC, 65, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_POISON, 30 },  // 40
+  { "SLUDGE BOMB", T_POISON, MC_SPEC, 90, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_POISON, 30 },  // 41
+  { "BONE CLUB", T_GROUND, MC_PHYS, 65, 85, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 42
+  { "DIG", T_GROUND, MC_PHYS, 80, 100, EF_CHARGE, 1, 0, 0, TG_FOE, AIL_NONE, 0 },  // 43
+  { "EARTHQUAKE", T_GROUND, MC_PHYS, 100, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 44
+  { "WING ATTACK", T_FLYING, MC_PHYS, 60, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 45
+  { "DRILL PECK", T_FLYING, MC_PHYS, 80, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 46
+  { "FLY", T_FLYING, MC_PHYS, 90, 95, EF_CHARGE, 1, 0, 0, TG_FOE, AIL_NONE, 0 },  // 47
+  { "PSYWAVE", T_PSYCHIC, MC_SPEC, 30, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 48
+  { "CONFUSION", T_PSYCHIC, MC_SPEC, 50, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_CONFUSE, 10 },  // 49
+  { "PSYBEAM", T_PSYCHIC, MC_SPEC, 65, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_CONFUSE, 10 },  // 50
+  { "PSYCHIC", T_PSYCHIC, MC_SPEC, 90, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 51
+  { "BUG BITE", T_BUG, MC_PHYS, 30, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 52
+  { "PIN MISSILE", T_BUG, MC_PHYS, 25, 95, EF_MULTI, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 53
+  { "LEECH LIFE", T_BUG, MC_PHYS, 80, 100, EF_DRAIN, 50, 0, 0, TG_FOE, AIL_NONE, 0 },  // 54
+  { "MEGAHORN", T_BUG, MC_PHYS, 120, 85, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 55
+  { "BUG BUZZ", T_BUG, MC_SPEC, 90, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 56
+  { "X-SCISSOR", T_BUG, MC_PHYS, 80, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 57
+  { "ROCK SMASH", T_FIGHTING, MC_PHYS, 40, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 58
+  { "ROCK THROW", T_ROCK, MC_PHYS, 50, 90, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 59
+  { "ROCK SLIDE", T_ROCK, MC_PHYS, 75, 90, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 60
+  { "ANCIENTPOWER", T_ROCK, MC_SPEC, 60, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 61
+  { "LICK", T_GHOST, MC_PHYS, 30, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_PARA, 30 },  // 62
+  { "NIGHT SHADE", T_GHOST, MC_SPEC, 0, 100, EF_FIXED_LVL, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 63
+  { "SHADOW BALL", T_GHOST, MC_SPEC, 80, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 64
+  { "DRAGON RAGE", T_DRAGON, MC_SPEC, 0, 100, EF_FIXED, 40, 0, 0, TG_FOE, AIL_NONE, 0 },  // 65
+  { "DRAGON CLAW", T_DRAGON, MC_PHYS, 80, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 66
+  { "OUTRAGE", T_DRAGON, MC_PHYS, 120, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 67
+  { "BITE", T_DARK, MC_PHYS, 60, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 68
+  { "CRUNCH", T_DARK, MC_PHYS, 80, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 69
+  { "IRON HEAD", T_STEEL, MC_PHYS, 80, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 70
+  { "FLASH CANNON", T_STEEL, MC_SPEC, 80, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 71
+  { "DAZZLE GLEAM", T_FAIRY, MC_SPEC, 80, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 72
+  { "PLAY ROUGH", T_FAIRY, MC_PHYS, 90, 90, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 73
+  { "MOONBLAST", T_FAIRY, MC_SPEC, 95, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 74
+  { "SWORDS DANCE", T_NORMAL, MC_STATUS, 0, 0, EF_STAGE, 0, ST_ATK, 2, TG_SELF, AIL_NONE, 0 },  // 75
+  { "AGILITY", T_PSYCHIC, MC_STATUS, 0, 0, EF_STAGE, 0, ST_SPE, 2, TG_SELF, AIL_NONE, 0 },  // 76
+  { "BARRIER", T_PSYCHIC, MC_STATUS, 0, 0, EF_STAGE, 0, ST_DEF, 2, TG_SELF, AIL_NONE, 0 },  // 77
+  { "AMNESIA", T_PSYCHIC, MC_STATUS, 0, 0, EF_STAGE, 0, ST_SPD, 2, TG_SELF, AIL_NONE, 0 },  // 78
+  { "NASTY PLOT", T_DARK, MC_STATUS, 0, 0, EF_STAGE, 0, ST_SPA, 2, TG_SELF, AIL_NONE, 0 },  // 79
+  { "DRAGON DANCE", T_DRAGON, MC_STATUS, 0, 0, EF_STAGE, 0, ST_ATK | ST_SPE, 1, TG_SELF, AIL_NONE, 0 },  // 80
+  { "BULK UP", T_FIGHTING, MC_STATUS, 0, 0, EF_STAGE, 0, ST_ATK | ST_DEF, 1, TG_SELF, AIL_NONE, 0 },  // 81
+  { "GROWL", T_NORMAL, MC_STATUS, 0, 0, EF_STAGE, 0, ST_ATK, -1, TG_FOE, AIL_NONE, 0 },  // 82
+  { "LEER", T_NORMAL, MC_STATUS, 0, 0, EF_STAGE, 0, ST_DEF, -1, TG_FOE, AIL_NONE, 0 },  // 83
+  { "SCREECH", T_NORMAL, MC_STATUS, 0, 0, EF_STAGE, 0, ST_DEF, -2, TG_FOE, AIL_NONE, 0 },  // 84
+  { "STRING SHOT", T_BUG, MC_STATUS, 0, 0, EF_STAGE, 0, ST_SPE, -1, TG_FOE, AIL_NONE, 0 },  // 85
+  { "RECOVER", T_NORMAL, MC_STATUS, 0, 0, EF_HEAL, 50, 0, 0, TG_SELF, AIL_NONE, 0 },  // 86
+  { "SOFT-BOILED", T_NORMAL, MC_STATUS, 0, 0, EF_HEAL, 50, 0, 0, TG_SELF, AIL_NONE, 0 },  // 87
+  { "STRUGGLE", T_NORMAL, MC_PHYS, 50, 0, EF_RECOIL, 4, 0, 0, TG_FOE, AIL_NONE, 0 },  // 88
+  { "DARK PULSE", T_DARK, MC_SPEC, 80, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },  // 89
+  { "VOLT TACKLE", T_ELECTRIC, MC_PHYS, 120, 100, EF_RECOIL, 3, 0, 0, TG_FOE, AIL_NONE, 0 }, // 90
+  { "SACRED FIRE", T_FIRE, MC_PHYS, 100, 95, EF_NONE, 0, 0, 0, TG_FOE, AIL_BURN, 50 }, // 91
+  { "AEROBLAST", T_FLYING, MC_SPEC, 100, 95, EF_HIGH_CRIT, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 92
+  { "ORIGIN PULSE", T_WATER, MC_SPEC, 110, 85, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 93
+  { "PRECIPICE BLADES", T_GROUND, MC_PHYS, 120, 85, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 94
+  { "ROAR OF TIME", T_DRAGON, MC_SPEC, 150, 90, EF_RECHARGE, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 95
+  { "SPACIAL REND", T_DRAGON, MC_SPEC, 100, 95, EF_HIGH_CRIT, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 96
+  { "SHADOW FORCE", T_GHOST, MC_PHYS, 120, 100, EF_CHARGE, 1, 0, 0, TG_FOE, AIL_NONE, 0 }, // 97
+  { "PSYSTRIKE", T_PSYCHIC, MC_SPEC, 100, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 98
+  { "FUSION FLARE", T_FIRE, MC_SPEC, 100, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 99
+  { "FUSION BOLT", T_ELECTRIC, MC_PHYS, 100, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 100
+  { "SECRET SWORD", T_FIGHTING, MC_SPEC, 85, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 101
+  { "GEOMANCY", T_FAIRY, MC_STATUS, 0, 0, EF_STAGE, 0, ST_SPA | ST_SPD | ST_SPE, 2, TG_SELF, AIL_NONE, 0 }, // 102
+  { "OBLIVION WING", T_FLYING, MC_SPEC, 80, 100, EF_DRAIN, 75, 0, 0, TG_FOE, AIL_NONE, 0 }, // 103
+  { "SUNSTEEL STRIKE", T_STEEL, MC_PHYS, 100, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 104
+  { "MOONGEIST BEAM", T_GHOST, MC_SPEC, 100, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 105
+  { "SPECTRAL THIEF", T_GHOST, MC_PHYS, 90, 100, EF_STEAL_STAGE, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 106
+  { "DRUM BEATING", T_GRASS, MC_PHYS, 80, 100, EF_STAGE_HIT, 0, ST_SPE, -1, TG_FOE, AIL_NONE, 0 }, // 107
+  { "PYRO BALL", T_FIRE, MC_PHYS, 120, 90, EF_NONE, 0, 0, 0, TG_FOE, AIL_BURN, 10 }, // 108
+  { "SNIPE SHOT", T_WATER, MC_SPEC, 80, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 109
+  { "FLOWER TRICK", T_GRASS, MC_PHYS, 70, 0, EF_ALWAYS_CRIT, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 110
+  { "TORCH SONG", T_FIRE, MC_SPEC, 80, 100, EF_STAGE_HIT, 0, ST_SPA, 1, TG_SELF, AIL_NONE, 0 }, // 111
+  { "AQUA STEP", T_WATER, MC_PHYS, 80, 100, EF_STAGE_HIT, 0, ST_SPE, 1, TG_SELF, AIL_NONE, 0 }, // 112
+  { "LUMINA CRASH", T_PSYCHIC, MC_SPEC, 80, 100, EF_STAGE_HIT, 0, ST_SPD, -2, TG_FOE, AIL_NONE, 0 }, // 113
+  { "THUNDER CAGE", T_ELECTRIC, MC_SPEC, 80, 90, EF_NONE, 0, 0, 0, TG_FOE, AIL_PARA, 20 }, // 114
+  { "DRAGON ENERGY", T_DRAGON, MC_SPEC, 150, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 115
+  { "DIRE CLAW", T_POISON, MC_PHYS, 80, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_POISON, 50 }, // 116
+  { "SPRINGTIDE STORM", T_FAIRY, MC_SPEC, 100, 80, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 117
+  { "POPULATION BOMB", T_NORMAL, MC_PHYS, 20, 90, EF_MULTI, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 118
+  { "SALT CURE", T_ROCK, MC_PHYS, 40, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_POISON, 100 }, // 119
+  { "ARMOR CANNON", T_FIRE, MC_SPEC, 120, 100, EF_STAGE_HIT, 0, ST_DEF | ST_SPD, -1, TG_SELF, AIL_NONE, 0 }, // 120
+  { "BITTER BLADE", T_FIRE, MC_PHYS, 90, 100, EF_DRAIN, 50, 0, 0, TG_FOE, AIL_NONE, 0 }, // 121
+  { "KOWTOW CLEAVE", T_DARK, MC_PHYS, 85, 0, EF_NEVER_MISS, 0, 0, 0, TG_FOE, AIL_NONE, 0 }, // 122
+  { "MAKE IT RAIN", T_STEEL, MC_SPEC, 120, 100, EF_STAGE_HIT, 0, ST_SPA, -1, TG_SELF, AIL_NONE, 0 }, // 123
+  { "DATA PULSE", T_NORMAL, MC_SPEC, 80, 100, EF_NEVER_MISS, 0, 0, 0, TG_FOE, AIL_NONE, 0 },
+  { "DIGI FLARE", T_FIRE, MC_SPEC, 90, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_BURN, 20 },
+  { "TIDAL CODE", T_WATER, MC_SPEC, 90, 100, EF_DRAIN, 35, 0, 0, TG_FOE, AIL_NONE, 0 },
+  { "VOLT LINK", T_ELECTRIC, MC_SPEC, 85, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_PARA, 25 },
+  { "GREEN DRIVER", T_GRASS, MC_PHYS, 85, 100, EF_DRAIN, 35, 0, 0, TG_FOE, AIL_NONE, 0 },
+  { "FROST BIT", T_ICE, MC_SPEC, 85, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_FREEZE, 10 },
+  { "BRAVE IMPACT", T_FIGHTING, MC_PHYS, 95, 95, EF_STAGE_HIT, 0, ST_ATK, 1, TG_SELF, AIL_NONE, 0 },
+  { "VENOM CODE", T_POISON, MC_SPEC, 85, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_POISON, 30 },
+  { "CORE QUAKE", T_GROUND, MC_PHYS, 95, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_NONE, 0 },
+  { "SKY PACKET", T_FLYING, MC_PHYS, 85, 100, EF_HIGH_CRIT, 0, 0, 0, TG_FOE, AIL_NONE, 0 },
+  { "MIND TRACE", T_PSYCHIC, MC_SPEC, 85, 100, EF_STAGE_HIT, 0, ST_SPD, -1, TG_FOE, AIL_NONE, 0 },
+  { "SWARM SCRIPT", T_BUG, MC_PHYS, 30, 95, EF_MULTI, 0, 0, 0, TG_FOE, AIL_NONE, 0 },
+  { "CRAG BREAK", T_ROCK, MC_PHYS, 95, 90, EF_HIGH_CRIT, 0, 0, 0, TG_FOE, AIL_NONE, 0 },
+  { "GHOST PROCESS", T_GHOST, MC_SPEC, 85, 100, EF_NONE, 0, 0, 0, TG_FOE, AIL_CONFUSE, 20 },
+  { "DRACO STREAM", T_DRAGON, MC_SPEC, 100, 90, EF_HIGH_CRIT, 0, 0, 0, TG_FOE, AIL_NONE, 0 },
+  { "DARK PROTOCOL", T_DARK, MC_PHYS, 90, 100, EF_STAGE_HIT, 0, ST_DEF, -1, TG_FOE, AIL_NONE, 0 },
+  { "ALLOY BURST", T_STEEL, MC_PHYS, 90, 100, EF_STAGE_HIT, 0, ST_DEF, 1, TG_SELF, AIL_NONE, 0 },
+  { "LIGHT PATCH", T_FAIRY, MC_STATUS, 0, 0, EF_HEAL, 25, 0, 0, TG_SELF, AIL_NONE, 0 },
+};
+
+// Learnsets en formato CSR: la especie n ocupa
+// LEARN_TBL[LEARN_OFS[n] .. LEARN_OFS[n + 1]).
+// nivel 0 = MT, sin requisito. El nivel se guarda pero todavia
+// no filtra nada: lo decide la fase de UI.
+struct LearnEntry { uint8_t move; uint8_t level; };
+
+static const LearnEntry LEARN_TBL[11114] = {
+  {  78,   0 }, {   7,   0 }, {  28,   0 }, {  67,   0 }, {  58,   0 }, {  41,   0 },
+  {  75,   0 }, {   1,   1 }, {  82,   4 }, {  26,  10 }, {  27,  20 }, {   8,  27 },
+  {  29,  46 }, {  78,   0 }, {   7,   0 }, {  28,   0 }, {  67,   0 }, {  58,   0 },
+  {  41,   0 }, {  75,   0 }, {  82,   1 }, {   1,   1 }, {  26,  10 }, {  27,  22 },
+  {   8,  31 }, {  29,  56 }, {   7,   0 }, {  44,   0 }, {   9,   0 }, {  28,   0 },
+  {  67,   0 }, {  58,   0 }, {  41,   0 }, {  75,   0 }, {  78,   1 }, {  82,   1 },
+  {   1,   1 }, {  26,   1 }, {  27,  22 }, {   8,  31 }, {  29,  65 }, {   7,   0 },
+  {  69,   0 }, {  43,   0 }, {   8,   0 }, {  66,   0 }, {  80,   0 }, {  14,   0 },
+  {  12,   0 }, {  67,   0 }, {  60,   0 }, {  58,   0 }, {  35,   0 }, {  36,   0 },
+  {   6,   0 }, {  75,   0 }, {  22,   0 }, {  82,   1 }, {   2,   1 }, {  11,   7 },
+  {  83,  15 }, {  13,  31 }, {  65,  43 }, {   7,   0 }, {  69,   0 }, {  43,   0 },
+  {   8,   0 }, {  66,   0 }, {  80,   0 }, {  14,   0 }, {  12,   0 }, {  67,   0 },
+  {  60,   0 }, {  58,   0 }, {  35,   0 }, {  36,   0 }, {   6,   0 }, {  75,   0 },
+  {  22,   0 }, {  11,   1 }, {  82,   1 }, {   2,   1 }, {  83,  15 }, {  13,  34 },
+  {  65,  48 }, {   7,   0 }, {  43,   0 }, {   8,   0 }, {  80,   0 }, {  44,   0 },
+  {  14,   0 }, {  12,   0 }, {  47,   0 }, {   9,   0 }, {  67,   0 }, {  60,   0 },
+  {  58,   0 }, {  35,   0 }, {  29,   0 }, {  36,   0 }, {   6,   0 }, {  75,   0 },
+  {  22,   0 }, {  69,   1 }, {  66,   1 }, {  11,   1 }, {  82,   1 }, {   2,   1 },
+  {  83,  15 }, {  13,  34 }, {  45,  36 }, {  65,  54 }, {  33,   0 }, {   7,   0 },
+  {  43,   0 }, {   8,   0 }, {  32,   0 }, {  31,   0 }, {  67,   0 }, {  60,   0 },
+  {  58,   0 }, {  35,   0 }, {  36,   0 }, {  18,   0 }, {  17,   0 }, {   1,   1 },
+  {  15,   7 }, {  16,  13 }, {  68,  18 }, {  19,  47 }, {  33,   0 }, {   7,   0 },
+  {  43,   0 }, {   8,   0 }, {  32,   0 }, {  31,   0 }, {  67,   0 }, {  60,   0 },
+  {  58,   0 }, {  35,   0 }, {  36,   0 }, {  18,   0 }, {  17,   0 }, {  15,   1 },
+  {   1,   1 }, {  16,  13 }, {  68,  19 }, {  19,  53 }, {  33,   0 }, {   7,   0 },
+  {  69,   0 }, {  89,   0 }, {  43,   0 }, {   8,   0 }, {  44,   0 }, {   9,   0 },
+  {  32,   0 }, {  31,   0 }, {  67,   0 }, {  60,   0 }, {  58,   0 }, {  35,   0 },
+  {  36,   0 }, {  18,   0 }, {  17,   0 }, {  15,   1 }, {  71,   1 }, {   1,   1 },
+  {  16,  13 }, {  68,  19 }, {  19,  68 }, {  85,   1 }, {   1,   1 }, {  52,   9 },
+  {   8,   0 }, {   9,   0 }, {  28,   0 }, {  51,   0 }, {  48,   0 }, {  64,   0 },
+  {  29,   0 }, {   6,   0 }, {  52,   1 }, {  49,   1 }, {  85,   1 }, {   1,   1 },
+  {  56,  31 }, {  50,  34 }, {  38,   1 }, {  85,   1 }, {  52,   9 }, {   8,   0 },
+  {   9,   0 }, {  28,   0 }, {  58,   0 }, {  41,   0 }, {  29,   0 }, {   6,   0 },
+  {  75,   0 }, {  57,   0 }, {  52,   1 }, {   4,   1 }, {  10,   1 }, {  85,   1 },
+  {  38,  17 }, {  67,  31 }, {  53,  35 }, {  76,  40 }, {   8,   0 }, {  47,   0 },
+  {   6,   0 }, {   1,   1 }, {   5,  13 }, {  45,  25 }, {  76,  39 }, {   8,   0 },
+  {  47,   0 }, {   6,   0 }, {   1,   1 }, {   5,  13 }, {  45,  27 }, {  76,  43 },
+  {   8,   0 }, {  47,   0 }, {   9,   0 }, {   6,   0 }, {   5,   1 }, {   1,   1 },
+  {  45,  27 }, {  76,  48 }, {  33,   0 }, {   7,   0 }, {  43,   0 }, {  32,   0 },
+  {  58,   0 }, {  64,   0 }, {  41,   0 }, {   6,   0 }, {  24,   0 }, {  23,   0 },
+  {  16,   0 }, {   1,   1 }, {   5,   7 }, {  68,  10 }, {  69,  18 }, {   8,  27 },
+  {  33,   0 }, {   7,   0 }, {  43,   0 }, {   9,   0 }, {  32,   0 }, {  58,   0 },
+  {  64,   0 }, {  41,   0 }, {   6,   0 }, {  24,   0 }, {  23,   0 }, {  16,   0 },
+  {   5,   1 }, {  75,   1 }, {   1,   1 }, {  68,  10 }, {  69,  18 }, {   8,  39 },
+  {   8,   0 }, {  47,   0 }, {   6,   0 }, {  82,   1 }, {  10,   1 }, {  83,   7 },
+  {   4,  13 }, {  45,  18 }, {  46,  37 }, {  76,  43 }, {   8,   0 }, {  47,   0 },
+  {   9,   0 }, {   6,   0 }, {   4,   1 }, {  82,   1 }, {  83,   1 }, {  10,   1 },
+  {   5,   1 }, {  45,  18 }, {  46,  40 }, {  76,  47 }, {   7,   0 }, {  69,   0 },
+  {  89,   0 }, {  43,   0 }, {   8,   0 }, {  44,   0 }, {  54,   0 }, {  28,   0 },
+  {  60,   0 }, {  83,   1 }, {  38,   8 }, {  68,  13 }, {  84,  25 }, {  39,  32 },
+  {  41,  33 }, {   7,   0 }, {  89,   0 }, {  43,   0 }, {   8,   0 }, {  44,   0 },
+  {   9,   0 }, {  54,   0 }, {  28,   0 }, {  60,   0 }, {  68,   1 }, {  83,   1 },
+  {  38,   1 }, {  69,  22 }, {  84,  28 }, {  39,  38 }, {  41,  39 }, {   7,   0 },
+  {  43,   0 }, {   8,   0 }, {  73,   0 }, {  58,   0 }, {  35,   0 }, {  36,   0 },
+  {  18,   0 }, {  22,   0 }, {  82,   1 }, {  79,   1 }, {  21,   1 }, {   5,  11 },
+  {   6,  15 }, {  20,  20 }, {  23,  26 }, {  76,  33 }, {  24,  41 }, {   7,   0 },
+  {  43,   0 }, {   8,   0 }, {   9,   0 }, {  73,   0 }, {  58,   0 }, {  35,   0 },
+  {  36,   0 }, {  18,   0 }, {  76,   1 }, {  82,   1 }, {  79,   1 }, {   5,   1 },
+  {  22,   1 }, {  21,   1 }, {  23,   1 }, {   6,  15 }, {  20,  21 }, {  24,  47 },
+  {  78,   0 }, {   7,   0 }, {   8,   0 }, {  54,   0 }, {  60,   0 }, {  58,   0 },
+  {  35,   0 }, {  36,   0 }, {  57,   0 }, {   2,   1 }, {  38,  17 }, {  43,  20 },
+  {  76,  27 }, {  75,  28 }, {   6,  30 }, {  44,  36 }, {  78,   0 }, {   7,   0 },
+  {   8,   0 }, {   9,   0 }, {  54,   0 }, {  53,   0 }, {  60,   0 }, {  58,   0 },
+  {  35,   0 }, {  36,   0 }, {  57,   0 }, {  76,   1 }, {   2,   1 }, {  38,  17 },
+  {  43,  20 }, {   6,  33 }, {  75,  36 }, {  44,  46 }, {  33,   0 }, {   7,   0 },
+  {  43,   0 }, {   8,   0 }, {  32,   0 }, {  58,   0 }, {  41,   0 }, {  24,   0 },
+  {  23,   0 }, {  82,   1 }, {   2,   1 }, {   1,   1 }, {  38,  17 }, {  68,  20 },
+  {  69,  47 }, {  33,   0 }, {   7,   0 }, {  43,   0 }, {   8,   0 }, {  32,   0 },
+  {  58,   0 }, {  41,   0 }, {  24,   0 }, {  23,   0 }, {  16,   0 }, {  82,   1 },
+  {   2,   1 }, {   1,   1 }, {  38,  18 }, {  68,  22 }, {  69,  53 }, {  33,   0 },
+  {  43,   0 }, {   8,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 },
+  {   9,   0 }, {  32,   0 }, {  31,   0 }, {  67,   0 }, {  60,   0 }, {  58,   0 },
+  {  35,   0 }, {  64,   0 }, {  41,   0 }, {  36,   0 }, {  18,   0 }, {  24,   0 },
+  {  22,   0 }, {  23,   0 }, {  16,   0 }, {  68,   1 }, {  69,   1 }, {  82,   1 },
+  {  38,   1 }, {   2,   1 }, {   1,   1 }, {   7,  22 }, {  78,   0 }, {  33,   0 },
+  {   7,   0 }, {  43,   0 }, {   8,   0 }, {  32,   0 }, {  58,   0 }, {  41,   0 },
+  {  24,   0 }, {  23,   0 }, {  83,   1 }, {  10,   1 }, {   1,   1 }, {  38,  17 },
+  {   4,  30 }, {  78,   0 }, {  33,   0 }, {   7,   0 }, {  43,   0 }, {   8,   0 },
+  {  32,   0 }, {  58,   0 }, {  41,   0 }, {  24,   0 }, {  23,   0 }, {  16,   0 },
+  {  83,   1 }, {  10,   1 }, {   1,   1 }, {  38,  18 }, {   4,  34 }, {  78,   0 },
+  {  33,   0 }, {   7,   0 }, {  43,   0 }, {   8,   0 }, {  44,   0 }, {  14,   0 },
+  {  12,   0 }, {  13,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 }, {  67,   0 },
+  {  60,   0 }, {  58,   0 }, {  35,   0 }, {  64,   0 }, {  41,   0 }, {  36,   0 },
+  {  18,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  16,   0 }, {   4,   1 },
+  {  83,   1 }, {  10,   1 }, {  38,   1 }, {   1,   1 }, {  55,  43 }, {  33,   0 },
+  {  72,   0 }, {  43,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 }, {  32,   0 },
+  {  31,   0 }, {  63,   0 }, {  73,   0 }, {  50,   0 }, {  48,   0 }, {  58,   0 },
+  {  35,   0 }, {  64,   0 }, {  29,   0 }, {  36,   0 }, {   6,   0 }, {  24,   0 },
+  {  22,   0 }, {  23,   0 }, {  16,   0 }, {  82,   1 }, {   3,   1 }, {   1,   1 },
+  {  78,  16 }, {   7,  24 }, {  74,  28 }, {  51,  29 }, {   8,  47 }, {  78,   0 },
+  {  33,   0 }, {   7,   0 }, {  72,   0 }, {  43,   0 }, {  14,   0 }, {  12,   0 },
+  {  13,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 }, {  63,   0 }, {  73,   0 },
+  {  50,   0 }, {  48,   0 }, {  58,   0 }, {  35,   0 }, {  64,   0 }, {  29,   0 },
+  {  36,   0 }, {   6,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  16,   0 },
+  {  82,   1 }, {   3,   1 }, {   1,   1 }, {  51,  29 }, {  74,  37 }, {   8,  47 },
+  {  76,   0 }, {   7,   0 }, {  89,   0 }, {  43,   0 }, {   8,   0 }, {   6,   0 },
+  {  11,   1 }, {   1,   1 }, {  79,   9 }, {   5,  13 }, {  13,  29 }, {  14,  31 },
+  {  76,   0 }, {   7,   0 }, {  89,   0 }, {  43,   0 }, {   8,   0 }, {   9,   0 },
+  {  63,   0 }, {  64,   0 }, {  29,   0 }, {   6,   0 }, {  11,   1 }, {   5,   1 },
+  {   1,   1 }, {  79,   9 }, {  13,  37 }, {  14,  47 }, {  78,   0 }, {  33,   0 },
+  {  89,   0 }, {  72,   0 }, {  43,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 },
+  {  32,   0 }, {  31,   0 }, {  79,   0 }, {  51,   0 }, {  48,   0 }, {  84,   0 },
+  {  35,   0 }, {  64,   0 }, {  29,   0 }, {  36,   0 }, {   6,   0 }, {  24,   0 },
+  {  22,   0 }, {  23,   0 }, {  16,   0 }, {   3,   9 }, {   7,  34 }, {  73,  40 },
+  {   8,  49 }, {  78,   0 }, {  33,   0 }, {  89,   0 }, {  72,   0 }, {  43,   0 },
+  {  14,   0 }, {  12,   0 }, {  13,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 },
+  {  79,   0 }, {  51,   0 }, {  48,   0 }, {  84,   0 }, {  35,   0 }, {  64,   0 },
+  {  29,   0 }, {  36,   0 }, {   6,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 },
+  {  16,   0 }, {   7,   1 }, {   8,   1 }, {   3,   1 }, {  73,   5 }, {  76,   0 },
+  {  69,   0 }, {   8,   0 }, {  47,   0 }, {  28,   0 }, {  79,   0 }, {  64,   0 },
+  {  41,   0 }, {  25,   1 }, {  54,   1 }, {   6,  12 }, {  68,  16 }, {  45,  21 },
+  {  76,   0 }, {   8,   0 }, {  47,   0 }, {   9,   0 }, {  28,   0 }, {  79,   0 },
+  {  64,   0 }, {  41,   0 }, {  25,   1 }, {  69,   1 }, {  54,   1 }, {   5,   1 },
+  {  84,   1 }, {   6,  12 }, {  68,  16 }, {  45,  21 }, {  72,   0 }, {   8,   0 },
+  {  41,   0 }, {  75,   0 }, {  25,   1 }, {  28,  12 }, {  27,  18 }, {  39,  23 },
+  {  74,  28 }, {  29,  46 }, {  72,   0 }, {   8,   0 }, {  41,   0 }, {  75,   0 },
+  {  25,   1 }, {  28,  12 }, {  27,  18 }, {  39,  24 }, {  74,  32 }, {  29,  52 },
+  {   7,   0 }, {  72,   0 }, {   8,   0 }, {   9,   0 }, {  41,   0 }, {  75,   0 },
+  {  25,   1 }, {  39,   1 }, {  28,   1 }, {  74,   1 }, {  29,  64 }, {   7,   0 },
+  {  43,   0 }, {   8,   0 }, {  28,   0 }, {  58,   0 }, {  41,   0 }, {  29,   0 },
+  {  75,   0 }, {   2,   1 }, {  25,   9 }, {  54,  19 }, {  57,  31 }, {   7,   0 },
+  {  43,   0 }, {   8,   0 }, {   9,   0 }, {  28,   0 }, {  58,   0 }, {  41,   0 },
+  {  29,   0 }, {  75,   0 }, {   2,   1 }, {  84,   1 }, {  25,   9 }, {  54,  19 },
+  {  57,  37 }, {  76,   0 }, {  52,   0 }, {   8,   0 }, {  63,   0 }, {  48,   0 },
+  {  41,   0 }, {  29,   0 }, {   6,   0 }, {   1,   1 }, {  49,  17 }, {  56,  25 },
+  {  54,  25 }, {  28,  25 }, {  50,  33 }, {  51,  41 }, {  52,   0 }, {   8,   0 },
+  {   9,   0 }, {  63,   0 }, {  48,   0 }, {  41,   0 }, {  29,   0 }, {   6,   0 },
+  {  76,   1 }, {  84,   1 }, {   1,   1 }, {  49,  17 }, {  56,  25 }, {  54,  25 },
+  {  28,  25 }, {  50,  36 }, {  51,  52 }, {   7,   0 }, {   8,   0 }, {  60,   0 },
+  {  58,   0 }, {  84,   0 }, {  41,   0 }, {  75,   0 }, {   2,   1 }, {  82,   5 },
+  {  76,  12 }, {  43,  17 }, {  44,  41 }, {   7,   0 }, {   8,   0 }, {   9,   0 },
+  {  60,   0 }, {  58,   0 }, {  41,   0 }, {  75,   0 }, {  82,   1 }, {   2,   1 },
+  {  84,   1 }, {  76,  12 }, {  43,  17 }, {  44,  51 }, {  76,   0 }, {  78,   0 },
+  {   7,   0 }, {  89,   0 }, {  43,   0 }, {   8,   0 }, {  64,   0 }, {   6,   0 },
+  {  24,   0 }, {  23,   0 }, {  16,   0 }, {  82,   1 }, {   2,   1 }, {  68,  10 },
+  {  79,  31 }, {  84,  31 }, {  73,  35 }, {  76,   0 }, {   7,   0 }, {  89,   0 },
+  {  43,   0 }, {   8,   0 }, {   9,   0 }, {  64,   0 }, {  24,   0 }, {  23,   0 },
+  {  16,   0 }, {  78,   1 }, {  68,   1 }, {  82,   1 }, {   2,   1 }, {   6,  28 },
+  {  84,  34 }, {  79,  37 }, {  73,  47 }, {  33,   0 }, {   7,   0 }, {  43,   0 },
+  {   8,   0 }, {  32,   0 }, {  31,   0 }, {  79,   0 }, {  51,   0 }, {  58,   0 },
+  {  35,   0 }, {  36,   0 }, {   6,   0 }, {  17,   0 }, {  15,   1 }, {   2,   1 },
+  {  16,   3 }, {  49,  16 }, {  84,  23 }, {  50,  27 }, {  78,  34 }, {  18,  36 },
+  {  19,  50 }, {  33,   0 }, {   7,   0 }, {  43,   0 }, {   8,   0 }, {   9,   0 },
+  {  32,   0 }, {  31,   0 }, {  79,   0 }, {  51,   0 }, {  58,   0 }, {  35,   0 },
+  {  36,   0 }, {   6,   0 }, {  17,   0 }, {  15,   1 }, {   2,   1 }, {  16,   7 },
+  {  49,  16 }, {  84,  23 }, {  50,  27 }, {  78,  36 }, {  18,  42 }, {  19,  58 },
+  {   7,   0 }, {  81,   0 }, {  43,   0 }, {   8,   0 }, {  44,   0 }, {  12,   0 },
+  {  31,   0 }, {  60,   0 }, {  58,   0 }, {  36,   0 }, {   6,   0 }, {  24,   0 },
+  {  22,   0 }, {  23,   0 }, {  83,   1 }, {   2,   1 }, {  34,  11 }, {  35,  26 },
+  {  67,  40 }, {  84,  41 }, {   7,   0 }, {  81,   0 }, {  43,   0 }, {   8,   0 },
+  {  44,   0 }, {  12,   0 }, {   9,   0 }, {  31,   0 }, {  60,   0 }, {  58,   0 },
+  {  36,   0 }, {   6,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  83,   1 },
+  {   2,   1 }, {  34,  11 }, {  35,  26 }, {  67,  53 }, {  84,  53 }, {   7,   0 },
+  {  43,   0 }, {   8,   0 }, {  65,   0 }, {  14,   0 }, {  58,   0 }, {   6,   0 },
+  {  68,   1 }, {  11,   7 }, {  83,  13 }, {  69,  28 }, {  67,  31 }, {  73,  35 },
+  {  76,  43 }, {  13,  49 }, {   7,   0 }, {  43,   0 }, {  65,   0 }, {  14,   0 },
+  {   9,   0 }, {  70,   0 }, {  67,   0 }, {  58,   0 }, {  29,   0 }, {   6,   0 },
+  {  76,   1 }, {  68,   1 }, {  69,   1 }, {   8,   1 }, {  11,   1 }, {  83,   1 },
+  {  73,   1 }, {  13,   5 }, {  33,   0 }, {  43,   0 }, {  32,   0 }, {  51,   0 },
+  {  48,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 }, {  15,   1 }, {   3,   4 },
+  {  16,  13 }, {   7,  31 }, {  78,  38 }, {  19,  43 }, {   8,  54 }, {  33,   0 },
+  {  43,   0 }, {  44,   0 }, {  32,   0 }, {  31,   0 }, {  51,   0 }, {  48,   0 },
+  {  58,   0 }, {  35,   0 }, {  36,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 },
+  {  15,   1 }, {  16,   1 }, {   3,   4 }, {   7,  35 }, {  78,  41 }, {  19,  51 },
+  {   8,  66 }, {  78,   0 }, {  33,   0 }, {  43,   0 }, {  44,   0 }, {   9,   0 },
+  {  32,   0 }, {  31,   0 }, {  51,   0 }, {  48,   0 }, {  60,   0 }, {  58,   0 },
+  {  35,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 }, {   7,   1 }, {  15,   1 },
+  {  81,   1 }, {   8,   1 }, {  19,   1 }, {   3,   1 }, {  36,   1 }, {  16,   1 },
+  {   7,   0 }, {  72,   0 }, {   8,   0 }, {  12,   0 }, {  31,   0 }, {  51,   0 },
+  {  48,   0 }, {  35,   0 }, {  64,   0 }, {  36,   0 }, {   6,   0 }, {  22,   0 },
+  {   7,   0 }, {  72,   0 }, {  43,   0 }, {   8,   0 }, {  12,   0 }, {  31,   0 },
+  {  48,   0 }, {  35,   0 }, {  64,   0 }, {  36,   0 }, {   6,   0 }, {  22,   0 },
+  {  49,   1 }, {  63,  19 }, {  50,  21 }, {  86,  25 }, {  51,  36 }, {   7,   0 },
+  {  72,   0 }, {  43,   0 }, {   8,   0 }, {  12,   0 }, {   9,   0 }, {  31,   0 },
+  {  79,   0 }, {  48,   0 }, {  35,   0 }, {  64,   0 }, {  36,   0 }, {   6,   0 },
+  {  22,   0 }, {  77,   1 }, {  49,   1 }, {  63,  19 }, {  50,  21 }, {  86,  25 },
+  {  51,  36 }, {   7,   0 }, {  43,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 },
+  {  13,   0 }, {  31,   0 }, {  60,   0 }, {  22,   0 }, {  83,   1 }, {   1,   1 },
+  {  58,   6 }, {  34,  13 }, {  35,  19 }, {  81,  25 }, {   8,  34 }, {  36,  37 },
+  {   7,   0 }, {  43,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 },
+  {  31,   0 }, {  60,   0 }, {  22,   0 }, {  83,   1 }, {   1,   1 }, {  58,   6 },
+  {  34,  13 }, {  35,  19 }, {  81,  25 }, {   8,  34 }, {  36,  41 }, {   7,   0 },
+  {  43,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 }, {   9,   0 },
+  {  31,   0 }, {  60,   0 }, {  22,   0 }, {  83,   1 }, {   1,   1 }, {  58,   6 },
+  {  34,  13 }, {  35,  19 }, {  81,  25 }, {   8,  34 }, {  36,  41 }, {   8,   0 },
+  {  54,   0 }, {  28,   0 }, {  41,   0 }, {  29,   0 }, {  75,   0 }, {  26,   1 },
+  {  39,  23 }, {  27,  37 }, {   7,   0 }, {  52,   0 }, {   8,   0 }, {  54,   0 },
+  {  28,   0 }, {  41,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 }, {  26,   1 },
+  {  39,  24 }, {  27,  42 }, {   7,   0 }, {  52,   0 }, {   8,   0 }, {   9,   0 },
+  {  28,   0 }, {  41,   0 }, {  29,   0 }, {   6,   0 }, {  39,   1 }, {  54,   1 },
+  {  27,   1 }, {  75,   1 }, {  26,   1 }, {  33,   0 }, {  72,   0 }, {   8,   0 },
+  {  32,   0 }, {  28,   0 }, {  41,   0 }, {   6,   0 }, {  75,   0 }, {  17,   0 },
+  {  38,   1 }, {  15,   6 }, {  39,  19 }, {  16,  22 }, {  18,  27 }, {  77,  36 },
+  {  84,  43 }, {  19,  49 }, {  33,   0 }, {  72,   0 }, {   8,   0 }, {   9,   0 },
+  {  32,   0 }, {  28,   0 }, {  41,   0 }, {   6,   0 }, {  75,   0 }, {  17,   0 },
+  {  38,   1 }, {  15,   6 }, {  39,  19 }, {  16,  22 }, {  18,  27 }, {  77,  38 },
+  {  84,  47 }, {  19,  55 }, {   7,   0 }, {  43,   0 }, {  14,   0 }, {  12,   0 },
+  {  13,   0 }, {  58,   0 }, {  35,   0 }, {  36,   0 }, {  22,   0 }, {   1,   1 },
+  {  59,  11 }, {  60,  21 }, {  44,  36 }, {   8,  46 }, {   7,   0 }, {  43,   0 },
+  {  14,   0 }, {  12,   0 }, {  13,   0 }, {  70,   0 }, {  58,   0 }, {  35,   0 },
+  {  36,   0 }, {  22,   0 }, {  59,   1 }, {   1,   1 }, {  60,  21 }, {  44,  45 },
+  {   8,  62 }, {   7,   0 }, {  43,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 },
+  {   9,   0 }, {  70,   0 }, {  58,   0 }, {  35,   0 }, {  36,   0 }, {  22,   0 },
+  {  59,   1 }, {   1,   1 }, {  60,  21 }, {  44,  45 }, {   8,  62 }, {   7,   0 },
+  {  13,   0 }, {  73,   0 }, {  29,   0 }, {   6,   0 }, {   5,   1 }, {   1,   1 },
+  {  82,   5 }, {  11,  14 }, {   8,  37 }, {  76,  38 }, {  14,  53 }, {   7,   0 },
+  {  13,   0 }, {   9,   0 }, {  73,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 },
+  {  11,   1 }, {  82,   1 }, {  55,   1 }, {   5,   1 }, {   1,   1 }, {   8,  37 },
+  {  76,  38 }, {   4,  40 }, {  14,  63 }, {  33,   0 }, {   7,   0 }, {  43,   0 },
+  {   8,   0 }, {  44,   0 }, {  14,   0 }, {  13,   0 }, {  19,   0 }, {  32,   0 },
+  {  50,   0 }, {  48,   0 }, {  64,   0 }, {   6,   0 }, {  17,   0 }, {   1,   1 },
+  {  82,   6 }, {  16,  13 }, {  49,  17 }, {  18,  30 }, {  78,  36 }, {  51,  40 },
+  {  33,   0 }, {   7,   0 }, {  43,   0 }, {   8,   0 }, {  44,   0 }, {  14,   0 },
+  {  13,   0 }, {  19,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 }, {  79,   0 },
+  {  50,   0 }, {  48,   0 }, {  58,   0 }, {  35,   0 }, {  64,   0 }, {  36,   0 },
+  {   6,   0 }, {  17,   0 }, {  82,   1 }, {   1,   1 }, {  16,  13 }, {  49,  17 },
+  {  18,  30 }, {  78,  36 }, {  51,  44 }, {   8,   0 }, {  70,   0 }, {   1,   1 },
+  {  21,   6 }, {  71,  25 }, {  20,  26 }, {  23,  26 }, {   6,  38 }, {  24,  43 },
+  {  84,  44 }, {   8,   0 }, {   9,   0 }, {  70,   0 }, {   1,   1 }, {  21,   1 },
+  {  71,  25 }, {  20,  26 }, {  23,  26 }, {   6,  35 }, {  24,  43 }, {  84,  53 },
+  {   7,   0 }, {   8,   0 }, {  47,   0 }, {   6,   0 }, {  10,   1 }, {   5,   1 },
+  {  83,  11 }, {  27,  13 }, {   4,  16 }, {  75,  31 }, {  76,  36 }, {   7,   0 },
+  {   8,   0 }, {  47,   0 }, {   6,   0 }, {  82,   1 }, {  10,   1 }, {   5,   5 },
+  {  83,   8 }, {   4,  13 }, {  45,  15 }, {  75,  32 }, {  46,  37 }, {  76,  45 },
+  {   7,   0 }, {   8,   0 }, {  47,   0 }, {   9,   0 }, {   6,   0 }, {   4,   1 },
+  {  82,   1 }, {  10,   1 }, {   5,   5 }, {  83,   8 }, {  45,  15 }, {  75,  34 },
+  {  46,  47 }, {  76,  60 }, {  33,   0 }, {   7,   0 }, {  19,   0 }, {  55,   0 },
+  {  18,   0 }, {  16,   7 }, {  82,   9 }, {  30,  21 }, {  17,  32 }, {  32,  41 },
+  {   8,  50 }, {  33,   0 }, {   7,   0 }, {  19,   0 }, {   9,   0 }, {  55,   0 },
+  {  73,   0 }, {  18,   0 }, {  30,   1 }, {  82,   1 }, {  16,   1 }, {  17,  32 },
+  {  32,  51 }, {   8,  62 }, {   7,   0 }, {  43,   0 }, {  14,   0 }, {  12,   0 },
+  {  13,   0 }, {  31,   0 }, {  28,   0 }, {  60,   0 }, {  64,   0 }, {  24,   0 },
+  {  22,   0 }, {  23,   0 }, {   3,   1 }, {  40,  13 }, {  84,  26 }, {  41,  43 },
+  {   7,   0 }, {  89,   0 }, {  43,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 },
+  {   9,   0 }, {  31,   0 }, {  28,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 },
+  {   6,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  74,   1 }, {   3,   1 },
+  {  40,  13 }, {  84,  26 }, {  41,  47 }, {  33,   0 }, {   8,   0 }, {  84,   0 },
+  {  18,   0 }, {   6,   0 }, {  17,   0 }, {   1,   1 }, {  16,   1 }, {  30,  22 },
+  {  83,  36 }, {  19,  45 }, {  32,  50 }, {  33,   0 }, {   7,   0 }, {   8,   0 },
+  {   9,   0 }, {  53,   0 }, {  84,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 },
+  {  30,   1 }, {  77,   1 }, {  19,   1 }, {  32,   1 }, {  83,   1 }, {   1,   1 },
+  {  16,   1 }, {  72,   0 }, {  12,   0 }, {  31,   0 }, {  28,   0 }, {  79,   0 },
+  {  51,   0 }, {  48,   0 }, {  41,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 },
+  {  62,   1 }, {  63,  16 }, {  89,  28 }, {  64,  36 }, {  72,   0 }, {  12,   0 },
+  {  31,   0 }, {  28,   0 }, {  79,   0 }, {  51,   0 }, {  48,   0 }, {  41,   0 },
+  {  24,   0 }, {  22,   0 }, {  23,   0 }, {  62,   1 }, {  63,  16 }, {  89,  34 },
+  {  64,  45 }, {   7,   0 }, {  72,   0 }, {   8,   0 }, {  12,   0 }, {   9,   0 },
+  {  31,   0 }, {  28,   0 }, {  79,   0 }, {  51,   0 }, {  48,   0 }, {  58,   0 },
+  {  35,   0 }, {  41,   0 }, {  36,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 },
+  {  62,   1 }, {  63,  16 }, {  89,  34 }, {  64,  45 }, {   7,   0 }, {  80,   0 },
+  {  71,   0 }, {  70,   0 }, {  58,   0 }, {  84,   1 }, {   1,   1 }, {  59,  12 },
+  {  60,  18 }, {  43,  20 }, {  44,  35 }, {   8,  56 }, {   7,   0 }, {  72,   0 },
+  {   8,   0 }, {  12,   0 }, {  31,   0 }, {  63,   0 }, {  48,   0 }, {  35,   0 },
+  {  64,   0 }, {  36,   0 }, {   6,   0 }, {  22,   0 }, {   3,   1 }, {  49,  11 },
+  {  50,  21 }, {  51,  31 }, {  79,  36 }, {   7,   0 }, {  72,   0 }, {   8,   0 },
+  {  12,   0 }, {   9,   0 }, {  31,   0 }, {  63,   0 }, {  48,   0 }, {  35,   0 },
+  {  64,   0 }, {  36,   0 }, {   6,   0 }, {  22,   0 }, {  77,   1 }, {  49,   1 },
+  {   3,   1 }, {  50,  21 }, {  51,  35 }, {  79,  46 }, {  76,   0 }, {  78,   0 },
+  {  33,   0 }, {   7,   0 }, {  43,   0 }, {   8,   0 }, {  32,   0 }, {  60,   0 },
+  {  58,   0 }, {  18,   0 }, {  57,   0 }, {  15,   1 }, {  16,   1 }, {  83,   5 },
+  {  75,  40 }, {  33,   0 }, {   7,   0 }, {  43,   0 }, {   8,   0 }, {  19,   0 },
+  {   9,   0 }, {  32,   0 }, {  60,   0 }, {  58,   0 }, {  18,   0 }, {  57,   0 },
+  {  76,   1 }, {  78,   1 }, {  15,   1 }, {  83,   1 }, {  16,   1 }, {  75,  48 },
+  {  76,   0 }, {   8,   0 }, {  24,   0 }, {   1,   1 }, {  21,   4 }, {  84,   8 },
+  {  20,  21 }, {  23,  31 }, {   6,  42 }, {  76,   0 }, {   8,   0 }, {   9,   0 },
+  {  24,   0 }, {  84,   1 }, {   1,   1 }, {  21,   4 }, {  20,  21 }, {  23,  36 },
+  {   6,  48 }, {   8,   0 }, {  48,   0 }, {  41,   0 }, {  75,   0 }, {  25,   1 },
+  {  28,  15 }, {  49,  19 }, {  50,  27 }, {  29,  43 }, {  51,  47 }, {   7,   0 },
+  {   8,   0 }, {  44,   0 }, {   9,   0 }, {  50,   0 }, {  51,   0 }, {  48,   0 },
+  {  41,   0 }, {  75,   0 }, {  25,   1 }, {  49,   1 }, {  28,   1 }, {  29,   1 },
+  {  33,   0 }, {   7,   0 }, {  43,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 },
+  {  13,   0 }, {  32,   0 }, {  70,   0 }, {  60,   0 }, {  58,   0 }, {  84,   0 },
+  {  35,   0 }, {  36,   0 }, {   6,   0 }, {  75,   0 }, {  22,   0 }, {  16,   0 },
+  {  82,   1 }, {  42,   9 }, {  83,  17 }, {   8,  45 }, {  33,   0 }, {   7,   0 },
+  {  43,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 }, {   9,   0 },
+  {  32,   0 }, {  70,   0 }, {  67,   0 }, {  60,   0 }, {  58,   0 }, {  35,   0 },
+  {  36,   0 }, {   6,   0 }, {  22,   0 }, {  16,   0 }, {  42,   1 }, {  82,   1 },
+  {  84,   1 }, {  75,   1 }, {  83,  17 }, {   8,  61 }, {   7,   0 }, {  81,   0 },
+  {   8,   0 }, {  44,   0 }, {  60,   0 }, {  58,   0 }, {  35,   0 }, {  36,   0 },
+  {   6,   0 }, {  75,   0 }, {   1,   1 }, {  37,  26 }, {   7,   0 }, {  81,   0 },
+  {   8,   0 }, {  44,   0 }, {  60,   0 }, {  58,   0 }, {  35,   0 }, {  36,   0 },
+  {  75,   0 }, {   1,   1 }, {  83,   5 }, {  76,   7 }, {   6,  20 }, {  12,  26 },
+  {  31,  26 }, {  22,  26 }, {  78,   0 }, {  33,   0 }, {   7,   0 }, {  43,   0 },
+  {  44,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 }, {  19,   0 }, {   9,   0 },
+  {  32,   0 }, {  31,   0 }, {  60,   0 }, {  58,   0 }, {  35,   0 }, {  64,   0 },
+  {  29,   0 }, {  36,   0 }, {  18,   0 }, {  75,   0 }, {  24,   0 }, {  22,   0 },
+  {  23,   0 }, {  16,   0 }, {  62,   1 }, {   1,   1 }, {  39,  10 }, {   8,  25 },
+  {  84,  45 }, {   7,   0 }, {  89,   0 }, {  14,   0 }, {  13,   0 }, {  50,   0 },
+  {  84,   0 }, {  64,   0 }, {  24,   0 }, {  23,   0 }, {   1,   1 }, {  40,  21 },
+  {  41,  32 }, {   7,   0 }, {  89,   0 }, {  14,   0 }, {  13,   0 }, {   9,   0 },
+  {  64,   0 }, {  24,   0 }, {  23,   0 }, {  50,   1 }, {  84,   1 }, {   1,   1 },
+  {  40,  21 }, {  41,  32 }, {  33,   0 }, {   7,   0 }, {  69,   0 }, {  43,   0 },
+  {  14,   0 }, {  13,   0 }, {  32,   0 }, {  75,   0 }, {  24,   0 }, {  23,   0 },
+  {   1,   1 }, {  58,  11 }, {   4,  15 }, {  59,  19 }, {  60,  25 }, {   8,  43 },
+  {  83,  50 }, {  44,  52 }, {  55,  57 }, {  33,   0 }, {   7,   0 }, {  43,   0 },
+  {  14,   0 }, {  12,   0 }, {  13,   0 }, {  19,   0 }, {   9,   0 }, {  32,   0 },
+  {  31,   0 }, {  67,   0 }, {  35,   0 }, {  36,   0 }, {  18,   0 }, {  75,   0 },
+  {  24,   0 }, {  22,   0 }, {  23,   0 }, {  16,   0 }, {  69,   1 }, {   4,   1 },
+  {   1,   1 }, {  58,  11 }, {  59,  19 }, {  60,  25 }, {   8,  43 }, {  83,  55 },
+  {  44,  58 }, {  55,  66 }, {  33,   0 }, {   7,   0 }, {  72,   0 }, {  44,   0 },
+  {  14,   0 }, {  12,   0 }, {  13,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 },
+  {  51,   0 }, {  48,   0 }, {  60,   0 }, {  58,   0 }, {  35,   0 }, {  64,   0 },
+  {  29,   0 }, {  36,   0 }, {   6,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 },
+  {  16,   0 }, {  82,   1 }, {   3,   1 }, {   1,   1 }, {  87,  13 }, {   8,  57 },
+  {   7,   0 }, {   8,   0 }, {   9,   0 }, {  58,   0 }, {  41,   0 }, {  29,   0 },
+  {  75,   0 }, {  25,  10 }, {  49,  10 }, {  26,  22 }, {  61,  24 }, {  28,  31 },
+  {  78,  49 }, {  33,   0 }, {   7,   0 }, {  43,   0 }, {   8,   0 }, {  44,   0 },
+  {  14,   0 }, {  12,   0 }, {  13,   0 }, {  19,   0 }, {   9,   0 }, {  32,   0 },
+  {  31,   0 }, {  60,   0 }, {  58,   0 }, {  35,   0 }, {  64,   0 }, {  29,   0 },
+  {  36,   0 }, {  18,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  16,   0 },
+  {  83,   1 }, {   3,   1 }, {  82,   4 }, {  68,   7 }, {  69,  31 }, {  67,  37 },
+  {  33,   0 }, {   8,   0 }, {  71,   0 }, {  32,   0 }, {  67,   0 }, {  18,   0 },
+  {   6,   0 }, {  15,   1 }, {  83,  15 }, {  16,  22 }, {  17,  27 }, {  76,  36 },
+  {  19,  43 }, {  80,  50 }, {  33,   0 }, {   8,   0 }, {  71,   0 }, {   9,   0 },
+  {  32,   0 }, {  67,   0 }, {  18,   0 }, {   6,   0 }, {  15,   1 }, {  83,   1 },
+  {  16,   1 }, {  17,  27 }, {  76,  40 }, {  19,  51 }, {  80,  62 }, {  33,   0 },
+  {   7,   0 }, {   8,   0 }, {  19,   0 }, {  32,   0 }, {  18,   0 }, {   6,   0 },
+  {  75,   0 }, {  16,   0 }, {  10,   1 }, {   5,  10 }, {   4,  29 }, {  17,  38 },
+  {  76,  52 }, {  55,  57 }, {  33,   0 }, {   7,   0 }, {   8,   0 }, {  19,   0 },
+  {   9,   0 }, {  32,   0 }, {  18,   0 }, {   6,   0 }, {  75,   0 }, {  16,   0 },
+  {  10,   1 }, {  50,   1 }, {   5,  10 }, {   4,  29 }, {  17,  41 }, {  76,  61 },
+  {  55,  69 }, {  33,   0 }, {  72,   0 }, {   8,   0 }, {  71,   0 }, {  32,   0 },
+  {  24,   0 }, {  23,   0 }, {  17,   0 }, {   1,   1 }, {  48,   4 }, {  16,   6 },
+  {  86,  15 }, {  50,  24 }, {   6,  24 }, {  51,  36 }, {  18,  44 }, {  19,  46 },
+  {  76,   0 }, {  33,   0 }, {  72,   0 }, {   8,   0 }, {  71,   0 }, {   9,   0 },
+  {  32,   0 }, {  24,   0 }, {  23,   0 }, {  17,   0 }, {  19,   1 }, {  50,   1 },
+  {  51,   1 }, {  48,   1 }, {  86,   1 }, {  18,   1 }, {   6,   1 }, {   1,   1 },
+  {  16,   1 }, {   7,   0 }, {   8,   0 }, {  12,   0 }, {   9,   0 }, {  31,   0 },
+  {  79,   0 }, {  35,   0 }, {  64,   0 }, {  29,   0 }, {  36,   0 }, {  24,   0 },
+  {  22,   0 }, {  23,   0 }, {  77,   1 }, {   3,   1 }, {  49,   5 }, {  48,  15 },
+  {  50,  29 }, {  51,  43 }, {  72,  44 }, {  52,   0 }, {  56,   0 }, {   8,   0 },
+  {   9,   0 }, {  58,   0 }, {   6,   0 }, {  83,   1 }, {   5,   1 }, {  76,  21 },
+  {  45,  26 }, {  57,  34 }, {  75,  36 }, {   8,   0 }, {   9,   0 }, {  32,   0 },
+  {  79,   0 }, {  48,   0 }, {  35,   0 }, {  64,   0 }, {  36,   0 }, {  16,   0 },
+  {  62,   1 }, {   3,   1 }, {  49,  12 }, {  84,  18 }, {  31,  25 }, {  51,  34 },
+  {   7,  51 }, {  33,  67 }, {   7,   0 }, {  81,   0 }, {   8,   0 }, {  12,   0 },
+  {   9,   0 }, {  31,   0 }, {  51,   0 }, {  48,   0 }, {  58,   0 }, {  35,   0 },
+  {  36,   0 }, {  83,   1 }, {   5,   1 }, {  22,   1 }, {  21,   5 }, {  20,  11 },
+  {   6,  25 }, {  84,  36 }, {  23,  47 }, {  24,  58 }, {   7,   0 }, {   8,   0 },
+  {  51,   0 }, {  48,   0 }, {  58,   0 }, {  84,   0 }, {  35,   0 }, {  36,   0 },
+  {  22,   0 }, {  11,   1 }, {  12,   1 }, {  83,   1 }, {   1,   6 }, {  13,  41 },
+  {  14,  57 }, {   9,  64 }, {   7,   0 }, {  81,   0 }, {  43,   0 }, {   8,   0 },
+  {  44,   0 }, {   9,   0 }, {  67,   0 }, {  60,   0 }, {  58,   0 }, {  35,  13 },
+  {  52,  16 }, {  57,  20 }, {  36,  43 }, {  75,  49 }, {  33,   0 }, {   7,   0 },
+  {  43,   0 }, {  44,   0 }, {  14,   0 }, {  13,   0 }, {   9,   0 }, {  32,   0 },
+  {  70,   0 }, {  55,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 },
+  {  18,   0 }, {  24,   0 }, {  23,   0 }, {   1,   1 }, {  83,  24 }, {   8,  46 },
+  {  67,  50 }, {  19,   0 }, {   1,  15 }, {  33,   0 }, {   7,   0 }, {  89,   0 },
+  {   8,   0 }, {  44,   0 }, {  14,   0 }, {  13,   0 }, {  32,   0 }, {  70,   0 },
+  {  58,   0 }, {  18,   0 }, {  24,   0 }, {  23,   0 }, {  16,   0 }, {   1,   1 },
+  {  68,  20 }, {  69,  21 }, {  17,  21 }, {  65,  25 }, {  83,  30 }, {  19,  40 },
+  {  67,  41 }, {  80,  50 }, {   9,  55 }, {   8,   0 }, {  80,   0 }, {  65,   0 },
+  {  44,   0 }, {   9,   0 }, {  70,   0 }, {  55,   0 }, {  67,   0 }, {  51,   0 },
+  {  48,   0 }, {  58,   0 }, {  29,   0 }, {  24,   0 }, {  23,   0 }, {  17,   0 },
+  {  82,   1 }, {  16,   1 }, {   7,  13 }, {  32,  31 }, {  18,  45 }, {  19,  49 },
+  {  33,  58 }, {   7,   0 }, {  43,   0 }, {  64,   0 }, {   1,   1 }, {   6,  10 },
+  {  82,  16 }, {   5,  23 }, {   8,  28 }, {  68,  30 }, {  33,   0 }, {   7,   0 },
+  {  43,   0 }, {   9,   0 }, {  32,   0 }, {  58,   0 }, {  64,   0 }, {  18,   0 },
+  {  17,   0 }, {  15,   1 }, {  82,   1 }, {   1,   1 }, {   6,  11 }, {  16,  16 },
+  {   5,  23 }, {  68,  30 }, {  30,  36 }, {   8,  43 }, {  19,  52 }, {   7,   0 },
+  {  43,   0 }, {   9,   0 }, {  58,   0 }, {  64,   0 }, {  68,   1 }, {  82,   1 },
+  {   1,   1 }, {   6,  11 }, {  21,  16 }, {   5,  23 }, {  23,  25 }, {  53,  36 },
+  {   8,  43 }, {  76,  47 }, {  24,  52 }, {   7,   0 }, {  43,   0 }, {   9,   0 },
+  {  58,   0 }, {  64,   0 }, {  82,   1 }, {   1,   1 }, {   6,  11 }, {  11,  16 },
+  {   5,  23 }, {  68,  30 }, {   8,  43 }, {  14,  45 }, {  83,  47 }, {  13,  52 },
+  {  33,   0 }, {  32,   0 }, {  51,   0 }, {  48,   0 }, {  64,   0 }, {  29,   0 },
+  {   6,   0 }, {  24,   0 }, {   1,   1 }, {  21,   5 }, {  76,   9 }, {  50,  12 },
+  {  20,  15 }, {  77,  18 }, {  86,  20 }, {  23,  29 }, {   9,  40 }, {   8,  50 },
+  {  33,   0 }, {   7,   0 }, {   8,   0 }, {  32,   0 }, {  58,   0 }, {  17,   0 },
+  {  68,  13 }, {  16,  19 }, {  59,  26 }, {  83,  31 }, {  60,  37 }, {  61,  49 },
+  {  18,  50 }, {  19,  55 }, {  33,   0 }, {   7,   0 }, {   8,   0 }, {   9,   0 },
+  {  32,   0 }, {  53,   0 }, {  58,   0 }, {  35,   0 }, {  36,   0 }, {  17,   0 },
+  {  68,   1 }, {  69,   1 }, {  16,   1 }, {  59,  26 }, {  83,  31 }, {  60,  37 },
+  {  61,  55 }, {  18,  56 }, {  19,  65 }, {  33,   0 }, {   7,   0 }, {  43,   0 },
+  {   8,   0 }, {  32,   0 }, {  58,   0 }, {  84,   0 }, {  18,   0 }, {  16,   0 },
+  {  17,   0 }, {   2,   1 }, {  25,  13 }, {  83,  19 }, {  59,  30 }, {  60,  42 },
+  {  54,  45 }, {  19,  49 }, {  28,  49 }, {  61,  55 }, {  33,   0 }, {   7,   0 },
+  {  43,   0 }, {   8,   0 }, {   9,   0 }, {  32,   0 }, {  58,   0 }, {  35,   0 },
+  {  36,   0 }, {  18,   0 }, {  16,   0 }, {  17,   0 }, {  57,   0 }, {  25,   1 },
+  {  83,   1 }, {   2,   1 }, {  84,   1 }, {  59,  30 }, {  60,  45 }, {  54,  49 },
+  {  19,  53 }, {  28,  55 }, {  75,  63 }, {  61,  65 }, {   8,   0 }, {  66,   0 },
+  {  80,   0 }, {  65,   0 }, {  44,   0 }, {  14,   0 }, {  13,   0 }, {  58,   0 },
+  {   6,   0 }, {  45,   1 }, {  76,   8 }, {  68,  15 }, {  60,  20 }, {  59,  21 },
+  {  61,  29 }, {  69,  30 }, {  70,  35 }, {  47,  49 }, {   9,  50 }, {  33,   0 },
+  {  43,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 }, {  19,   0 },
+  {  32,   0 }, {  31,   0 }, {  70,   0 }, {  67,   0 }, {  51,   0 }, {  48,   0 },
+  {  60,   0 }, {  58,   0 }, {  35,   0 }, {  64,   0 }, {  29,   0 }, {  36,   0 },
+  {  18,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  16,   0 }, {   1,   1 },
+  {  78,   5 }, {  62,  12 }, {  68,  16 }, {  69,  24 }, {   7,  33 }, {  84,  39 },
+  {   8,  46 }, {   9,  53 }, {   8,   0 }, {  47,   0 }, {   9,   0 }, {  58,   0 },
+  {   6,   0 }, {  16,   0 }, {  10,   1 }, {  83,  16 }, {  76,  25 }, {  61,  25 },
+  {  32,  49 }, {  33,  73 }, {   8,   0 }, {  47,   0 }, {   9,   0 }, {  58,   0 },
+  {   6,   0 }, {  10,   1 }, {  21,   1 }, {  83,  16 }, {  76,  25 }, {  61,  25 },
+  {  23,  32 }, {  46,  49 }, {  24,  85 }, {   8,   0 }, {  14,   0 }, {  47,   0 },
+  {   9,   0 }, {  58,   0 }, {   6,   0 }, {  11,   1 }, {  10,   1 }, {  45,   1 },
+  {  83,  16 }, {  76,  25 }, {  61,  25 }, {  13,  49 }, {  29,  64 }, {  33,   0 },
+  {   7,   0 }, {   8,   0 }, {  14,   0 }, {  13,   0 }, {  19,   0 }, {  32,   0 },
+  {  70,   0 }, {  18,   0 }, {   6,   0 }, {  24,   0 }, {  23,   0 }, {  16,   0 },
+  {  17,   0 }, {  83,   1 }, {  65,  22 }, {  76,  36 }, {  80,  45 }, {  67,  50 },
+  {   9,  57 }, {  33,   0 }, {   7,   0 }, {   8,   0 }, {  14,   0 }, {  13,   0 },
+  {  19,   0 }, {  32,   0 }, {  70,   0 }, {  18,   0 }, {   6,   0 }, {  24,   0 },
+  {  23,   0 }, {  16,   0 }, {  17,   0 }, {  83,   1 }, {  65,  22 }, {  76,  38 },
+  {  80,  53 }, {  67,  56 }, {   9,  65 }, {  33,   0 }, {   7,   0 }, {   8,   0 },
+  {  66,   0 }, {  44,   0 }, {  14,   0 }, {  13,   0 }, {  47,   0 }, {  19,   0 },
+  {  32,   0 }, {  31,   0 }, {  70,   0 }, {  60,   0 }, {  58,   0 }, {  18,   0 },
+  {   6,   0 }, {  24,   0 }, {  23,   0 }, {  16,   0 }, {  17,   0 }, {  12,   1 },
+  {  83,   1 }, {  22,   1 }, {  65,  22 }, {  76,  38 }, {  80,  53 }, {  45,  55 },
+  {  67,  61 }, {   9,  75 }, {  33,   0 }, {   7,   0 }, {  81,   0 }, {  89,   0 },
+  {   8,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 }, {   9,   0 },
+  {  32,   0 }, {  31,   0 }, {  79,   0 }, {  63,   0 }, {  60,   0 }, {  58,   0 },
+  {  35,   0 }, {  64,   0 }, {  29,   0 }, {  36,   0 }, {  24,   0 }, {  22,   0 },
+  {  23,   0 }, {  16,   0 }, {  49,   1 }, {  48,   1 }, {  61,   8 }, {  77,  11 },
+  {  50,  22 }, {   6,  33 }, {  86,  44 }, {  51,  66 }, {  76,  88 }, {  78,  99 },
+  {  76,   0 }, {  33,   0 }, {   7,   0 }, {  52,   0 }, {  56,   0 }, {  81,   0 },
+  {  69,   0 }, {  89,   0 }, {  72,   0 }, {  43,   0 }, {   8,   0 }, {  66,   0 },
+  {  80,   0 }, {  65,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 },
+  {  71,   0 }, {  47,   0 }, {  19,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 },
+  {  70,   0 }, {  54,   0 }, {  28,   0 }, {  55,   0 }, {  63,   0 }, {  67,   0 },
+  {  53,   0 }, {  73,   0 }, {  50,   0 }, {  60,   0 }, {  58,   0 }, {  84,   0 },
+  {  35,   0 }, {  64,   0 }, {  41,   0 }, {  87,   0 }, {  29,   0 }, {  36,   0 },
+  {  18,   0 }, {  75,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  16,   0 },
+  {  17,   0 }, {  57,   0 }, {  49,   1 }, {   3,   1 }, {  78,  10 }, {   6,  11 },
+  {  48,  33 }, {  77,  40 }, {  51,  40 }, {  61,  50 }, {  79,  50 }, {   8,   0 },
+  {  75,   0 }, {  82,   1 }, {   1,   1 }, {  27,   8 }, {   7,  29 }, {  29,  50 },
+  {   8,   0 }, {  58,   0 }, {  75,   0 }, {  82,   1 }, {  27,   1 }, {   1,   1 },
+  {   7,  31 }, {  29,  55 }, {   8,   0 }, {  44,   0 }, {   9,   0 }, {  67,   0 },
+  {  58,   0 }, {  75,   0 }, {  82,   1 }, {  27,   1 }, {   1,   1 }, {   7,  31 },
+  {  29,  61 }, {   7,   0 }, {  43,   0 }, {  14,   0 }, {  70,   0 }, {  73,   0 },
+  {  83,   1 }, {   1,   1 }, {  11,  12 }, {   5,  19 }, {   6,  36 }, {   8,  46 },
+  {  13,  46 }, {   7,   0 }, {  43,   0 }, {  14,   0 }, {  70,   0 }, {  73,   0 },
+  {  58,   0 }, {  83,   1 }, {   1,   1 }, {  11,  12 }, {   5,  21 }, {   6,  42 },
+  {   8,  53 }, {  13,  54 }, {   7,   0 }, {  43,   0 }, {  44,   0 }, {  14,   0 },
+  {  12,   0 }, {   9,   0 }, {  70,   0 }, {  63,   0 }, {  73,   0 }, {  60,   0 },
+  {  58,   0 }, {  64,   0 }, {  29,   0 }, {  22,   0 }, {  11,   1 }, {  83,   1 },
+  {   1,   1 }, {   5,  21 }, {   6,  45 }, {   8,  53 }, {  13,  60 }, {  33,   0 },
+  {  43,   0 }, {   8,   0 }, {  66,   0 }, {  80,   0 }, {  32,   0 }, {  31,   0 },
+  {  60,   0 }, {  18,   0 }, {  75,   0 }, {  17,   0 }, {  83,   1 }, {   2,   1 },
+  {  16,  13 }, {  68,  20 }, {  69,  27 }, {  84,  43 }, {  19,  52 }, {  33,   0 },
+  {  43,   0 }, {   8,   0 }, {  66,   0 }, {  80,   0 }, {  32,   0 }, {  31,   0 },
+  {  60,   0 }, {  58,   0 }, {  18,   0 }, {  75,   0 }, {  17,   0 }, {  83,   1 },
+  {   2,   1 }, {  16,  13 }, {  68,  21 }, {  69,  30 }, {  84,  45 }, {  19,  55 },
+  {  33,   0 }, {   7,   0 }, {  43,   0 }, {   8,   0 }, {  66,   0 }, {  80,   0 },
+  {  44,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 }, {  67,   0 }, {  60,   0 },
+  {  58,   0 }, {  18,   0 }, {  75,   0 }, {  17,   0 }, {  83,   1 }, {   2,   1 },
+  {  16,   1 }, {  68,  21 }, {  76,  30 }, {  69,  32 }, {  84,  47 }, {  19,  58 },
+  {  33,   0 }, {   7,   0 }, {  43,   0 }, {  12,   0 }, {  13,   0 }, {  32,   0 },
+  {  31,   0 }, {  73,   0 }, {  64,   0 }, {  29,   0 }, {  18,   0 }, {   6,   0 },
+  {  24,   0 }, {  22,   0 }, {  23,   0 }, {  82,   1 }, {   2,   1 }, {   1,   1 },
+  {   5,  11 }, {  78,  41 }, {   8,  42 }, {  33,   0 }, {   7,   0 }, {  43,   0 },
+  {  12,   0 }, {  13,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 }, {  73,   0 },
+  {  58,   0 }, {  64,   0 }, {  29,   0 }, {  18,   0 }, {   6,   0 }, {  24,   0 },
+  {  22,   0 }, {  23,   0 }, {  76,   1 }, {  82,   1 }, {   5,   1 }, {   2,   1 },
+  {  78,  48 }, {   8,  50 }, {  76,   0 }, {  78,   0 }, {  47,   0 }, {  79,   0 },
+  {  63,   0 }, {  50,   0 }, {  51,   0 }, {  84,   0 }, {  64,   0 }, {   6,   0 },
+  {  82,   1 }, {   1,   1 }, {  10,  11 }, {  74,  33 }, {  49,  34 }, {  76,   0 },
+  {  78,   0 }, {   7,   0 }, {   8,   0 }, {  47,   0 }, {   9,   0 }, {  79,   0 },
+  {  63,   0 }, {  50,   0 }, {  51,   0 }, {  84,   0 }, {  64,   0 }, {   6,   0 },
+  {  82,   1 }, {  10,   1 }, {   1,   1 }, {  49,  41 }, {  74,  43 }, {  43,   0 },
+  {  31,   0 }, {  29,   0 }, {  75,   0 }, {  22,   0 }, {   1,   1 }, {  56,  33 },
+  {   6,  36 }, {  76,  43 }, {   8,  50 }, {  43,   0 }, {   9,   0 }, {  31,   0 },
+  {  58,   0 }, {  29,   0 }, {  75,   0 }, {  22,   0 }, {   1,   1 }, {  56,  38 },
+  {   6,  42 }, {  76,  51 }, {   8,  60 }, {  52,   0 }, {  56,   0 }, {  43,   0 },
+  {  41,   0 }, {  29,   0 }, {  57,   0 }, {  38,   1 }, {  85,   1 }, {  25,   5 },
+  {  63,  17 }, {  54,  23 }, {  53,  33 }, {  76,  45 }, {  84,  45 }, {  51,  53 },
+  {  56,   0 }, {  43,   0 }, {   9,   0 }, {  41,   0 }, {  29,   0 }, {  57,   0 },
+  {  52,   1 }, {  38,   1 }, {  85,   1 }, {  75,   1 }, {  25,   5 }, {  63,  17 },
+  {  54,  25 }, {  53,  35 }, {  76,  53 }, {  84,  53 }, {  51,  63 }, {  76,   0 },
+  {  69,   0 }, {  89,   0 }, {  47,   0 }, {   9,   0 }, {  79,   0 }, {  64,   0 },
+  {  41,   0 }, {  57,   0 }, {  25,   1 }, {  54,   1 }, {  84,   1 }, {  68,  12 },
+  {   6,  24 }, {  45,  30 }, {  76,   0 }, {  78,   0 }, {  33,   0 }, {  72,   0 },
+  {   8,   0 }, {  32,   0 }, {  50,   0 }, {  84,   0 }, {  18,   0 }, {  24,   0 },
+  {  23,   0 }, {  17,   0 }, {  15,   1 }, {  16,  17 }, {  20,  25 }, {  19,  41 },
+  {  76,   0 }, {  78,   0 }, {  33,   0 }, {  72,   0 }, {   8,   0 }, {   9,   0 },
+  {  32,   0 }, {  50,   0 }, {  84,   0 }, {  18,   0 }, {  24,   0 }, {  23,   0 },
+  {  17,   0 }, {  15,   1 }, {  16,  17 }, {  20,  25 }, {  19,  53 }, {   7,   0 },
+  {  73,   0 }, {  18,   0 }, {  22,   0 }, {  21,   1 }, {   5,   5 }, {  79,  13 },
+  {   6,  15 }, {  20,  21 }, {  23,  29 }, {  24,  47 }, {  78,   0 }, {   7,   0 },
+  {  72,   0 }, {  43,   0 }, {  14,   0 }, {  13,   0 }, {  73,   0 }, {  50,   0 },
+  {  64,   0 }, {  29,   0 }, {   6,   0 }, {   3,   1 }, {   1,   1 }, {  51,  29 },
+  {  74,  37 }, {   8,  47 }, {   7,   0 }, {  72,   0 }, {  43,   0 }, {   8,   0 },
+  {  14,   0 }, {  13,   0 }, {  73,   0 }, {  51,   0 }, {  84,   0 }, {  64,   0 },
+  {  29,   0 }, {   6,   0 }, {   3,   9 }, {   7,   0 }, {  72,   0 }, {  14,   0 },
+  {  13,   0 }, {  79,   0 }, {  73,   0 }, {  51,   0 }, {  58,   0 }, {  64,   0 },
+  {  29,   0 }, {   6,   0 }, {  82,   1 }, {   3,   1 }, {   1,   1 }, {  61,  16 },
+  {   8,  38 }, {  74,  43 }, {   7,   0 }, {  72,   0 }, {  14,   0 }, {  13,   0 },
+  {  47,   0 }, {   9,   0 }, {  79,   0 }, {  73,   0 }, {  51,   0 }, {  58,   0 },
+  {  64,   0 }, {  29,   0 }, {   6,   0 }, {  82,   1 }, {   3,   1 }, {   1,   1 },
+  {  61,  16 }, {   8,  38 }, {  74,  43 }, {  72,   0 }, {  64,   0 }, {  29,   0 },
+  {   6,   0 }, {  83,   1 }, {  10,   1 }, {  63,  10 }, {  51,  50 }, {  72,   0 },
+  {  47,   0 }, {   9,   0 }, {  64,   0 }, {  29,   0 }, {   6,   0 }, {  83,   1 },
+  {  63,   1 }, {  10,   1 }, {  51,  65 }, {  76,   0 }, {   7,   0 }, {  43,   0 },
+  {   8,   0 }, {   6,   0 }, {  23,   0 }, {  82,   1 }, {   1,   1 }, {  21,   9 },
+  {  24,  37 }, {  72,  39 }, {  76,   0 }, {   7,   0 }, {  43,   0 }, {   8,   0 },
+  {  12,   0 }, {  31,   0 }, {  58,   0 }, {   6,   0 }, {  22,   0 }, {  23,   0 },
+  {  82,   1 }, {   1,   1 }, {  21,   1 }, {  24,  45 }, {  72,  47 }, {  76,   0 },
+  {   7,   0 }, {  43,   0 }, {   8,   0 }, {   9,   0 }, {  31,   0 }, {  67,   0 },
+  {  58,   0 }, {   6,   0 }, {  23,   0 }, {  12,   1 }, {  82,   1 }, {   1,   1 },
+  {  21,   1 }, {  22,  30 }, {  72,  51 }, {  24,  57 }, {  72,   0 }, {   9,   0 },
+  {  73,   0 }, {  41,   0 }, {  75,   0 }, {  25,   1 }, {  39,   1 }, {  28,   1 },
+  {  74,   1 }, {  29,  55 }, {  78,   0 }, {  33,   0 }, {   7,   0 }, {  43,   0 },
+  {  32,   0 }, {  31,   0 }, {  58,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 },
+  {   1,   1 }, {  15,   7 }, {  16,  10 }, {  73,  21 }, {   8,  28 }, {  19,  30 },
+  {  78,   0 }, {  33,   0 }, {   7,   0 }, {  43,   0 }, {   9,   0 }, {  32,   0 },
+  {  31,   0 }, {  58,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 }, {   1,   1 },
+  {  16,   1 }, {  15,   7 }, {  73,  25 }, {   8,  36 }, {  19,  40 }, {   7,   0 },
+  {  43,   0 }, {  44,   0 }, {  12,   0 }, {   9,   0 }, {  31,   0 }, {  58,   0 },
+  {  22,   0 }, {  59,   1 }, {   1,   5 }, {  60,  28 }, {   8,  37 }, {  78,   0 },
+  {  33,   0 }, {  43,   0 }, {  44,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 },
+  {  51,   0 }, {  58,   0 }, {  84,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 },
+  {   7,   1 }, {   8,   1 }, {  19,   1 }, {   3,   1 }, {  16,   1 }, {  72,   0 },
+  {   8,   0 }, {  29,   0 }, {  75,   0 }, {  25,   6 }, {   1,  10 }, {  28,  30 },
+  {  72,   0 }, {   8,   0 }, {  29,   0 }, {  75,   0 }, {  25,   1 }, {   1,   1 },
+  {  28,  36 }, {  72,   0 }, {   8,   0 }, {   9,   0 }, {  29,   0 }, {  75,   0 },
+  {  25,   1 }, {   1,   1 }, {  28,  44 }, {  43,   0 }, {  12,   0 }, {  31,   0 },
+  {  58,   0 }, {  64,   0 }, {  29,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 },
+  {   5,   1 }, {   2,   1 }, {  79,   6 }, {   6,  27 }, {  84,  36 }, {   8,  43 },
+  {  76,  46 }, {  41,   0 }, {  75,   0 }, {  25,   1 }, {   1,   1 }, {  28,  10 },
+  {  27,  16 }, {  29,  31 }, {   8,  34 }, {  72,   0 }, {   9,   0 }, {  41,   0 },
+  {  75,   0 }, {  25,   1 }, {   3,   1 }, {   1,   1 }, {  28,   5 }, {  27,  10 },
+  {   8,  34 }, {  29,  46 }, {   8,   0 }, {  54,   0 }, {  51,   0 }, {  64,   0 },
+  {  29,   0 }, {  75,   0 }, {   1,   1 }, {   5,   7 }, {  52,  30 }, {  85,  30 },
+  {  61,  33 }, {   6,  37 }, {  45,  37 }, {  56,  43 }, {  84,  43 }, {  33,   0 },
+  {   7,   0 }, {  43,   0 }, {   8,   0 }, {  19,   0 }, {  32,   0 }, {  31,   0 },
+  {  60,   0 }, {  58,   0 }, {  41,   0 }, {  18,   0 }, {  17,   0 }, {  16,   1 },
+  {  78,  21 }, {  44,  31 }, {  33,   0 }, {   7,   0 }, {  43,   0 }, {   8,   0 },
+  {  19,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 }, {  60,   0 }, {  58,   0 },
+  {  41,   0 }, {  18,   0 }, {  17,   0 }, {  16,   1 }, {  78,  23 }, {  44,  35 },
+  {   7,   0 }, {  72,   0 }, {  43,   0 }, {   9,   0 }, {  64,   0 }, {  68,   1 },
+  {  82,   1 }, {   1,   1 }, {  49,  16 }, {   5,  23 }, {   6,  30 }, {  50,  36 },
+  {   8,  43 }, {  51,  47 }, {   7,   0 }, {  69,   0 }, {  43,   0 }, {   9,   0 },
+  {  51,   0 }, {  64,   0 }, {  68,   1 }, {  82,   1 }, {   1,   1 }, {   6,  11 },
+  {   5,  23 }, {  89,  25 }, {   8,  43 }, {  84,  47 }, {   8,   0 }, {  47,   0 },
+  {   9,   0 }, {  51,   0 }, {  64,   0 }, {   6,   0 }, {  10,   1 }, {  45,  15 },
+  {  63,  26 }, {  79,  34 }, {  89,  43 }, {  33,   0 }, {   7,   0 }, {  43,   0 },
+  {  44,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 }, {  19,   0 }, {   9,   0 },
+  {  32,   0 }, {  31,   0 }, {  50,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 },
+  {   6,   0 }, {  22,   0 }, {  17,   0 }, {   1,   1 }, {  82,   6 }, {  16,  15 },
+  {  49,  20 }, {  78,  27 }, {  18,  30 }, {  79,  36 }, {  51,  48 }, {  89,   0 },
+  {  72,   0 }, {   9,   0 }, {  79,   0 }, {  63,   0 }, {  51,   0 }, {   6,   0 },
+  {  24,   0 }, {  23,   0 }, {  82,   1 }, {  48,   1 }, {  49,   6 }, {  50,  27 },
+  {  64,  37 }, {  78,   1 }, {  78,   0 }, {   7,   0 }, {  72,   0 }, {   8,   0 },
+  {  44,   0 }, {   9,   0 }, {  58,   0 }, {  64,   0 }, {   6,   0 }, {  24,   0 },
+  {  23,   0 }, {  49,   1 }, {  82,   1 }, {   1,   1 }, {  76,  20 }, {  51,  37 },
+  {  50,  41 }, {  79,  46 }, {  69,  54 }, {   7,   0 }, {  56,   0 }, {  43,   0 },
+  {  44,   0 }, {  60,   0 }, {  58,   0 }, {  29,   0 }, {   6,   0 }, {   1,   1 },
+  {  52,   9 }, {   8,  50 }, {   7,   0 }, {  56,   0 }, {  43,   0 }, {  44,   0 },
+  {  71,   0 }, {   9,   0 }, {  70,   0 }, {  60,   0 }, {  58,   0 }, {  29,   0 },
+  {   6,   0 }, {   1,   1 }, {  52,   9 }, {   8,  59 }, {  76,   0 }, {  78,   0 },
+  {  33,   0 }, {  44,   0 }, {  14,   0 }, {  13,   0 }, {   9,   0 }, {  32,   0 },
+  {  60,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 }, {  24,   0 }, {  23,   0 },
+  {  61,  16 }, {   7,  18 }, {  84,  30 }, {  43,  31 }, {   8,  34 }, {  76,   0 },
+  {  69,   0 }, {  89,   0 }, {  43,   0 }, {   8,   0 }, {  60,   0 }, {  58,   0 },
+  {  41,   0 }, {   6,   0 }, {  38,   1 }, {   5,  20 }, {  75,  34 }, {  57,  40 },
+  {  84,  44 }, {  44,  45 }, {   7,   0 }, {  89,   0 }, {  80,   0 }, {  44,   0 },
+  {  71,   0 }, {   9,   0 }, {  70,   0 }, {  58,   0 }, {  84,   1 }, {   1,   1 },
+  {  59,  14 }, {  60,  18 }, {  43,  43 }, {   8,  46 }, {  69,  49 }, {   7,   0 },
+  {  81,   0 }, {  72,   0 }, {  43,   0 }, {   8,   0 }, {  44,   0 }, {  14,   0 },
+  {  12,   0 }, {  13,   0 }, {  31,   0 }, {  58,   0 }, {  64,   0 }, {  41,   0 },
+  {  29,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  82,   1 }, {   1,   1 },
+  {  68,  13 }, {  62,  19 }, {  73,  37 }, {  69,  49 }, {   7,   0 }, {  81,   0 },
+  {  72,   0 }, {  43,   0 }, {   8,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 },
+  {  13,   0 }, {   9,   0 }, {  31,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 },
+  {  41,   0 }, {  29,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  82,   1 },
+  {   1,   1 }, {  68,  13 }, {  62,  19 }, {  73,  43 }, {  69,  59 }, {  67,  67 },
+  {  76,   0 }, {  33,   0 }, {  69,   0 }, {   8,   0 }, {  32,   0 }, {  64,   0 },
+  {  41,   0 }, {  18,   0 }, {   6,   0 }, {  75,   0 }, {  17,   0 }, {  38,   1 },
+  {   1,   1 }, {  15,  13 }, {  16,  19 }, {  53,  28 }, {  19,  46 }, {  52,   0 },
+  {  56,   0 }, {   8,   0 }, {  71,   0 }, {   9,   0 }, {  58,   0 }, {   6,   0 },
+  {  83,   1 }, {   5,   1 }, {  45,   1 }, {  76,  24 }, {  70,  34 }, {  57,  34 },
+  {  75,  42 }, {   7,   0 }, {  43,   0 }, {  44,   0 }, {  58,   0 }, {  41,   0 },
+  {  59,  15 }, {  52,  30 }, {  60,  38 }, {   7,   0 }, {  52,   0 }, {  56,   0 },
+  {  81,   0 }, {  43,   0 }, {  44,   0 }, {   9,   0 }, {  60,   0 }, {  83,   1 },
+  {   1,   1 }, {  58,   5 }, {  53,   9 }, {   4,  19 }, {  75,  29 }, {   8,  37 },
+  {  55,  54 }, {  89,   0 }, {  43,   0 }, {  32,   0 }, {  31,   0 }, {  79,   0 },
+  {  58,   0 }, {  64,   0 }, {  18,   0 }, {  57,   0 }, {  83,   1 }, {   2,   1 },
+  {   5,   9 }, {   6,  11 }, {  84,  17 }, {  75,  34 }, {  76,  41 }, {  33,  43 },
+  {   7,   0 }, {  81,   0 }, {  69,   0 }, {  43,   0 }, {  44,   0 }, {  12,   0 },
+  {  31,   0 }, {  60,   0 }, {  58,   0 }, {   6,   0 }, {  75,   0 }, {  22,   0 },
+  {  83,   1 }, {   2,   1 }, {   1,   1 }, {  62,   8 }, {  73,  25 }, {   8,  43 },
+  {   7,   0 }, {  81,   0 }, {  69,   0 }, {  43,   0 }, {  44,   0 }, {  12,   0 },
+  {   9,   0 }, {  31,   0 }, {  60,   0 }, {  58,   0 }, {   6,   0 }, {  75,   0 },
+  {  22,   0 }, {  83,   1 }, {  62,   1 }, {   2,   1 }, {   1,   1 }, {  73,  25 },
+  {   8,  43 }, {  44,   0 }, {  14,   0 }, {  58,   0 }, {  11,   8 }, {  59,  15 },
+  {  86,  19 }, {  61,  22 }, {  78,  29 }, {  13,  36 }, {  60,  43 }, {   7,  50 },
+  {  44,   0 }, {  14,   0 }, {   9,   0 }, {  58,   0 }, {  29,   0 }, {  11,   1 },
+  {  59,   1 }, {  86,  19 }, {  61,  22 }, {  78,  29 }, {  13,  36 }, {  60,  48 },
+  {   7,  60 }, {   7,   0 }, {  43,   0 }, {  32,   0 }, {  60,   0 }, {  58,   0 },
+  {   1,   1 }, {  61,  34 }, {  44,  37 }, {  33,  46 }, {   8,  52 }, {  78,  55 },
+  {   7,   0 }, {  43,   0 }, {   9,   0 }, {  32,   0 }, {  60,   0 }, {  58,   0 },
+  {  10,   1 }, {   1,   1 }, {   4,  33 }, {  61,  34 }, {  44,  40 }, {   8,  52 },
+  {  33,  56 }, {  78,  70 }, {  78,   0 }, {  33,   0 }, {   7,   0 }, {  43,   0 },
+  {  44,   0 }, {  19,   0 }, {  32,   0 }, {  51,   0 }, {  60,   0 }, {  58,   0 },
+  {  84,   0 }, {  64,   0 }, {  18,   0 }, {   1,   1 }, {  16,   5 }, {  15,  13 },
+  {  86,  19 }, {  61,  43 }, {  33,   0 }, {  14,   0 }, {  13,   0 }, {  51,   0 },
+  {  84,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 }, {  15,   1 }, {  16,   1 },
+  {  30,  22 }, {  50,  22 }, {  19,  34 }, {  32,  44 }, {   9,  55 }, {  33,   0 },
+  {  14,   0 }, {  13,   0 }, {  71,   0 }, {  51,   0 }, {  84,   0 }, {  41,   0 },
+  {  18,   0 }, {   6,   0 }, {  17,   0 }, {  15,   1 }, {  16,   1 }, {  30,  22 },
+  {  50,  22 }, {  19,  34 }, {  32,  54 }, {   9,  70 }, {  76,   0 }, {  33,   0 },
+  {   7,   0 }, {  47,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 }, {   6,   0 },
+  {  46,  25 }, {  78,   0 }, {  33,   0 }, {   7,   0 }, {  44,   0 }, {   9,   0 },
+  {  32,   0 }, {  70,   0 }, {  60,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 },
+  {  15,   1 }, {  50,   1 }, {   1,   1 }, {  16,   1 }, {  76,  32 }, {  19,  37 },
+  {  45,  40 }, {   8,  47 }, {  89,   0 }, {  71,   0 }, {  47,   0 }, {   9,   0 },
+  {  70,   0 }, {  60,   0 }, {  58,   0 }, {  75,   0 }, {  57,   0 }, {  83,   1 },
+  {  10,   1 }, {   6,  19 }, {  45,  20 }, {  76,  25 }, {  46,  36 }, {   4,  37 },
+  {   7,   0 }, {  89,   0 }, {   8,   0 }, {  14,   0 }, {  58,   0 }, {  64,   0 },
+  {  41,   0 }, {  29,   0 }, {   6,   0 }, {  11,   1 }, {  83,   1 }, {  68,  20 },
+  {  13,  35 }, {  69,  43 }, {  79,  52 }, {   7,   0 }, {  89,   0 }, {   8,   0 },
+  {  14,   0 }, {   9,   0 }, {  58,   0 }, {  64,   0 }, {  41,   0 }, {  29,   0 },
+  {   6,   0 }, {  11,   1 }, {  83,   1 }, {  68,  20 }, {  13,  41 }, {  69,  52 },
+  {  79,  60 }, {  33,   0 }, {   7,   0 }, {   8,   0 }, {  71,   0 }, {   9,   0 },
+  {  32,   0 }, {  70,   0 }, {  67,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 },
+  {  15,   1 }, {  83,   1 }, {  16,   1 }, {  76,  40 }, {  80,  48 }, {  19,  51 },
+  {   7,   0 }, {  43,   0 }, {  44,   0 }, {  70,   0 }, {  73,   0 }, {  60,   0 },
+  {  58,   0 }, {  82,   1 }, {   1,   1 }, {   8,  49 }, {   7,   0 }, {  43,   0 },
+  {   9,   0 }, {  70,   0 }, {  73,   0 }, {  60,   0 }, {  58,   0 }, {   8,   1 },
+  {  82,   1 }, {   1,   1 }, {   4,  25 }, {  44,  49 }, {  33,   0 }, {   8,   0 },
+  {  32,   0 }, {  51,   0 }, {  64,   0 }, {  29,   0 }, {   6,   0 }, {  24,   0 },
+  {  23,   0 }, {   1,   1 }, {  76,   9 }, {  50,  12 }, {  21,  15 }, {  86,  20 },
+  {   9,  60 }, {  76,   0 }, {   7,   0 }, {  43,   0 }, {  44,   0 }, {   9,   0 },
+  {  50,   0 }, {  51,   0 }, {  64,   0 }, {  29,   0 }, {   6,   0 }, {  24,   0 },
+  {  23,   0 }, {   1,   1 }, {  49,   5 }, {  83,   8 }, {   8,  47 }, {   7,   0 },
+  {  81,   0 }, {  44,   0 }, {  60,   0 }, {  58,   0 }, {   6,   0 }, {   1,   1 },
+  {   7,   0 }, {  81,   0 }, {   8,   0 }, {  44,   0 }, {  60,   0 }, {  58,   0 },
+  {   6,   0 }, {   1,   1 }, {   5,  19 }, {  43,  32 }, {  76,  37 }, {   7,   0 },
+  {  32,   0 }, {  79,   0 }, {  64,   0 }, {  62,   1 }, {   3,   1 }, {  49,  21 },
+  {  31,  28 }, {  51,  37 }, {  33,  49 }, {   7,   0 }, {   8,   0 }, {  12,   0 },
+  {  31,   0 }, {  51,   0 }, {  58,   0 }, {  83,   1 }, {   5,   1 }, {  21,   4 },
+  {  22,   9 }, {  20,  11 }, {   6,  25 }, {  84,  33 }, {  23,  41 }, {  24,  49 },
+  {   7,   0 }, {   8,   0 }, {  51,   0 }, {  58,   0 }, {  84,   0 }, {  22,   0 },
+  {  11,   1 }, {   1,   6 }, {  83,   7 }, {  12,  19 }, {  13,  37 }, {  14,  49 },
+  {  33,   0 }, {  44,   0 }, {  12,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 },
+  {  70,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 }, {  18,   0 },
+  {  24,   0 }, {  22,   0 }, {  23,   0 }, {   1,   1 }, {  82,   4 }, {   7,  43 },
+  {  73,  45 }, {  33,   0 }, {   7,   0 }, {  72,   0 }, {  44,   0 }, {  14,   0 },
+  {  12,   0 }, {  13,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 }, {  51,   0 },
+  {  60,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 }, {   6,   0 }, {  24,   0 },
+  {  22,   0 }, {  23,   0 }, {   3,   1 }, {   1,   1 }, {  82,   4 }, {  87,  10 },
+  {   8,  47 }, {  76,   0 }, {   7,   0 }, {  43,   0 }, {   8,   0 }, {   9,   0 },
+  {  70,   0 }, {  58,   0 }, {  64,   0 }, {   6,   0 }, {  23,   0 }, {  68,   1 },
+  {  83,   1 }, {  21,  11 }, {   5,  31 }, {  20,  41 }, {  69,  61 }, {  24,  71 },
+  {  76,   0 }, {   7,   0 }, {  43,   0 }, {   8,   0 }, {   9,   0 }, {  70,   0 },
+  {  58,   0 }, {  64,   0 }, {  29,   0 }, {   6,   0 }, {  68,   1 }, {  83,   1 },
+  {  11,  11 }, {  69,  42 }, {  13,  51 }, {  14,  71 }, {  76,   0 }, {   7,   0 },
+  {  43,   0 }, {   8,   0 }, {   9,   0 }, {  32,   0 }, {  70,   0 }, {  58,   0 },
+  {  64,   0 }, {   6,   0 }, {  17,   0 }, {  68,   1 }, {  83,   1 }, {  16,  11 },
+  {  30,  41 }, {  69,  42 }, {  18,  54 }, {  19,  71 }, {  33,  78 }, {   7,   0 },
+  {  43,   0 }, {   8,   0 }, {  80,   0 }, {  70,   0 }, {  67,   0 }, {  58,   0 },
+  {  68,   1 }, {  83,   1 }, {   1,   1 }, {  59,   3 }, {  84,  15 }, {  60,  22 },
+  {  89,  24 }, {  69,  43 }, {  44,  50 }, {   9,  57 }, {   7,   0 }, {  43,   0 },
+  {   8,   0 }, {  80,   0 }, {  70,   0 }, {  67,   0 }, {  58,   0 }, {  68,   1 },
+  {  83,   1 }, {  59,   1 }, {  84,   1 }, {   1,   1 }, {  60,  22 }, {  89,  24 },
+  {  69,  47 }, {  44,  56 }, {   9,  65 }, {  33,   0 }, {   7,   0 }, {  43,   0 },
+  {   8,   0 }, {  66,   0 }, {  80,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 },
+  {  19,   0 }, {  32,   0 }, {  31,   0 }, {  70,   0 }, {  67,   0 }, {  58,   0 },
+  {  18,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  68,   1 }, {  83,   1 },
+  {  59,   1 }, {  84,   1 }, {   1,   1 }, {  60,  22 }, {  89,  24 }, {  69,  47 },
+  {  44,  61 }, {   9,  75 }, {  33,   0 }, {   7,   0 }, {   8,   0 }, {  44,   0 },
+  {  47,   0 }, {   9,   0 }, {  32,   0 }, {  70,   0 }, {  51,   0 }, {  58,   0 },
+  {  64,   0 }, {  18,   0 }, {  24,   0 }, {  23,   0 }, {  17,   0 }, {  86,  33 },
+  {  19,  44 }, {   6,  66 }, {  61,  88 }, {   7,   0 }, {   8,   0 }, {  44,   0 },
+  {  13,   0 }, {  47,   0 }, {   9,   0 }, {  70,   0 }, {  51,   0 }, {  58,   0 },
+  {  64,   0 }, {  29,   0 }, {  24,   0 }, {  23,   0 }, {  86,  33 }, {  14,  44 },
+  {   6,  66 }, {  61,  88 }, {  72,   0 }, {   9,   0 }, {  79,   0 }, {  51,   0 },
+  {  64,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 }, {  49,   1 }, {  86,   1 },
+  {  61,  20 }, {   7,   0 }, {  69,   0 }, {  43,   0 }, {  60,   0 }, {  58,   0 },
+  {  29,   0 }, {   6,   0 }, {  75,   0 }, {  22,   0 }, {  83,   1 }, {   3,   1 },
+  {  25,   6 }, {   5,  11 }, {  84,  21 }, {  28,  26 }, {  76,  31 }, {   7,   0 },
+  {  69,   0 }, {  43,   0 }, {  60,   0 }, {  58,   0 }, {  29,   0 }, {   6,   0 },
+  {  75,   0 }, {  22,   0 }, {  25,   1 }, {  83,   1 }, {   3,   1 }, {   5,   1 },
+  {  28,   9 }, {  84,  23 }, {  76,  35 }, {  57,  43 }, {   7,   0 }, {  69,   0 },
+  {  43,   0 }, {   8,   0 }, {  66,   0 }, {  80,   0 }, {  44,   0 }, {   9,   0 },
+  {  67,   0 }, {  60,   0 }, {  58,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 },
+  {  22,   0 }, {  25,   1 }, {  83,   1 }, {   3,   1 }, {   5,   1 }, {  28,   5 },
+  {  57,  16 }, {  84,  23 }, {  76,  35 }, {  76,   0 }, {   7,   0 }, {  43,   0 },
+  {   8,   0 }, {  14,   0 }, {  60,   0 }, {  58,   0 }, {   6,   0 }, {  75,   0 },
+  {  82,   1 }, {   2,   1 }, {  11,  10 }, {  10,  16 }, {   5,  28 }, {  13,  43 },
+  {  76,   0 }, {   7,   0 }, {  43,   0 }, {   8,   0 }, {  14,   0 }, {  12,   0 },
+  {  60,   0 }, {  58,   0 }, {   6,   0 }, {  75,   0 }, {  22,   0 }, {  11,   1 },
+  {  13,   1 }, {  82,   1 }, {   2,   1 }, {  10,  17 }, {  81,  28 }, {   5,  32 },
+  {  76,   0 }, {   7,   0 }, {  43,   0 }, {   8,   0 }, {  44,   0 }, {  14,   0 },
+  {   9,   0 }, {  60,   0 }, {  58,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 },
+  {  22,   0 }, {  11,   1 }, {  12,   1 }, {  13,   1 }, {  82,   1 }, {  37,   1 },
+  {   2,   1 }, {  10,  17 }, {  81,  28 }, {   5,  32 }, {  33,   0 }, {   7,   0 },
+  {  43,   0 }, {   8,   0 }, {  32,   0 }, {  17,   0 }, {  82,   1 }, {   1,   1 },
+  {  58,   6 }, {  59,   9 }, {  16,  10 }, {  60,  21 }, {  78,  27 }, {  18,  30 },
+  {  84,  33 }, {  19,  42 }, {  33,   0 }, {   7,   0 }, {  43,   0 }, {   8,   0 },
+  {  32,   0 }, {  31,   0 }, {  17,   0 }, {  82,   1 }, {  58,   1 }, {  18,   1 },
+  {   1,   1 }, {  16,   1 }, {  59,   9 }, {  60,  25 }, {  78,  35 }, {  84,  45 },
+  {  44,  46 }, {  19,  55 }, {  33,   0 }, {   7,   0 }, {  81,   0 }, {  43,   0 },
+  {   8,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 }, {  67,   0 }, {  17,   0 },
+  {  82,   1 }, {  58,   1 }, {  18,   1 }, {   1,   1 }, {  16,   1 }, {  59,   9 },
+  {  60,  25 }, {  78,  35 }, {  84,  49 }, {  44,  52 }, {  19,  63 }, {  89,   0 },
+  {  43,   0 }, {   8,   0 }, {  79,   0 }, {  58,   0 }, {  64,   0 }, {   1,   1 },
+  {  68,  13 }, {  83,  13 }, {  69,  41 }, {  73,  44 }, {   7,   0 }, {  89,   0 },
+  {  43,   0 }, {   8,   0 }, {   9,   0 }, {  79,   0 }, {  58,   0 }, {  64,   0 },
+  {  68,   1 }, {   1,   1 }, {  83,  13 }, {  69,  47 }, {  73,  56 }, {  33,   0 },
+  {   7,   0 }, {  43,   0 }, {  32,   0 }, {  58,   0 }, {  64,   0 }, {  18,   0 },
+  {   6,   0 }, {  24,   0 }, {  23,   0 }, {  82,   1 }, {   1,   1 }, {  53,  25 },
+  {   8,  36 }, {  33,   0 }, {   7,   0 }, {  43,   0 }, {   9,   0 }, {  32,   0 },
+  {  58,   0 }, {  64,   0 }, {  18,   0 }, {   6,   0 }, {  24,   0 }, {  23,   0 },
+  {  82,   1 }, {  53,   1 }, {  73,   1 }, {   1,   1 }, {   8,  35 }, {  85,   1 },
+  {   1,   1 }, {  38,   5 }, {  52,  15 }, {  38,   1 }, {   1,   6 }, {   9,   0 },
+  {  51,   0 }, {  64,   0 }, {  29,   0 }, {  25,   1 }, {  52,   1 }, {  38,   1 },
+  {  85,   1 }, {   1,   6 }, {  28,  24 }, {  54,  25 }, {  56,  35 }, {  38,   1 },
+  {   1,   6 }, {   9,   0 }, {  51,   0 }, {  64,   0 }, {  41,   0 }, {  29,   0 },
+  {  52,   1 }, {  49,   1 }, {  38,   1 }, {  85,   1 }, {   1,   6 }, {  50,  24 },
+  {  54,  25 }, {  56,  35 }, {  33,   0 }, {   7,   0 }, {   8,   0 }, {  32,   0 },
+  {  29,   0 }, {  18,   0 }, {  75,   0 }, {  82,   3 }, {  16,   6 }, {  25,   7 },
+  {  15,   9 }, {  28,  43 }, {  33,   0 }, {   7,   0 }, {   8,   0 }, {  12,   0 },
+  {  32,   0 }, {  31,   0 }, {  58,   0 }, {  29,   0 }, {  18,   0 }, {  75,   0 },
+  {  22,   0 }, {  17,   0 }, {  16,   1 }, {  82,   3 }, {  25,   7 }, {  15,   9 },
+  {  28,  12 }, {  19,  49 }, {  78,   0 }, {  33,   0 }, {   7,   0 }, {   8,   0 },
+  {  12,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 }, {  58,   0 }, {  29,   0 },
+  {  18,   0 }, {   6,   0 }, {  75,   0 }, {  22,   0 }, {  17,   0 }, {  25,   1 },
+  {  82,   1 }, {  19,   1 }, {  28,   1 }, {  16,   1 }, {  78,   0 }, {   7,   0 },
+  {  43,   0 }, {   8,   0 }, {  79,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 },
+  {  75,   0 }, {   1,   1 }, {  25,   3 }, {  28,  15 }, {  78,   0 }, {   7,   0 },
+  {  89,   0 }, {  43,   0 }, {   8,   0 }, {   9,   0 }, {  79,   0 }, {  60,   0 },
+  {  58,   0 }, {  64,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 }, {  25,   1 },
+  {   3,   1 }, {   1,   1 }, {  27,  14 }, {  28,  18 }, {  78,   0 }, {   7,   0 },
+  {  89,   0 }, {  43,   0 }, {   8,   0 }, {   9,   0 }, {  60,   0 }, {  58,   0 },
+  {  84,   0 }, {  64,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 }, {  57,   0 },
+  {  25,   1 }, {  28,   1 }, {  79,   1 }, {   3,   1 }, {  27,   1 }, {   1,   1 },
+  {  47,   0 }, {  82,   1 }, {  10,   1 }, {   5,   8 }, {  45,  13 }, {  76,  43 },
+  {  47,   0 }, {   9,   0 }, {  82,   1 }, {  10,   1 }, {   5,   1 }, {  45,  13 },
+  {  76,  49 }, {  33,   0 }, {  47,   0 }, {  19,   0 }, {  32,   0 }, {  18,   0 },
+  {   6,   0 }, {  17,   0 }, {  82,   1 }, {  16,   1 }, {  45,  13 }, {   5,  31 },
+  {  76,  55 }, {  33,   0 }, {   7,   0 }, {  47,   0 }, {   9,   0 }, {  32,   0 },
+  {  18,   0 }, {   6,   0 }, {  17,   0 }, {  76,   1 }, {  82,   1 }, {   5,   1 },
+  {  16,   1 }, {  45,   1 }, {  19,  61 }, {   7,   0 }, {  72,   0 }, {  12,   0 },
+  {  31,   0 }, {  64,   0 }, {   6,   0 }, {  22,   0 }, {  23,   0 }, {  82,   1 },
+  {  49,   6 }, {  50,  18 }, {  51,  26 }, {   7,   0 }, {  72,   0 }, {  12,   0 },
+  {   9,   0 }, {  31,   0 }, {  64,   0 }, {   6,   0 }, {  22,   0 }, {  23,   0 },
+  {  49,   1 }, {  82,   1 }, {  50,  18 }, {  51,  26 }, {   7,   0 }, {  12,   0 },
+  {   9,   0 }, {  31,   0 }, {  63,   0 }, {  64,   0 }, {   6,   0 }, {  22,   0 },
+  {  23,   0 }, {  49,   1 }, {  72,   1 }, {  82,   1 }, {  50,  18 }, {  51,  26 },
+  {  74,  43 }, {  86,  52 }, {  33,   0 }, {  52,   0 }, {  56,   0 }, {  19,   0 },
+  {  32,   0 }, {  54,   0 }, {  50,   0 }, {  64,   0 }, {  29,   0 }, {  18,   0 },
+  {  17,   0 }, {  15,   1 }, {  16,   1 }, {   5,   7 }, {  76,  31 }, {  33,   0 },
+  {  52,   0 }, {  19,   0 }, {   9,   0 }, {  32,   0 }, {  54,   0 }, {  50,   0 },
+  {  64,   0 }, {  29,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 }, {  76,   1 },
+  {  15,   1 }, {   5,   1 }, {  16,   1 }, {  56,  42 }, {   7,   0 }, {  41,   0 },
+  {  29,   0 }, {   6,   0 }, {  75,   0 }, {  25,   1 }, {   1,   4 }, {  28,  16 },
+  {   7,   0 }, {  81,   0 }, {  43,   0 }, {   9,   0 }, {  60,   0 }, {  58,   0 },
+  {  41,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 }, {  22,   0 }, {  25,   1 },
+  {   1,   1 }, {  28,  16 }, {  33,   0 }, {   7,   0 }, {  81,   0 }, {  14,   0 },
+  {  12,   0 }, {  13,   0 }, {  32,   0 }, {  31,   0 }, {  60,   0 }, {  58,   0 },
+  {  64,   0 }, {  29,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  57,   0 },
+  {   2,   1 }, {  78,  25 }, {  73,  38 }, {  33,   0 }, {   7,   0 }, {  81,   0 },
+  {  43,   0 }, {   8,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 },
+  {  32,   0 }, {  31,   0 }, {  67,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 },
+  {  29,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  57,   0 }, {  78,   1 },
+  {  73,   1 }, {   2,   1 }, {  33,   0 }, {   7,   0 }, {  81,   0 }, {  43,   0 },
+  {   8,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 }, {   9,   0 },
+  {  32,   0 }, {  31,   0 }, {  67,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 },
+  {  29,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  57,   0 }, {  73,   1 },
+  {   2,   1 }, {  78,  25 }, {  56,   0 }, {  64,   0 }, {  29,   0 }, {  57,   0 },
+  {   2,   1 }, {  25,   5 }, {  54,   5 }, {  43,  45 }, {  56,   0 }, {   9,   0 },
+  {  64,   0 }, {  29,   0 }, {   6,   0 }, {  43,   1 }, {  54,   1 }, {   2,   1 },
+  {  25,   5 }, {  84,  20 }, {  75,  25 }, {  52,  29 }, {  76,  38 }, {  57,  47 },
+  {  76,   0 }, {  56,   0 }, {   9,   0 }, {  29,   0 }, {  57,   0 }, {  43,   1 },
+  {   2,   1 }, {  25,   5 }, {  54,   5 }, {  64,  38 }, {  33,   0 }, {   7,   0 },
+  {  14,   0 }, {  12,   0 }, {  13,   0 }, {  32,   0 }, {  31,   0 }, {  64,   0 },
+  {  29,   0 }, {  22,   0 }, {   3,   1 }, {  84,  31 }, {  33,   0 }, {   7,   0 },
+  {  44,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 }, {  32,   0 }, {  31,   0 },
+  {  60,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 }, {  22,   0 }, {   3,   1 },
+  {  68,  20 }, {  84,  37 }, {  33,   0 }, {   7,   0 }, {  44,   0 }, {  14,   0 },
+  {  12,   0 }, {  13,   0 }, {  19,   0 }, {  32,   0 }, {  31,   0 }, {  67,   0 },
+  {  60,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 }, {  18,   0 }, {  22,   0 },
+  {   3,   1 }, {  68,  20 }, {  84,  37 }, {  69,  40 }, {   9,  40 }, {   7,   0 },
+  {  43,   0 }, {   8,   0 }, {  44,   0 }, {  12,   0 }, {  31,   0 }, {  60,   0 },
+  {  58,   0 }, {  18,   0 }, {   6,   0 }, {  22,   0 }, {   1,   1 }, {  81,  22 },
+  {  35,  46 }, {   7,   0 }, {  43,   0 }, {   8,   0 }, {  44,   0 }, {  12,   0 },
+  {   9,   0 }, {  31,   0 }, {  70,   0 }, {  60,   0 }, {  58,   0 }, {  18,   0 },
+  {   6,   0 }, {  22,   0 }, {   1,   1 }, {  81,  22 }, {  35,  51 }, {  33,   0 },
+  {   7,   0 }, {  32,   0 }, {  18,   0 }, {  17,   0 }, {  15,  10 }, {  16,  21 },
+  {   7,   0 }, {  72,   0 }, {   8,   0 }, {  44,   0 }, {  12,   0 }, {  71,   0 },
+  {  31,   0 }, {  58,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {   1,   1 },
+  {  20,  11 }, {  59,  13 }, {  60,  28 }, {  33,   0 }, {  43,   0 }, {  32,   0 },
+  {  79,   0 }, {  64,   0 }, {  29,   0 }, {  24,   0 }, {  23,   0 }, {  82,   1 },
+  {   1,   1 }, {   8,  39 }, {  73,  46 }, {  33,   0 }, {  43,   0 }, {   9,   0 },
+  {  32,   0 }, {  79,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 }, {  24,   0 },
+  {  23,   0 }, {   8,   1 }, {  82,   1 }, {  73,   1 }, {   1,   1 }, {   7,   0 },
+  {  81,   0 }, {  89,   0 }, {  72,   0 }, {  43,   0 }, {  12,   0 }, {   9,   0 },
+  {  31,   0 }, {  79,   0 }, {  50,   0 }, {  51,   0 }, {  58,   0 }, {  22,   0 },
+  {  57,   0 }, {  83,   1 }, {   2,   1 }, {  63,   9 }, {  64,  41 }, {   7,   0 },
+  {  89,   0 }, {  14,   0 }, {  13,   0 }, {  71,   0 }, {   9,   0 }, {  32,   0 },
+  {  31,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 }, {  41,   0 }, {  29,   0 },
+  {  75,   0 }, {  22,   0 }, {  82,   1 }, {  68,  11 }, {  69,  36 }, {  70,  36 },
+  {  73,  48 }, {   7,   0 }, {  43,   0 }, {  44,   0 }, {  58,   0 }, {  84,   0 },
+  {   1,   1 }, {  70,  22 }, {  60,  24 }, {   8,  44 }, {   7,   0 }, {  43,   0 },
+  {  44,   0 }, {  58,   0 }, {  84,   0 }, {   1,   1 }, {  70,  22 }, {  60,  24 },
+  {   8,  53 }, {  33,   0 }, {   7,   0 }, {  69,   0 }, {  89,   0 }, {  43,   0 },
+  {  66,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 }, {  71,   0 },
+  {  19,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 }, {  67,   0 }, {  58,   0 },
+  {  84,   0 }, {  29,   0 }, {  18,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 },
+  {   1,   1 }, {  70,  22 }, {  60,  24 }, {   8,  63 }, {   7,   0 }, {  81,   0 },
+  {  12,   0 }, {  31,   0 }, {  63,   0 }, {  51,   0 }, {  60,   0 }, {  58,   0 },
+  {  64,   0 }, {   6,   0 }, {  22,   0 }, {   3,   1 }, {  49,   9 }, {  50,  20 },
+  {  37,  32 }, {  86,  48 }, {   7,   0 }, {  81,   0 }, {   9,   0 }, {  63,   0 },
+  {  51,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 }, {   6,   0 }, {  49,   1 },
+  {  12,   1 }, {  31,   1 }, {   3,   1 }, {  22,   1 }, {  50,  20 }, {  37,  32 },
+  {  86,  54 }, {  76,   0 }, {   7,   0 }, {  69,   0 }, {  13,   0 }, {   6,   0 },
+  {  23,   0 }, {   1,   1 }, {  83,   9 }, {   5,  17 }, {  20,  20 }, {  68,  33 },
+  {  24,  36 }, {  76,   0 }, {   7,   0 }, {  69,   0 }, {  13,   0 }, {   9,   0 },
+  {   6,   0 }, {  23,   0 }, {  83,   1 }, {   1,   1 }, {   5,  17 }, {  20,  20 },
+  {  68,  39 }, {  24,  45 }, {  73,   0 }, {  22,   0 }, {  23,   0 }, {  82,   1 },
+  {   5,  10 }, {   6,  16 }, {  20,  19 }, {  24,  37 }, {  79,  46 }, {  76,  47 },
+  {  73,   0 }, {  22,   0 }, {  23,   0 }, {  82,   1 }, {   5,  10 }, {   6,  16 },
+  {  20,  19 }, {  24,  37 }, {  79,  46 }, {  76,  47 }, {   7,   0 }, {  52,   0 },
+  {  72,   0 }, {  31,   0 }, {  64,   0 }, {  29,   0 }, {   6,   0 }, {  24,   0 },
+  {  22,   0 }, {  23,   0 }, {   1,   1 }, {   5,  17 }, {  56,  36 }, {   8,  37 },
+  {  73,  40 }, {  52,   0 }, {  72,   0 }, {   8,   0 }, {  31,   0 }, {  64,   0 },
+  {  29,   0 }, {   6,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {   1,   1 },
+  {   5,  17 }, {  56,  40 }, {  73,  43 }, {   7,   0 }, {  72,   0 }, {  53,   0 },
+  {  64,   0 }, {  41,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 }, {  25,   1 },
+  {  38,   9 }, {  28,  17 }, {   7,   0 }, {  12,   0 }, {  32,   0 }, {  31,   0 },
+  {  58,   0 }, {  64,   0 }, {  29,   0 }, {  75,   0 }, {  22,   0 }, {   3,   1 },
+  {  40,  14 }, {  78,  17 }, {  41,  39 }, {   8,   0 }, {  44,   0 }, {  12,   0 },
+  {   9,   0 }, {  32,   0 }, {  31,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 },
+  {  75,   0 }, {  22,   0 }, {   3,   1 }, {  40,   1 }, {  78,  17 }, {   7,  26 },
+  {  41,  48 }, {  33,   0 }, {  89,   0 }, {  19,   0 }, {  32,   0 }, {  18,   0 },
+  {   6,   0 }, {  17,   0 }, {  68,   1 }, {  83,   1 }, {  69,  22 }, {  84,  28 },
+  {  76,  43 }, {  33,   0 }, {  89,   0 }, {  44,   0 }, {  19,   0 }, {   9,   0 },
+  {  32,   0 }, {  58,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 }, {  68,   1 },
+  {  83,   1 }, {  69,  22 }, {  84,  28 }, {  76,  53 }, {  33,   0 }, {  44,   0 },
+  {  32,   0 }, {  58,   0 }, {  18,   0 }, {  17,   0 }, {  82,   5 }, {  16,  10 },
+  {   7,  36 }, {  78,  46 }, {  19,  50 }, {  33,   0 }, {  44,   0 }, {   9,   0 },
+  {  32,   0 }, {  70,   0 }, {  58,   0 }, {  18,   0 }, {  17,   0 }, {  82,   1 },
+  {  16,   1 }, {   7,  36 }, {  78,  52 }, {  19,  59 }, {   7,   0 }, {  43,   0 },
+  {  14,   0 }, {  71,   0 }, {  70,   0 }, {  60,   0 }, {  58,   0 }, {  82,   1 },
+  {   1,   1 }, {  11,  11 }, {  78,  31 }, {  44,  35 }, {  13,  41 }, {   8,  49 },
+  {   7,   0 }, {  43,   0 }, {  14,   0 }, {  71,   0 }, {   9,   0 }, {  70,   0 },
+  {  58,   0 }, {  29,   0 }, {   8,   1 }, {  11,   1 }, {  13,   1 }, {  82,   1 },
+  {   1,   1 }, {  78,  31 }, {  60,  33 }, {  44,  37 }, {   8,   0 }, {  44,   0 },
+  {  14,   0 }, {   9,   0 }, {  60,   0 }, {  58,   0 }, {  41,   0 }, {  29,   0 },
+  {  11,   1 }, {   7,  20 }, {  13,  30 }, {  78,  40 }, {  78,   0 }, {   7,   0 },
+  {  72,   0 }, {  71,   0 }, {  63,   0 }, {  64,   0 }, {   6,   0 }, {  49,   7 },
+  {  48,   7 }, {  82,  10 }, {  50,  16 }, {  51,  34 }, {  78,   0 }, {   7,   0 },
+  {  72,   0 }, {  43,   0 }, {  12,   0 }, {  71,   0 }, {   9,   0 }, {  31,   0 },
+  {  79,   0 }, {  63,   0 }, {  64,   0 }, {   6,   0 }, {  22,   0 }, {  50,   1 },
+  {  48,   1 }, {  49,   7 }, {  82,  10 }, {  51,  37 }, {  43,   0 }, {  51,   0 },
+  {  60,   0 }, {  58,   0 }, {  64,   0 }, {   1,   1 }, {  50,  16 }, {   7,  23 },
+  {   8,  45 }, {   7,   0 }, {  52,   0 }, {  58,   0 }, {  29,   0 }, {  68,   1 },
+  {  60,  15 }, {  69,  33 }, {  44,  33 }, {  43,  41 }, {   9,  57 }, {   7,   0 },
+  {  52,   0 }, {  66,   0 }, {  47,   0 }, {  67,   0 }, {  58,   0 }, {  29,   0 },
+  {   6,   0 }, {  68,   1 }, {  43,   1 }, {  60,  15 }, {  56,  28 }, {  69,  33 },
+  {  44,  33 }, {  84,  41 }, {   9,  57 }, {  76,   0 }, {   7,   0 }, {  52,   0 },
+  {   8,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 }, {  47,   0 }, {  58,   0 },
+  {  29,   0 }, {   6,   0 }, {  22,   0 }, {  68,   1 }, {  43,   1 }, {  80,   1 },
+  {  67,   1 }, {  60,  15 }, {  56,  28 }, {  69,  33 }, {  44,  33 }, {  84,  41 },
+  {  66,  45 }, {   9,  65 }, {   7,   0 }, {  89,   0 }, {  43,   0 }, {  79,   0 },
+  {  29,   0 }, {   6,   0 }, {  75,   0 }, {  22,   0 }, {  83,   1 }, {  38,   1 },
+  {  25,   5 }, {  53,  21 }, {   7,   0 }, {  89,   0 }, {  43,   0 }, {   9,   0 },
+  {  79,   0 }, {  64,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 }, {  22,   0 },
+  {  25,   1 }, {  83,   1 }, {  38,   1 }, {  53,  21 }, {  76,   0 }, {   7,   0 },
+  {  72,   0 }, {  47,   0 }, {  32,   0 }, {  67,   0 }, {  73,   0 }, {  29,   0 },
+  {   6,   0 }, {  82,   1 }, {  10,   1 }, {   4,  18 }, {  74,  40 }, {  76,   0 },
+  {   7,   0 }, {  72,   0 }, {   8,   0 }, {  66,   0 }, {  44,   0 }, {  14,   0 },
+  {  13,   0 }, {  47,   0 }, {   9,   0 }, {  32,   0 }, {  67,   0 }, {  73,   0 },
+  {  58,   0 }, {  29,   0 }, {   6,   0 }, {  82,   1 }, {  10,   1 }, {   4,  18 },
+  {  80,  40 }, {  74,  44 }, {  76,   0 }, {  33,   0 }, {   7,   0 }, {  43,   0 },
+  {   8,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 }, {   9,   0 }, {  32,   0 },
+  {  31,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 }, {  18,   0 },
+  {   6,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {   2,   1 }, {  83,   4 },
+  {   5,   7 }, {  75,  10 }, {  57,  36 }, {   7,   0 }, {  89,   0 }, {  43,   0 },
+  {   8,   0 }, {  44,   0 }, {  13,   0 }, {   9,   0 }, {  70,   0 }, {  58,   0 },
+  {  57,   0 }, {  62,   7 }, {  68,  10 }, {  84,  19 }, {  69,  28 }, {  75,  36 },
+  {  41,  46 }, {  33,   0 }, {   7,   0 }, {  44,   0 }, {   9,   0 }, {  32,   0 },
+  {  70,   0 }, {  79,   0 }, {  64,   0 }, {   6,   0 }, {   1,   1 }, {  49,   7 },
+  {  59,  13 }, {  60,  15 }, {  48,  25 }, {  51,  37 }, {  74,  50 }, {   7,   0 },
+  {  44,   0 }, {  14,   0 }, {  13,   0 }, {   9,   0 }, {  70,   0 }, {  64,   0 },
+  {   6,   0 }, {  75,   0 }, {   1,   1 }, {  49,   7 }, {  59,  13 }, {  48,  25 },
+  {  51,  29 }, {  60,  37 }, {  29,  43 }, {  33,   0 }, {   8,   0 }, {  80,   0 },
+  {  19,   0 }, {  32,   0 }, {  67,   0 }, {  60,   0 }, {  18,   0 }, {   6,   0 },
+  {  17,   0 }, {  16,  11 }, {  78,  21 }, {  44,  31 }, {  33,   0 }, {   7,   0 },
+  {   8,   0 }, {  80,   0 }, {  19,   0 }, {   9,   0 }, {  32,   0 }, {  67,   0 },
+  {  60,   0 }, {  58,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 }, {  16,  11 },
+  {  78,  21 }, {  44,  36 }, {  33,   0 }, {   7,   0 }, {  43,   0 }, {   8,   0 },
+  {  80,   0 }, {  19,   0 }, {  32,   0 }, {  60,   0 }, {  58,   0 }, {  41,   0 },
+  {  18,   0 }, {  17,   0 }, {  57,   0 }, {  15,   1 }, {  16,   1 }, {  83,  13 },
+  {  75,  38 }, {  69,  39 }, {  33,   0 }, {   7,   0 }, {  89,   0 }, {  43,   0 },
+  {   8,   0 }, {  80,   0 }, {  19,   0 }, {   9,   0 }, {  32,   0 }, {  79,   0 },
+  {  60,   0 }, {  58,   0 }, {  41,   0 }, {  18,   0 }, {  17,   0 }, {  57,   0 },
+  {  15,   1 }, {  83,   1 }, {  16,   1 }, {   6,  30 }, {  69,  43 }, {  75,  44 },
+  {  72,   0 }, {  43,   0 }, {  44,   0 }, {  32,   0 }, {  51,   0 }, {  60,   0 },
+  {  64,   0 }, {  29,   0 }, {  49,   1 }, {  50,  11 }, {  61,  25 }, {  72,   0 },
+  {  43,   0 }, {  44,   0 }, {  32,   0 }, {  79,   0 }, {  51,   0 }, {  60,   0 },
+  {  58,   0 }, {  64,   0 }, {  29,   0 }, {  49,   1 }, {  50,  11 }, {  61,  25 },
+  {   9,  36 }, {   7,   0 }, {  60,   0 }, {  41,   0 }, {  29,   0 }, {  75,   0 },
+  {  39,  15 }, {  28,  20 }, {  78,  36 }, {  61,  43 }, {   7,   0 }, {  43,   0 },
+  {  44,   0 }, {   9,   0 }, {  60,   0 }, {  58,   0 }, {  41,   0 }, {  29,   0 },
+  {  75,   0 }, {  39,   1 }, {  28,  20 }, {  78,  36 }, {  61,  48 }, {   7,   0 },
+  {  43,   0 }, {  60,   0 }, {  58,   0 }, {  84,   0 }, {  75,   0 }, {   2,   1 },
+  {  16,  19 }, {  52,  20 }, {  61,  37 }, {  57,  44 }, {   7,   0 }, {  43,   0 },
+  {  44,   0 }, {  71,   0 }, {   9,   0 }, {  60,   0 }, {  58,   0 }, {  84,   0 },
+  {  75,   0 }, {   2,   1 }, {  16,   1 }, {  52,  20 }, {  61,  37 }, {  57,  46 },
+  {  33,   0 }, {   8,   0 }, {  32,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 },
+  {   1,  15 }, {  33,   0 }, {   7,   0 }, {   8,   0 }, {  80,   0 }, {   9,   0 },
+  {  32,   0 }, {  70,   0 }, {   6,   0 }, {  17,   0 }, {   1,   1 }, {  16,   1 },
+  {  86,  30 }, {  19,  40 }, {  18,  40 }, {  13,   0 }, {  32,   0 }, {  64,   0 },
+  {  29,   0 }, {  24,   0 }, {  23,   0 }, {   1,   1 }, {  11,  10 }, {  16,  10 },
+  {  33,  35 }, {  14,  35 }, {  19,  35 }, {  33,   0 }, {  43,   0 }, {  14,   0 },
+  {  13,   0 }, {  32,   0 }, {  79,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 },
+  {  29,   0 }, {  24,   0 }, {  23,   0 }, {  62,   1 }, {   2,   1 }, {  50,  17 },
+  {  84,  24 }, {  61,  49 }, {  89,   0 }, {  72,   0 }, {  79,   0 }, {  50,   0 },
+  {  51,   0 }, {  24,   0 }, {  23,   0 }, {  84,   8 }, {  63,  13 }, {  64,  44 },
+  {  89,   0 }, {  72,   0 }, {   9,   0 }, {  79,   0 }, {  50,   0 }, {  51,   0 },
+  {  75,   0 }, {  24,   0 }, {  23,   0 }, {  63,   1 }, {  84,   1 }, {  64,  48 },
+  {  33,   0 }, {   7,   0 }, {  32,   0 }, {  25,   1 }, {  83,   1 }, {  63,   1 },
+  {  54,  18 }, {  89,  25 }, {  64,  34 }, {  51,  43 }, {  33,   0 }, {   7,   0 },
+  {  44,   0 }, {   9,   0 }, {  32,   0 }, {  60,   0 }, {  58,   0 }, {  25,   1 },
+  {  12,   1 }, {  31,   1 }, {  83,   1 }, {  63,   1 }, {  22,   1 }, {  54,  18 },
+  {  89,  25 }, {  64,  34 }, {  51,  43 }, {   8,   0 }, {  44,   0 }, {  47,   0 },
+  {   9,   0 }, {  58,   0 }, {  75,   0 }, {  83,   1 }, {  27,  11 }, {  80,  30 },
+  {   7,  37 }, {  29,  41 }, {  67,  46 }, {  72,   0 }, {  50,   0 }, {  64,   0 },
+  {   6,   0 }, {   1,   1 }, {  82,   6 }, {  49,  14 }, {  48,  30 }, {   8,  33 },
+  {  86,  34 }, {  51,  46 }, {  33,   0 }, {   7,   0 }, {  89,   0 }, {  14,   0 },
+  {  13,   0 }, {   9,   0 }, {  32,   0 }, {  55,   0 }, {  73,   0 }, {  60,   0 },
+  {  58,   0 }, {  64,   0 }, {   6,   0 }, {  24,   0 }, {  23,   0 }, {  57,   0 },
+  {   2,   1 }, {  83,   5 }, {   5,  13 }, {  68,  21 }, {  75,  26 }, {  78,   1 },
+  {   7,   0 }, {  64,   0 }, {  83,   1 }, {  68,  10 }, {  69,  28 }, {  32,  34 },
+  {  33,  43 }, {   7,   0 }, {  89,   0 }, {  44,   0 }, {   9,   0 }, {  70,   0 },
+  {  64,   0 }, {  68,   1 }, {  83,   1 }, {  69,  28 }, {  32,  34 }, {  33,  53 },
+  {  44,   0 }, {  60,   0 }, {  58,   0 }, {  17,   0 }, {  82,   1 }, {  16,   1 },
+  {   7,  19 }, {  30,  25 }, {  32,  34 }, {  18,  40 }, {  33,  43 }, {  44,   0 },
+  {  60,   0 }, {  58,   0 }, {  17,   0 }, {  82,   1 }, {  16,   1 }, {   7,  19 },
+  {  30,  25 }, {  32,  34 }, {  18,  46 }, {  33,  47 }, {  44,   0 }, {  19,   0 },
+  {   9,   0 }, {  70,   0 }, {  60,   0 }, {  58,   0 }, {  75,   0 }, {  17,   0 },
+  {  69,   1 }, {  82,   1 }, {  16,   1 }, {   7,  19 }, {  30,  25 }, {  32,  34 },
+  {  18,  48 }, {  33,  50 }, {  33,   0 }, {  32,   0 }, {  18,   0 }, {  17,   0 },
+  {  16,   1 }, {  33,   0 }, {   9,   0 }, {  32,   0 }, {  18,   0 }, {  17,   0 },
+  {  16,   1 }, {  68,   8 }, {  84,  15 }, {  69,  36 }, {  19,  50 }, {  33,   0 },
+  {   9,   0 }, {  32,   0 }, {  64,   0 }, {  18,   0 }, {  17,   0 }, {  16,   1 },
+  {  49,   8 }, {  76,  15 }, {  78,  29 }, {  51,  36 }, {  19,  50 }, {  78,   0 },
+  {  33,   0 }, {   7,   0 }, {  44,   0 }, {   9,   0 }, {  32,   0 }, {  60,   0 },
+  {  58,   0 }, {  18,   0 }, {  17,   0 }, {   1,   1 }, {  16,   8 }, {  61,  43 },
+  {   8,  57 }, {  19,  64 }, {  33,   0 }, {  32,   0 }, {  18,   0 }, {  17,   0 },
+  {   1,   1 }, {  16,  12 }, {  76,  16 }, {  19,  40 }, {   7,   0 }, {  80,   0 },
+  {  14,   0 }, {  19,   0 }, {  70,   0 }, {  60,   0 }, {  58,   0 }, {  68,   5 },
+  {  83,   9 }, {  11,  25 }, {  69,  41 }, {  13,  44 }, {  66,  49 }, {  67,  50 },
+  {   8,  53 }, {   7,   0 }, {  80,   0 }, {  14,   0 }, {  19,   0 }, {  70,   0 },
+  {  60,   0 }, {  58,   0 }, {  68,   1 }, {  83,   1 }, {  11,  25 }, {  13,  49 },
+  {  69,  56 }, {  67,  60 }, {  66,  69 }, {   8,  78 }, {   7,   0 }, {  80,   0 },
+  {  44,   0 }, {  14,   0 }, {  19,   0 }, {   9,   0 }, {  70,   0 }, {  60,   0 },
+  {  58,   0 }, {   6,   0 }, {  68,   1 }, {  83,   1 }, {  11,  25 }, {  13,  49 },
+  {  47,  50 }, {  69,  61 }, {  67,  64 }, {  66,  79 }, {   8,  93 }, {  70,   0 },
+  {   1,   1 }, {   7,   0 }, {   8,   0 }, {  44,   0 }, {  31,   0 }, {  70,   0 },
+  {  60,   0 }, {  58,   0 }, {  64,   0 }, {  41,   0 }, {   6,   0 }, {  22,   0 },
+  {   1,   1 }, {  71,  18 }, {  49,  20 }, {  51,  38 }, {  76,  56 }, {   9,  62 },
+  {   7,   0 }, {   8,   0 }, {  44,   0 }, {  31,   0 }, {  70,   0 }, {  60,   0 },
+  {  58,   0 }, {  64,   0 }, {  41,   0 }, {   6,   0 }, {  22,   0 }, {  49,   1 },
+  {   1,   1 }, {  71,  16 }, {  51,  38 }, {  76,  66 }, {   9,  77 }, {   7,   0 },
+  {  43,   0 }, {   8,   0 }, {  44,   0 }, {  12,   0 }, {  71,   0 }, {  31,   0 },
+  {  70,   0 }, {  58,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  59,   9 },
+  {  60,  24 }, {  61,  33 }, {   9,  65 }, {   7,   0 }, {  44,   0 }, {  71,   0 },
+  {  31,   0 }, {  70,   0 }, {  60,   0 }, {  58,   0 }, {  24,   0 }, {  22,   0 },
+  {  23,   0 }, {  32,  24 }, {  61,  33 }, {  78,  41 }, {  33,  48 }, {   9,  65 },
+  {   7,   0 }, {   8,   0 }, {  44,   0 }, {  31,   0 }, {  60,   0 }, {  58,   0 },
+  {  24,   0 }, {  22,   0 }, {  23,   0 }, {  71,  24 }, {  70,  24 }, {  61,  33 },
+  {  78,  41 }, {   9,  65 }, {  76,   0 }, {   7,   0 }, {   8,   0 }, {  66,   0 },
+  {  80,   0 }, {  44,   0 }, {  47,   0 }, {   9,   0 }, {  32,   0 }, {  67,   0 },
+  {  64,   0 }, {  29,   0 }, {  18,   0 }, {   6,   0 }, {  24,   0 }, {  23,   0 },
+  {  17,   0 }, {  48,   1 }, {  49,  15 }, {  51,  40 }, {  86,  45 }, {  76,   0 },
+  {   7,   0 }, {   8,   0 }, {  66,   0 }, {  44,   0 }, {  47,   0 }, {   9,   0 },
+  {  32,   0 }, {  67,   0 }, {  64,   0 }, {  29,   0 }, {  18,   0 }, {   6,   0 },
+  {  24,   0 }, {  23,   0 }, {  17,   0 }, {  48,   1 }, {  49,  15 }, {  51,  40 },
+  {  86,  45 }, {  80,  50 }, {  33,   0 }, {  44,   0 }, {   9,   0 }, {  70,   0 },
+  {  60,   0 }, {  58,   0 }, {  18,   0 }, {  24,   0 }, {  23,   0 }, {  17,   0 },
+  {  61,  15 }, {   7,  20 }, {  32,  35 }, {  19,  45 }, {   8,  65 }, {   7,   0 },
+  {  69,   0 }, {  43,   0 }, {   8,   0 }, {  66,   0 }, {  12,   0 }, {  13,   0 },
+  {   9,   0 }, {  70,   0 }, {  60,   0 }, {  58,   0 }, {  75,   0 }, {  24,   0 },
+  {  22,   0 }, {  23,   0 }, {  61,  15 }, {  81,  30 }, {  44,  35 }, {  14,  45 },
+  {  29,  65 }, {  33,   0 }, {   7,   0 }, {  81,   0 }, {   8,   0 }, {  44,   0 },
+  {  14,   0 }, {  13,   0 }, {  19,   0 }, {  32,   0 }, {  70,   0 }, {  60,   0 },
+  {  58,   0 }, {  29,   0 }, {  18,   0 }, {   6,   0 }, {  75,   0 }, {  24,   0 },
+  {  23,   0 }, {  17,   0 }, {  61,  15 }, {  66,  20 }, {  80,  30 }, {  69,  35 },
+  {  47,  45 }, {  67,  65 }, {   9,  75 }, {  78,   0 }, {   7,   0 }, {  72,   0 },
+  {  12,   0 }, {  71,   0 }, {   9,   0 }, {  31,   0 }, {  70,   0 }, {  73,   0 },
+  {  50,   0 }, {  64,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  49,   1 },
+  {   6,  10 }, {  51,  20 }, {   8,  35 }, {  76,   0 }, {  89,   0 }, {  12,   0 },
+  {  71,   0 }, {  32,   0 }, {  31,   0 }, {  79,   0 }, {  50,   0 }, {  60,   0 },
+  {  58,   0 }, {  64,   0 }, {  29,   0 }, {   6,   0 }, {  24,   0 }, {  22,   0 },
+  {  23,   0 }, {  83,   1 }, {  63,   5 }, {  51,  25 }, {  86,  40 }, {   9,  50 },
+  {  78,   0 }, {   7,   0 }, {  70,   0 }, {  58,   0 }, {  29,   0 }, {  75,   0 },
+  {   1,   1 }, {  25,   9 }, {  68,  11 }, {  27,  13 }, {  28,  25 }, {  69,  37 },
+  {   8,  43 }, {  78,   0 }, {   7,   0 }, {  70,   0 }, {  58,   0 }, {  29,   0 },
+  {  75,   0 }, {   1,   1 }, {  25,   9 }, {  68,  11 }, {  27,  13 }, {  28,  27 },
+  {  69,  42 }, {   8,  43 }, {  78,   0 }, {   7,   0 }, {   9,   0 }, {  70,   0 },
+  {  67,   0 }, {  60,   0 }, {  58,   0 }, {  29,   0 }, {  75,   0 }, {   1,   1 },
+  {  25,   9 }, {  68,  11 }, {  27,  13 }, {  28,  27 }, {  44,  32 }, {   8,  43 },
+  {  69,  45 }, {  76,   0 }, {  81,   0 }, {  43,   0 }, {  14,   0 }, {  12,   0 },
+  {  60,   0 }, {  58,   0 }, {  75,   0 }, {  22,   0 }, {  83,   1 }, {   2,   1 },
+  {   1,   1 }, {  11,   6 }, {   6,  11 }, {  79,  23 }, {  13,  34 }, {   8,  43 },
+  {  76,   0 }, {  81,   0 }, {  43,   0 }, {  14,   0 }, {  12,   0 }, {  60,   0 },
+  {  58,   0 }, {  75,   0 }, {  22,   0 }, {  83,   1 }, {   2,   1 }, {   1,   1 },
+  {  11,   6 }, {   6,  11 }, {  79,  25 }, {  13,  34 }, {   8,  43 }, {  76,   0 },
+  {   7,   0 }, {  81,   0 }, {  43,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 },
+  {   9,   0 }, {  60,   0 }, {  58,   0 }, {  29,   0 }, {  75,   0 }, {  22,   0 },
+  {  83,   1 }, {   2,   1 }, {   1,   1 }, {  11,   6 }, {   6,  11 }, {  79,  25 },
+  {  13,  34 }, {   8,  43 }, {  76,   0 }, {  33,   0 }, {  43,   0 }, {  32,   0 },
+  {  18,   0 }, {   6,   0 }, {  17,   0 }, {   3,   1 }, {   1,   1 }, {  82,   4 },
+  {  15,   6 }, {  16,   6 }, {  10,  15 }, {   4,  25 }, {  46,  39 }, {   8,  43 },
+  {  19,  43 }, {  76,   0 }, {  33,   0 }, {  43,   0 }, {  32,   0 }, {  58,   0 },
+  {  18,   0 }, {   6,   0 }, {  17,   0 }, {   3,   1 }, {   1,   1 }, {  82,   4 },
+  {  15,   6 }, {  16,   8 }, {  10,  15 }, {   4,  28 }, {   8,  43 }, {  46,  46 },
+  {  19,  50 }, {  76,   0 }, {  33,   0 }, {   7,   0 }, {  43,   0 }, {  44,   0 },
+  {   9,   0 }, {  32,   0 }, {  60,   0 }, {  58,   0 }, {  18,   0 }, {   6,   0 },
+  {  17,   0 }, {  71,   1 }, {   3,   1 }, {   1,   1 }, {  82,   4 }, {  15,   6 },
+  {  16,   8 }, {  75,  11 }, {  10,  15 }, {   4,  28 }, {   8,  43 }, {  46,  52 },
+  {  19,  52 }, {  47,   0 }, {   6,   0 }, {  82,   1 }, {   1,   1 }, {   5,   5 },
+  {  45,   9 }, {   8,  29 }, {  76,  33 }, {  47,   0 }, {   6,   0 }, {  82,   1 },
+  {   1,   1 }, {   5,   5 }, {  45,   9 }, {   8,  29 }, {  76,  38 }, {  47,   0 },
+  {   9,   0 }, {   6,   0 }, {  82,   1 }, {   1,   1 }, {   5,   5 }, {  45,   9 },
+  {   8,  29 }, {  76,  41 }, {  33,   0 }, {  43,   0 }, {  32,   0 }, {  58,   0 },
+  {  64,   0 }, {  24,   0 }, {  23,   0 }, {  82,   5 }, {   1,   5 }, {  68,  10 },
+  {  69,  23 }, {  78,  29 }, {  75,  31 }, {   8,  40 }, {  33,   0 }, {  43,   0 },
+  {   9,   0 }, {  32,   0 }, {  58,   0 }, {  64,   0 }, {  18,   0 }, {  24,   0 },
+  {  23,   0 }, {  17,   0 }, {  82,   5 }, {   1,   5 }, {  68,  10 }, {  16,  15 },
+  {  69,  23 }, {  75,  31 }, {  78,  33 }, {   8,  40 }, {  25,   1 }, {  82,   1 },
+  {   3,   1 }, {   1,   5 }, {  52,  16 }, {   9,   0 }, {  58,   0 }, {  52,   1 },
+  {  82,   1 }, {   3,   1 }, {   1,   5 }, {  25,  14 }, {  54,  14 }, {  57,  26 },
+  {  84,  30 }, {  56,  34 }, {  75,  37 }, {   8,   0 }, {  73,   0 }, {   6,   0 },
+  {  23,   0 }, {   5,   1 }, {   1,   1 }, {  21,   4 }, {  83,   5 }, {  68,   9 },
+  {  20,  13 }, {  69,  29 }, {  24,  47 }, {   8,   0 }, {  73,   0 }, {   6,   0 },
+  {  23,   0 }, {   5,   1 }, {   1,   1 }, {  83,   5 }, {  21,   5 }, {  68,   9 },
+  {  20,  13 }, {  69,  29 }, {  24,  47 }, {  76,   0 }, {   7,   0 }, {   8,   0 },
+  {   9,   0 }, {  73,   0 }, {   6,   0 }, {  23,   0 }, {   5,   1 }, {   1,   1 },
+  {  83,   5 }, {  21,   5 }, {  68,   9 }, {  20,  13 }, {  69,  29 }, {  24,  47 },
+  {  72,   0 }, {  53,   0 }, {  64,   0 }, {  41,   0 }, {  29,   0 }, {   6,   0 },
+  {  75,   0 }, {  38,   1 }, {  25,   6 }, {  28,  13 }, {   7,   0 }, {  72,   0 },
+  {   9,   0 }, {  53,   0 }, {  64,   0 }, {  41,   0 }, {  29,   0 }, {   6,   0 },
+  {  75,   0 }, {  28,   1 }, {  38,   1 }, {  25,   6 }, {  33,   0 }, {   7,   0 },
+  {  43,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 }, {  32,   0 },
+  {  24,   0 }, {  22,   0 }, {  23,   0 }, {  83,   1 }, {   1,   1 }, {  61,   5 },
+  {  68,   9 }, {  58,  10 }, {  60,  15 }, {  70,  21 }, {  75,  28 }, {  69,  29 },
+  {   8,  37 }, {  84,  37 }, {  33,   0 }, {   7,   0 }, {  43,   0 }, {  66,   0 },
+  {  44,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 }, {   9,   0 }, {  32,   0 },
+  {  67,   0 }, {  18,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  83,   1 },
+  {   1,   1 }, {  61,   5 }, {  68,   9 }, {  58,  10 }, {  60,  15 }, {  70,  21 },
+  {  75,  28 }, {  69,  29 }, {   8,  37 }, {  84,  43 }, {  33,   0 }, {   7,   0 },
+  {  43,   0 }, {  44,   0 }, {  14,   0 }, {  13,   0 }, {  71,   0 }, {  32,   0 },
+  {  58,   0 }, {  24,   0 }, {  23,   0 }, {   1,   1 }, {  61,   5 }, {  60,  15 },
+  {  70,  21 }, {   8,  47 }, {  33,   0 }, {   7,   0 }, {  43,   0 }, {  44,   0 },
+  {  14,   0 }, {  13,   0 }, {  71,   0 }, {   9,   0 }, {  32,   0 }, {  67,   0 },
+  {  58,   0 }, {  24,   0 }, {  23,   0 }, {   1,   1 }, {  61,   5 }, {  60,  15 },
+  {  70,  21 }, {   8,  47 }, {   1,  10 }, {  52,  15 }, {  85,  20 }, {  43,   0 },
+  {   9,   0 }, {  64,   0 }, {  29,   0 }, {   1,   1 }, {  49,  11 }, {  52,  15 },
+  {  85,  20 }, {  27,  26 }, {  50,  32 }, {  51,  34 }, {  56,  43 }, {   9,   0 },
+  {  64,   0 }, {  29,   0 }, {   1,   1 }, {  49,  11 }, {  52,  15 }, {  85,  20 },
+  {  50,  32 }, {  51,  34 }, {  56,  43 }, {  52,  13 }, {  56,  29 }, {  76,   0 },
+  {   9,   0 }, {  84,   0 }, {  41,   0 }, {   6,   0 }, {  57,   0 }, {  52,   1 },
+  {  38,   3 }, {  53,  11 }, {  56,  43 }, {  86,  52 }, {  76,   0 }, {  43,   0 },
+  {   9,   0 }, {  73,   0 }, {  22,   0 }, {  23,   0 }, {  82,   1 }, {   5,   5 },
+  {  21,   5 }, {  68,   9 }, {  20,  13 }, {   6,  21 }, {  69,  29 }, {  24,  47 },
+  {  33,   0 }, {  81,   0 }, {  69,   0 }, {  43,   0 }, {  32,   0 }, {  31,   0 },
+  {  58,   0 }, {  18,   0 }, {   1,   1 }, {   5,   3 }, {  82,   4 }, {  16,   6 },
+  {   6,  11 }, {  68,  18 }, {  76,  28 }, {  17,  35 }, {  19,  43 }, {  33,   0 },
+  {   7,   0 }, {  81,   0 }, {  43,   0 }, {   8,   0 }, {   9,   0 }, {  32,   0 },
+  {  31,   0 }, {  58,   0 }, {  18,   0 }, {   1,   1 }, {   5,   3 }, {  82,   4 },
+  {  16,   6 }, {   6,  11 }, {  68,  18 }, {  69,  26 }, {  76,  29 }, {  17,  41 },
+  {  19,  43 }, {  72,   0 }, {  75,   0 }, {  25,   1 }, {   1,   5 }, {   8,  37 },
+  {  29,  37 }, {  72,   0 }, {   9,   0 }, {  73,   0 }, {  75,   0 }, {  25,   1 },
+  {   1,   5 }, {   8,  37 }, {  29,  43 }, {  78,   0 }, {  33,   0 }, {  32,   0 },
+  {  60,   0 }, {  18,   0 }, {  17,   0 }, {  16,   1 }, {   1,   5 }, {  86,  10 },
+  {  61,  15 }, {   7,  25 }, {  19,  47 }, {  78,   0 }, {  33,   0 }, {  43,   0 },
+  {  44,   0 }, {   9,   0 }, {  32,   0 }, {  60,   0 }, {  58,   0 }, {  41,   0 },
+  {  18,   0 }, {  17,   0 }, {  16,   1 }, {   1,   5 }, {  61,  15 }, {   7,  25 },
+  {  86,  37 }, {  19,  47 }, {  43,   0 }, {  12,   0 }, {   9,   0 }, {  31,   0 },
+  {  58,   0 }, {  64,   0 }, {  29,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 },
+  {   5,   1 }, {   2,   1 }, {  79,   6 }, {   6,  11 }, {  84,  25 }, {  76,  29 },
+  {   8,  43 }, {   7,   0 }, {  47,   0 }, {  63,   0 }, {  50,   0 }, {  51,   0 },
+  {   6,   0 }, {  24,   0 }, {  23,   0 }, {  49,   1 }, {  64,  20 }, {  78,  40 },
+  {   7,   0 }, {  47,   0 }, {   9,   0 }, {  63,   0 }, {  50,   0 }, {  51,   0 },
+  {   6,   0 }, {  24,   0 }, {  23,   0 }, {  49,   1 }, {  64,  20 }, {  78,  46 },
+  {  43,   0 }, {  12,   0 }, {  32,   0 }, {  31,   0 }, {  58,   0 }, {  64,   0 },
+  {  29,   0 }, {  22,   0 }, {  23,   0 }, {   3,   1 }, {   6,  10 }, {   5,  16 },
+  {  73,  31 }, {  76,  33 }, {   8,  40 }, {  33,   0 }, {  43,   0 }, {  12,   0 },
+  {   9,   0 }, {  32,   0 }, {  31,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 },
+  {  24,   0 }, {  22,   0 }, {  23,   0 }, {   3,   1 }, {   6,  10 }, {   5,  16 },
+  {  73,  31 }, {  76,  33 }, {   8,  40 }, {  37,  56 }, {  89,   0 }, {  72,   0 },
+  {   9,   0 }, {  79,   0 }, {  63,   0 }, {  51,   0 }, {   6,   0 }, {  24,   0 },
+  {  23,   0 }, {  82,   1 }, {  50,   1 }, {  48,   1 }, {  49,   6 }, {  64,  43 },
+  {   8,   0 }, {  47,   0 }, {   9,   0 }, {  51,   0 }, {  64,   0 }, {  63,   1 },
+  {  10,   1 }, {  45,   1 }, {  79,  34 }, {  89,  43 }, {  43,   0 }, {  64,   0 },
+  {  24,   0 }, {  23,   0 }, {   1,   1 }, {   2,   5 }, {  82,   8 }, {  79,  10 },
+  {  73,  31 }, {   8,  40 }, {  43,   0 }, {   9,   0 }, {  64,   0 }, {  24,   0 },
+  {  23,   0 }, {   1,   1 }, {   2,   5 }, {  82,   8 }, {  79,  10 }, {  73,  31 },
+  {   8,  40 }, {   7,  45 }, {  72,   0 }, {  51,   0 }, {  64,   0 }, {   1,   1 },
+  {  82,   4 }, {  49,   6 }, {  86,  34 }, {   8,  43 }, {   7,   0 }, {  69,   0 },
+  {  89,   0 }, {  43,   0 }, {  14,   0 }, {  13,   0 }, {  79,   0 }, {  73,   0 },
+  {  58,   0 }, {  64,   0 }, {  41,   0 }, {   6,   0 }, {   2,   1 }, {   1,   1 },
+  {  84,   7 }, {  68,  18 }, {   8,  43 }, {   7,   0 }, {  69,   0 }, {  89,   0 },
+  {  43,   0 }, {  14,   0 }, {   9,   0 }, {  79,   0 }, {  73,   0 }, {  58,   0 },
+  {  64,   0 }, {  41,   0 }, {   6,   0 }, {   2,   1 }, {   1,   1 }, {  84,   7 },
+  {  68,  18 }, {  13,  34 }, {   8,  43 }, {   7,   0 }, {  44,   0 }, {  70,   0 },
+  {  51,   0 }, {  60,   0 }, {  64,   0 }, {  29,   0 }, {   1,   1 }, {  49,   6 },
+  {  48,  15 }, {  71,  34 }, {   7,   0 }, {  44,   0 }, {   9,   0 }, {  70,   0 },
+  {  63,   0 }, {  50,   0 }, {  51,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 },
+  {  29,   0 }, {   1,   1 }, {  49,   6 }, {  48,  15 }, {  71,  34 }, {   7,   0 },
+  {  43,   0 }, {  44,   0 }, {   1,   5 }, {  59,   8 }, {  60,  15 }, {   8,  37 },
+  {  79,   0 }, {  64,   0 }, {  29,   0 }, {  24,   0 }, {  23,   0 }, {  77,   1 },
+  {   3,   1 }, {  49,  12 }, {  50,  25 }, {  51,  34 }, {  72,  44 }, {  14,   0 },
+  {  13,   0 }, {  51,   0 }, {  64,   0 }, {  29,   0 }, {   3,   1 }, {   1,   1 },
+  {  87,  34 }, {   8,  43 }, {  47,   0 }, {  82,   5 }, {  10,   5 }, {   6,   6 },
+  {   4,  17 }, {  79,  34 }, {  73,  43 }, {   7,   0 }, {   9,   0 }, {  50,   0 },
+  {  51,   0 }, {  63,   1 }, {  79,  18 }, {  89,  34 }, {  64,  43 }, {   7,   0 },
+  {  44,   0 }, {  14,   0 }, {  13,   0 }, {  70,   0 }, {  60,   0 }, {  58,   0 },
+  {   6,   0 }, {  75,   0 }, {   1,   1 }, {  65,   7 }, {  66,  21 }, {  68,  25 },
+  {  43,  31 }, {   8,  37 }, {  67,  47 }, {   7,   0 }, {  69,   0 }, {  44,   0 },
+  {  14,   0 }, {  13,   0 }, {  70,   0 }, {  60,   0 }, {  58,   0 }, {   6,   0 },
+  {  75,   0 }, {   1,   1 }, {  65,   7 }, {  66,  21 }, {  68,  27 }, {   8,  37 },
+  {  43,  40 }, {  67,  47 }, {   7,   0 }, {  44,   0 }, {  14,   0 }, {  13,   0 },
+  {   9,   0 }, {  70,   0 }, {  60,   0 }, {  58,   0 }, {  18,   0 }, {   6,   0 },
+  {  75,   0 }, {   1,   1 }, {  65,   7 }, {  66,  21 }, {  68,  27 }, {   8,  37 },
+  {  43,  40 }, {  67,  47 }, {  69,  48 }, {  33,   0 }, {  69,   0 }, {  43,   0 },
+  {  44,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 }, {  19,   0 }, {  32,   0 },
+  {  31,   0 }, {  51,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 },
+  {  18,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {   1,   5 }, {  78,   9 },
+  {  62,  12 }, {  68,  16 }, {  84,  20 }, {   7,  25 }, {   8,  46 }, {  76,   0 },
+  {  43,   0 }, {  44,   0 }, {  31,   0 }, {  60,   0 }, {   6,   0 }, {  22,   0 },
+  {   5,   1 }, {  68,   9 }, {  58,  20 }, {  79,  24 }, {  84,  24 }, {  69,  29 },
+  {  81,  37 }, {  75,  40 }, {  76,   0 }, {   7,   0 }, {  43,   0 }, {  44,   0 },
+  {  71,   0 }, {   9,   0 }, {  31,   0 }, {  51,   0 }, {  60,   0 }, {  64,   0 },
+  {   6,   0 }, {  22,   0 }, {  89,   1 }, {  79,   1 }, {   5,   1 }, {  58,   1 },
+  {  84,   1 }, {  68,   9 }, {  75,  19 }, {  69,  29 }, {  81,  37 }, {  78,   0 },
+  {   7,   0 }, {  60,   0 }, {  58,   0 }, {   1,   1 }, {  68,   4 }, {  43,  16 },
+  {  69,  20 }, {  44,  37 }, {   8,  43 }, {  78,   0 }, {   7,   0 }, {   9,   0 },
+  {  70,   0 }, {  60,   0 }, {  58,   0 }, {   1,   1 }, {  68,   7 }, {  43,  16 },
+  {  69,  20 }, {  44,  40 }, {   8,  43 }, {  76,   0 }, {  56,   0 }, {  89,   0 },
+  {  43,   0 }, {  58,   0 }, {  84,   0 }, {  64,   0 }, {  41,   0 }, {  38,   1 },
+  {  68,   6 }, {  83,   6 }, {  53,   9 }, {  52,  18 }, {  75,  25 }, {  57,  34 },
+  {  69,  43 }, {  76,   0 }, {  56,   0 }, {  89,   0 }, {  43,   0 }, {  44,   0 },
+  {   9,   0 }, {  54,   0 }, {  60,   0 }, {  58,   0 }, {  84,   0 }, {  64,   0 },
+  {  41,   0 }, {  38,   1 }, {  68,   6 }, {  83,   6 }, {  53,   9 }, {  52,  18 },
+  {  75,  25 }, {  57,  34 }, {  69,  43 }, {  81,   0 }, {  89,   0 }, {  43,   0 },
+  {  44,   0 }, {  31,   0 }, {  60,   0 }, {  84,   0 }, {  64,   0 }, {  22,   0 },
+  {  57,   0 }, {  58,   5 }, {  38,   8 }, {  79,  21 }, {  41,  43 }, {  81,   0 },
+  {  89,   0 }, {  43,   0 }, {  44,   0 }, {   9,   0 }, {  31,   0 }, {  60,   0 },
+  {  84,   0 }, {  64,   0 }, {  75,   0 }, {  22,   0 }, {  57,   0 }, {  58,   5 },
+  {  38,   8 }, {  79,  21 }, {  41,  48 }, {   9,   0 }, {  41,   0 }, {  29,   0 },
+  {  75,   0 }, {  25,   1 }, {  68,   7 }, {  26,  11 }, {  69,  25 }, {  76,   0 },
+  {  33,   0 }, {  72,   0 }, {  32,   0 }, {  50,   0 }, {  18,   0 }, {   6,   0 },
+  {  17,   0 }, {  15,   1 }, {   3,   1 }, {  16,   6 }, {  19,  43 }, {  76,   0 },
+  {  33,   0 }, {  72,   0 }, {   9,   0 }, {  32,   0 }, {  50,   0 }, {  18,   0 },
+  {   6,   0 }, {  17,   0 }, {  15,   1 }, {   3,   1 }, {  16,   6 }, {  19,  43 },
+  {  78,   0 }, {  33,   0 }, {  44,   0 }, {  32,   0 }, {  60,   0 }, {  18,   0 },
+  {   6,   0 }, {  17,   0 }, {   1,   1 }, {  16,   1 }, {  15,   5 }, {  45,   8 },
+  {  76,  19 }, {  19,  37 }, {   8,  47 }, {   7,   0 }, {   8,   0 }, {  32,   0 },
+  {  31,   0 }, {  64,   0 }, {  29,   0 }, {  75,   0 }, {  83,   1 }, {  27,   5 },
+  {  33,  34 }, {   7,   0 }, {   8,   0 }, {  44,   0 }, {   9,   0 }, {  32,   0 },
+  {  67,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 }, {  75,   0 },
+  {  31,   1 }, {  83,   1 }, {  27,   5 }, {  33,  34 }, {  43,   0 }, {   9,   0 },
+  {  32,   0 }, {  31,   0 }, {  58,   0 }, {  64,   0 }, {  18,   0 }, {  57,   0 },
+  {  76,   1 }, {  83,   1 }, {   2,   1 }, {   5,   8 }, {  84,  10 }, {   6,  11 },
+  {  79,  20 }, {  75,  34 }, {  33,  43 }, {  89,  47 }, {   7,   0 }, {   8,   0 },
+  {   9,   0 }, {  70,   0 }, {   6,   0 }, {  77,   1 }, {  21,   5 }, {   1,   6 },
+  {  20,  18 }, {  84,  24 }, {  71,  25 }, {  23,  34 }, {  24,  43 }, {  78,   0 },
+  {  33,   0 }, {   7,   0 }, {  43,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 },
+  {  13,   0 }, {  19,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 }, {  60,   0 },
+  {  58,   0 }, {  64,   0 }, {  29,   0 }, {  18,   0 }, {  75,   0 }, {  24,   0 },
+  {  22,   0 }, {  23,   0 }, {  62,   1 }, {   1,   1 }, {   8,  25 }, {  84,  42 },
+  {  33,   0 }, {   7,   0 }, {  69,   0 }, {  43,   0 }, {  14,   0 }, {  12,   0 },
+  {  13,   0 }, {  71,   0 }, {  19,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 },
+  {  70,   0 }, {  67,   0 }, {  18,   0 }, {  75,   0 }, {  24,   0 }, {  22,   0 },
+  {  23,   0 }, {   1,   1 }, {   4,   5 }, {  58,  11 }, {  60,  25 }, {   8,  43 },
+  {  44,  47 }, {  55,  55 }, {  78,   0 }, {   7,   0 }, {  44,   0 }, {   9,   0 },
+  {  60,   0 }, {  58,   0 }, {  29,   0 }, {  75,   0 }, {  26,   7 }, {  25,   8 },
+  {  28,  12 }, {  61,  24 }, {  41,  52 }, {   7,   0 }, {  81,   0 }, {  43,   0 },
+  {   8,   0 }, {  44,   0 }, {  13,   0 }, {   9,   0 }, {  31,   0 }, {  51,   0 },
+  {  60,   0 }, {  58,   0 }, {  12,   1 }, {  83,   1 }, {  21,   5 }, {   5,   6 },
+  {  20,  11 }, {   6,  12 }, {  84,  24 }, {  22,  25 }, {  23,  34 }, {  24,  43 },
+  {   7,   0 }, {   8,   0 }, {  44,   0 }, {  51,   0 }, {  60,   0 }, {  58,   0 },
+  {  84,   0 }, {  29,   0 }, {  23,   0 }, {  83,   1 }, {  22,   1 }, {  11,   5 },
+  {   1,   6 }, {  12,  25 }, {  13,  34 }, {  14,  43 }, {   9,  62 }, {  78,   0 },
+  {   7,   0 }, {  72,   0 }, {  14,   0 }, {  13,   0 }, {  47,   0 }, {   9,   0 },
+  {  79,   0 }, {  73,   0 }, {  51,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 },
+  {   6,   0 }, {  61,   1 }, {   8,   1 }, {  82,   1 }, {   3,   1 }, {   1,   1 },
+  {  74,  43 }, {   8,   0 }, {   9,   0 }, {  54,   0 }, {  51,   0 }, {  64,   0 },
+  {  29,   0 }, {   6,   0 }, {  75,   0 }, {   1,   1 }, {  45,   1 }, {   5,   6 },
+  {  52,  30 }, {  85,  30 }, {  61,  33 }, {  56,  43 }, {  69,  43 }, {  84,  43 },
+  {   7,   0 }, {  43,   0 }, {   9,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 },
+  {  57,   0 }, {  68,   1 }, {  82,   1 }, {   1,   1 }, {   5,   6 }, {  27,   9 },
+  {   6,  11 }, {  75,  29 }, {   8,  43 }, {   7,   0 }, {  43,   0 }, {   9,   0 },
+  {  58,   0 }, {  64,   0 }, {  82,   1 }, {   1,   1 }, {   5,   6 }, {   6,  11 },
+  {  68,  17 }, {  32,  25 }, {  77,  29 }, {   8,  43 }, {  33,  45 }, {  76,   0 },
+  {  69,   0 }, {  89,   0 }, {  43,   0 }, {   8,   0 }, {   9,   0 }, {  60,   0 },
+  {  58,   0 }, {  41,   0 }, {   6,   0 }, {  38,   1 }, {   5,   6 }, {  53,  20 },
+  {  84,  27 }, {  75,  30 }, {  57,  40 }, {  44,  45 }, {   7,   0 }, {  43,   0 },
+  {   9,   0 }, {  32,   0 }, {  70,   0 }, {  60,   0 }, {  58,   0 }, {   4,   1 },
+  {  10,   1 }, {   1,   1 }, {  61,  34 }, {  78,  37 }, {  44,  40 }, {  33,  43 },
+  {   8,  52 }, {  33,   0 }, {  89,   0 }, {  32,   0 }, {  51,   0 }, {  64,   0 },
+  {  29,   0 }, {   6,   0 }, {  24,   0 }, {  79,   1 }, {   1,   1 }, {  21,   5 },
+  {  50,   7 }, {  76,  12 }, {  20,  15 }, {  86,  18 }, {  23,  29 }, {   9,  47 },
+  {   8,  50 }, {  76,   0 }, {   7,   0 }, {  81,   0 }, {  72,   0 }, {  44,   0 },
+  {  12,   0 }, {   9,   0 }, {  31,   0 }, {  63,   0 }, {  60,   0 }, {  58,   0 },
+  {  64,   0 }, {   6,   0 }, {  22,   0 }, {  23,   0 }, {  57,   0 }, {  82,   1 },
+  {  83,   1 }, {  50,   1 }, {  49,   4 }, {  75,  25 }, {  51,  34 }, {   7,   0 },
+  {  72,   0 }, {   8,   0 }, {  44,   0 }, {  12,   0 }, {   9,   0 }, {  31,   0 },
+  {  70,   0 }, {  58,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  59,   1 },
+  {   1,   1 }, {  20,  11 }, {  60,  22 }, {  71,  38 }, {  33,   0 }, {   7,   0 },
+  {  44,   0 }, {   9,   0 }, {  32,   0 }, {  60,   0 }, {  58,   0 }, {   6,   0 },
+  {  25,   1 }, {  12,   1 }, {  31,   1 }, {  83,   1 }, {  22,   1 }, {  63,  16 },
+  {  54,  18 }, {  89,  25 }, {  64,  34 }, {  51,  43 }, {   7,   0 }, {   9,   0 },
+  {  32,   0 }, {  31,   0 }, {  63,   0 }, {  51,   0 }, {  24,   0 }, {  23,   0 },
+  {  83,   1 }, {  68,  11 }, {  69,  25 }, {  64,  25 }, {  33,  43 }, {  89,   0 },
+  {  79,   0 }, {  63,   0 }, {   6,   0 }, {  21,   5 }, {  64,  25 }, {  23,  34 },
+  {  24,  43 }, {  72,   0 }, {  12,   0 }, {   9,   0 }, {  31,   0 }, {  79,   0 },
+  {  73,   0 }, {  64,   0 }, {  29,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 },
+  {   6,   6 }, {  49,  21 }, {  50,  21 }, {  78,  42 }, {  51,  49 }, {  33,   0 },
+  {  72,   0 }, {   8,   0 }, {  12,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 },
+  {  79,   0 }, {  73,   0 }, {  64,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 },
+  {   6,   6 }, {  49,  21 }, {  50,  21 }, {  51,  49 }, {  86,  57 }, {  72,   0 },
+  {   8,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 }, {   9,   0 }, {  31,   0 },
+  {  73,   0 }, {  64,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {   6,   6 },
+  {  49,  21 }, {  50,  21 }, {  79,  36 }, {  51,  49 }, {  33,   0 }, {   7,   0 },
+  {  81,   0 }, {  44,   0 }, {  14,   0 }, {  13,   0 }, {   9,   0 }, {  32,   0 },
+  {  70,   0 }, {  67,   0 }, {  60,   0 }, {  58,   0 }, {   6,   0 }, {  24,   0 },
+  {  23,   0 }, {  61,   6 }, {  66,  19 }, {  71,  32 }, {  33,   0 }, {   7,   0 },
+  {  81,   0 }, {  44,   0 }, {  14,   0 }, {  13,   0 }, {   9,   0 }, {  32,   0 },
+  {  67,   0 }, {  60,   0 }, {  58,   0 }, {  18,   0 }, {   6,   0 }, {  24,   0 },
+  {  23,   0 }, {  17,   0 }, {  61,   6 }, {  66,  19 }, {  19,  42 }, {   7,   0 },
+  {  89,   0 }, {  43,   0 }, {  44,   0 }, {  14,   0 }, {  13,   0 }, {  71,   0 },
+  {   9,   0 }, {  60,   0 }, {  58,   0 }, {  29,   0 }, {  11,   1 }, {  83,   9 },
+  {  61,  12 }, {  70,  27 }, {  69,  33 }, {   7,   0 }, {   8,   0 }, {  44,   0 },
+  {   9,   0 }, {  60,   0 }, {  24,   0 }, {  23,   0 }, {  12,   1 }, {  31,   1 },
+  {   3,   1 }, {   1,   1 }, {  22,   1 }, {  58,   6 }, {  61,  19 }, {  70,  36 },
+  {   7,   0 }, {  89,   0 }, {  44,   0 }, {  47,   0 }, {   9,   0 }, {  70,   0 },
+  {  67,   0 }, {  51,   0 }, {  58,   0 }, {  64,   0 }, {   6,   0 }, {  24,   0 },
+  {  23,   0 }, {  61,  10 }, {  66,  28 }, {   7,   0 }, {  72,   0 }, {   9,   0 },
+  {  32,   0 }, {  64,   0 }, {  29,   0 }, {   6,   0 }, {  24,   0 }, {  23,   0 },
+  {   1,   1 }, {  49,   6 }, {  30,  12 }, {  50,  18 }, {  86,  27 }, {  51,  36 },
+  {  74,  46 }, {  33,   0 }, {  72,   0 }, {  32,   0 }, {  18,   0 }, {   6,   0 },
+  {  17,   0 }, {  15,   1 }, {  16,   1 }, {  49,   6 }, {  74,  36 }, {  19,  57 },
+  {  33,   0 }, {  72,   0 }, {   9,   0 }, {  32,   0 }, {  50,   0 }, {  51,   0 },
+  {  64,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 }, {  15,   1 }, {  16,   1 },
+  {  49,   6 }, {  74,  36 }, {  19,  57 }, {  33,   0 }, {   9,   0 }, {  32,   0 },
+  {  60,   0 }, {  58,   0 }, {  41,   0 }, {   6,   0 }, {  75,   0 }, {  24,   0 },
+  {  23,   0 }, {  57,   0 }, {   5,  11 }, {  79,  19 }, {  89,  27 }, {  64,  36 },
+  {  63,  38 }, {  51,  46 }, {  72,   0 }, {   8,   0 }, {   9,   0 }, {  51,   0 },
+  {  29,   0 }, {   6,   0 }, {  75,   0 }, {   5,   6 }, {  86,  27 }, {  73,  46 },
+  {  76,   0 }, {  33,   0 }, {   7,   0 }, {  56,   0 }, {  81,   0 }, {  89,   0 },
+  {  72,   0 }, {   8,   0 }, {  66,   0 }, {  80,   0 }, {  44,   0 }, {  14,   0 },
+  {  13,   0 }, {  71,   0 }, {  47,   0 }, {  19,   0 }, {  32,   0 }, {  70,   0 },
+  {  67,   0 }, {  51,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 }, {  41,   0 },
+  {  29,   0 }, {  18,   0 }, {   6,   0 }, {  75,   0 }, {  24,   0 }, {  23,   0 },
+  {  17,   0 }, {  57,   0 }, {   5,   1 }, {  35,   1 }, {  49,   6 }, {  61,  12 },
+  {  86,  27 }, {   9,  57 }, {  72,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 },
+  {   9,   0 }, {  51,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 }, {   6,   0 },
+  {  24,   0 }, {  22,   0 }, {  23,   0 }, {  49,   1 }, {   5,   1 }, {   8,  65 },
+  {   8,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 }, {   1,   1 }, {  83,   4 },
+  {  26,   7 }, {  28,  22 }, {   8,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 },
+  {   1,   1 }, {  83,   4 }, {  26,   7 }, {  28,  24 }, {   7,   0 }, {   8,   0 },
+  {   9,   0 }, {  67,   0 }, {  58,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 },
+  {   1,   1 }, {  83,   4 }, {  26,   7 }, {  28,  24 }, {   7,   0 }, {  43,   0 },
+  {   8,   0 }, {  14,   0 }, {  12,   0 }, {  58,   0 }, {  29,   0 }, {   1,   1 },
+  {  11,   7 }, {  13,  33 }, {   7,   0 }, {  81,   0 }, {  43,   0 }, {   8,   0 },
+  {  14,   0 }, {  12,   0 }, {  60,   0 }, {  58,   0 }, {  29,   0 }, {  22,   0 },
+  {   1,   1 }, {  11,   7 }, {  13,  39 }, {   7,   0 }, {  81,   0 }, {  43,   0 },
+  {   8,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 }, {   9,   0 }, {  70,   0 },
+  {  60,   0 }, {  58,   0 }, {  29,   0 }, {  22,   0 }, {   1,   1 }, {  11,   7 },
+  {  13,  43 }, {  33,   0 }, {  43,   0 }, {  32,   0 }, {  58,   0 }, {  18,   0 },
+  {   6,   0 }, {  17,   0 }, {  57,   0 }, {   1,   1 }, {  16,   7 }, {  75,  11 },
+  {  19,  43 }, {  33,   0 }, {  43,   0 }, {  32,   0 }, {  58,   0 }, {  18,   0 },
+  {   6,   0 }, {  17,   0 }, {  57,   0 }, {   1,   1 }, {  16,   7 }, {  75,  11 },
+  {  19,  43 }, {  33,   0 }, {   7,   0 }, {  89,   0 }, {  43,   0 }, {   9,   0 },
+  {  32,   0 }, {  58,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 }, {  57,   0 },
+  {  55,   1 }, {   1,   1 }, {  16,   7 }, {  75,  57 }, {  19,  62 }, {  43,   0 },
+  {  64,   0 }, {  75,   0 }, {  23,   0 }, {   1,   1 }, {  83,   3 }, {  68,   6 },
+  {  69,  16 }, {  79,  33 }, {  43,   0 }, {  13,   0 }, {   9,   0 }, {  58,   0 },
+  {  64,   0 }, {  75,   0 }, {  24,   0 }, {  23,   0 }, {   1,   1 }, {  83,   3 },
+  {  68,   6 }, {  69,  16 }, {  79,  39 }, {  43,   0 }, {  58,   0 }, {  64,   0 },
+  {  23,   0 }, {  83,   1 }, {   1,   1 }, {  68,   8 }, {  73,  20 }, {  69,  22 },
+  {  43,   0 }, {  58,   0 }, {  64,   0 }, {  18,   0 }, {  23,   0 }, {  83,   1 },
+  {   1,   1 }, {  68,   8 }, {  69,  24 }, {  73,  24 }, {  43,   0 }, {   9,   0 },
+  {  70,   0 }, {  58,   0 }, {  64,   0 }, {  18,   0 }, {  24,   0 }, {  23,   0 },
+  {  83,   1 }, {   1,   1 }, {  68,   8 }, {  69,  24 }, {  73,  24 }, {  89,   0 },
+  {  84,   0 }, {  64,   0 }, {   6,   0 }, {   2,   1 }, {  82,   3 }, {  79,  32 },
+  {  73,  40 }, {  89,   0 }, {   9,   0 }, {  58,   0 }, {  84,   0 }, {  64,   0 },
+  {   6,   0 }, {   2,   1 }, {  82,   3 }, {  79,  40 }, {  73,  52 }, {  43,   0 },
+  {  58,   0 }, {  29,   0 }, {   2,   1 }, {  83,   4 }, {  62,   7 }, {  26,  10 },
+  {  68,  19 }, {  69,  43 }, {  43,   0 }, {   9,   0 }, {  60,   0 }, {  58,   0 },
+  {  29,   0 }, {  83,   1 }, {  62,   1 }, {  43,   0 }, {  13,   0 }, {  58,   0 },
+  {  29,   0 }, {   2,   1 }, {  83,   4 }, {  62,   7 }, {  68,  19 }, {  78,  25 },
+  {  14,  34 }, {  69,  43 }, {  43,   0 }, {  14,   0 }, {  13,   0 }, {   9,   0 },
+  {  60,   0 }, {  58,   0 }, {  29,   0 }, {  83,   1 }, {  62,   1 }, {  33,   0 },
+  {  43,   0 }, {  32,   0 }, {  58,   0 }, {  18,   0 }, {  17,   0 }, {   2,   1 },
+  {  83,   4 }, {  62,   7 }, {  16,  10 }, {  68,  19 }, {  69,  43 }, {  33,   0 },
+  {  43,   0 }, {   9,   0 }, {  32,   0 }, {  60,   0 }, {  58,   0 }, {  18,   0 },
+  {  17,   0 }, {  83,   1 }, {  62,   1 }, {  78,   0 }, {  72,   0 }, {  60,   0 },
+  {  64,   0 }, {   6,   0 }, {  48,   1 }, {  50,   8 }, {  51,  36 }, {  74,  40 },
+  {  78,   0 }, {  72,   0 }, {   9,   0 }, {  60,   0 }, {  64,   0 }, {   6,   0 },
+  {  74,   1 }, {  50,   1 }, {  51,   1 }, {  76,   0 }, {  47,   0 }, {   6,   0 },
+  {  82,   4 }, {  83,   4 }, {   5,   8 }, {  76,   0 }, {  47,   0 }, {   6,   0 },
+  {  82,   4 }, {  83,   8 }, {   5,  11 }, {  76,   0 }, {  47,   0 }, {   9,   0 },
+  {   6,   0 }, {  82,   4 }, {  83,   8 }, {   5,  11 }, {   7,   0 }, {   8,   0 },
+  {   6,   0 }, {  24,   0 }, {  23,   0 }, {   5,   1 }, {  20,  22 }, {  76,  33 },
+  {   7,   0 }, {   8,   0 }, {   9,   0 }, {  58,   0 }, {   6,   0 }, {  24,   0 },
+  {  23,   0 }, {   5,   1 }, {  20,  25 }, {  76,  42 }, {  44,   0 }, {  71,   0 },
+  {  58,   0 }, {   1,   1 }, {  60,  27 }, {  44,   0 }, {  71,   0 }, {  58,   0 },
+  {   1,   1 }, {  60,  30 }, {  44,   0 }, {  71,   0 }, {   9,   0 }, {  70,   0 },
+  {  58,   0 }, {  29,   0 }, {   1,   1 }, {  60,  30 }, {  47,   0 }, {  79,   0 },
+  {  64,   0 }, {   6,   0 }, {  49,   5 }, {  78,  29 }, {  51,  40 }, {  47,   0 },
+  {   9,   0 }, {  79,   0 }, {  64,   0 }, {   6,   0 }, {  49,   1 }, {  78,  29 },
+  {  51,  40 }, {   8,   0 }, {  58,   0 }, {  41,   0 }, {  57,   0 }, {   2,   4 },
+  {  43,  19 }, {  60,  28 }, {  44,  33 }, {  75,  36 }, {   7,   0 }, {   8,   0 },
+  {   9,   0 }, {  70,   0 }, {  58,   0 }, {  41,   0 }, {  57,   0 }, {   2,   1 },
+  {  43,  19 }, {  60,  28 }, {  44,  36 }, {  75,  40 }, {  78,   0 }, {  33,   0 },
+  {   7,   0 }, {  72,   0 }, {  43,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 },
+  {   9,   0 }, {  32,   0 }, {  31,   0 }, {  51,   0 }, {  64,   0 }, {  29,   0 },
+  {  18,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {   3,   1 }, {  82,  16 },
+  {   8,  48 }, {  43,   0 }, {   8,   0 }, {  12,   0 }, {  31,   0 }, {  58,   0 },
+  {  22,   0 }, {  83,   1 }, {   3,   1 }, {  59,   8 }, {  81,  16 }, {  60,  20 },
+  {  43,   0 }, {   8,   0 }, {  12,   0 }, {  31,   0 }, {  58,   0 }, {  22,   0 },
+  {  83,   1 }, {   3,   1 }, {  81,  16 }, {  59,  16 }, {  60,  20 }, {   7,   0 },
+  {  43,   0 }, {   8,   0 }, {  44,   0 }, {  12,   0 }, {   9,   0 }, {  31,   0 },
+  {  58,   0 }, {  22,   0 }, {  83,   1 }, {   3,   1 }, {  81,  16 }, {  59,  16 },
+  {  60,  20 }, {  84,   0 }, {  41,   0 }, {  18,   0 }, {  15,   1 }, {  82,   1 },
+  {  39,   4 }, {  19,  42 }, {  58,   0 }, {  84,   0 }, {  41,   0 }, {  18,   0 },
+  {  39,   1 }, {  15,   1 }, {  82,   1 }, {  19,  47 }, {  43,   0 }, {  44,   0 },
+  {   9,   0 }, {  31,   0 }, {  60,   0 }, {  58,   0 }, {  84,   0 }, {  41,   0 },
+  {  18,   0 }, {  15,   1 }, {  82,   1 }, {  39,  36 }, {  19,  53 }, {  43,   0 },
+  {  44,   0 }, {  12,   0 }, {  31,   0 }, {  60,   0 }, {  58,   0 }, {  22,   0 },
+  {  83,   1 }, {  35,   5 }, {   7,  21 }, {  81,  25 }, {  43,   0 }, {  44,   0 },
+  {  12,   0 }, {  31,   0 }, {  60,   0 }, {  22,   0 }, {  83,   1 }, {  58,   1 },
+  {  34,  17 }, {  81,  25 }, {  29,   0 }, {  85,   1 }, {   1,   1 }, {  52,   8 },
+  {  27,  15 }, {  56,  36 }, {  29,   0 }, {  52,   1 }, {  27,   1 }, {  85,   1 },
+  {   1,   1 }, {  56,  36 }, {  76,   0 }, {  56,   0 }, {   9,   0 }, {  29,   0 },
+  {  85,   1 }, {   1,   1 }, {  52,   8 }, {  27,  15 }, {  57,  39 }, {  75,  46 },
+  {  53,   0 }, {  58,   0 }, {  41,   0 }, {  29,   0 }, {  38,   5 }, {  84,   8 },
+  {  52,  20 }, {  76,  29 }, {   8,  43 }, {  53,   0 }, {  58,   0 }, {  41,   0 },
+  {  29,   0 }, {  38,   5 }, {  84,   8 }, {  52,  20 }, {  76,  32 }, {   8,  50 },
+  {  43,   0 }, {  44,   0 }, {   9,   0 }, {  53,   0 }, {  60,   0 }, {  58,   0 },
+  {  41,   0 }, {  29,   0 }, {  75,   0 }, {  57,   0 }, {  38,   5 }, {  84,   8 },
+  {  52,  20 }, {  76,  33 }, {   8,  55 }, {  55,  65 }, {  72,   0 }, {   6,   0 },
+  {  25,   1 }, {  28,  12 }, {  27,  15 }, {  29,  46 }, {  72,   0 }, {   9,   0 },
+  {  73,   0 }, {  51,   0 }, {  64,   0 }, {   6,   0 }, {  25,   1 }, {  28,   1 },
+  {  27,   1 }, {  29,   1 }, {  74,  50 }, {  29,   0 }, {  25,   1 }, {  28,   9 },
+  {  86,  37 }, {   9,   0 }, {  29,   0 }, {  75,   0 }, {  25,   1 }, {  28,   1 },
+  {  76,   0 }, {  33,   0 }, {  19,   0 }, {   9,   0 }, {  32,   0 }, {  18,   0 },
+  {   6,   0 }, {  17,   0 }, {  16,   1 }, {   1,   4 }, {  68,   7 }, {  69,  17 },
+  {   8,  26 }, {   7,   0 }, {  89,   0 }, {   8,   0 }, {  60,   0 }, {  41,   0 },
+  {  83,   1 }, {  68,   4 }, {  43,  21 }, {  69,  27 }, {  44,  36 }, {   7,   0 },
+  {  89,   0 }, {   8,   0 }, {  66,   0 }, {  60,   0 }, {  58,   0 }, {  41,   0 },
+  {  83,   1 }, {  68,   4 }, {  43,  21 }, {  69,  27 }, {  44,  42 }, {   7,   0 },
+  {  81,   0 }, {  89,   0 }, {   8,   0 }, {  66,   0 }, {   9,   0 }, {  60,   0 },
+  {  58,   0 }, {  41,   0 }, {  83,   1 }, {  68,   4 }, {  43,  21 }, {  69,  27 },
+  {  44,  44 }, {  67,  58 }, {  43,   0 }, {  14,   0 }, {  13,   0 }, {  60,   0 },
+  {  58,   0 }, {  29,   0 }, {  11,   1 }, {   1,   1 }, {  68,   8 }, {  12,  22 },
+  {   7,   0 }, {  81,   0 }, {  43,   0 }, {  44,   0 }, {  14,   0 }, {  13,   0 },
+  {   9,   0 }, {  70,   0 }, {  51,   0 }, {  60,   0 }, {  58,   0 }, {  29,   0 },
+  {  68,   1 }, {  11,   1 }, {   1,   1 }, {  12,  22 }, {  84,   0 }, {  25,   1 },
+  {  10,   1 }, {  28,   8 }, {  53,  10 }, {  29,  48 }, {  43,   0 }, {  44,   0 },
+  {  58,   0 }, {  29,   0 }, {  75,   0 }, {  52,  12 }, {  60,  24 }, {  57,  35 },
+  {  43,   0 }, {  44,   0 }, {   9,   0 }, {  58,   0 }, {  29,   0 }, {  75,   0 },
+  {  52,  12 }, {  60,  24 }, {  57,  38 }, {  78,   0 }, {  81,   0 }, {  89,   0 },
+  {  43,   0 }, {   8,   0 }, {  66,   0 }, {  80,   0 }, {  12,   0 }, {  31,   0 },
+  {  70,   0 }, {  60,   0 }, {  58,   0 }, {  41,   0 }, {  22,   0 }, {  83,   1 },
+  {  37,  31 }, {  69,  38 }, {  78,   0 }, {   7,   0 }, {  81,   0 }, {  89,   0 },
+  {  43,   0 }, {   8,   0 }, {  66,   0 }, {  80,   0 }, {  12,   0 }, {   9,   0 },
+  {  31,   0 }, {  70,   0 }, {  67,   0 }, {  60,   0 }, {  58,   0 }, {  41,   0 },
+  {  75,   0 }, {  22,   0 }, {  83,   1 }, {  37,  31 }, {  69,  38 }, {  89,   0 },
+  {  72,   0 }, {  71,   0 }, {  47,   0 }, {   9,   0 }, {  32,   0 }, {  64,   0 },
+  {  29,   0 }, {   6,   0 }, {  49,   1 }, {  48,   8 }, {  50,  18 }, {  51,  40 },
+  {  79,   0 }, {  51,   0 }, {  63,   8 }, {  64,  37 }, {  89,  44 }, {   9,   0 },
+  {  79,   0 }, {  51,   0 }, {  63,  13 }, {  64,  39 }, {  89,  50 }, {  33,   0 },
+  {   7,   0 }, {  43,   0 }, {  44,   0 }, {  32,   0 }, {  58,   0 }, {  18,   0 },
+  {  17,   0 }, {  16,   1 }, {  68,   8 }, {  61,  12 }, {  69,  21 }, {  60,  24 },
+  {  19,  42 }, {  33,   0 }, {   7,   0 }, {  43,   0 }, {  44,   0 }, {   9,   0 },
+  {  32,   0 }, {  70,   0 }, {  58,   0 }, {  18,   0 }, {  17,   0 }, {  16,   1 },
+  {  68,   8 }, {  61,  12 }, {  69,  21 }, {  60,  24 }, {  19,  46 }, {  43,   0 },
+  {  44,   0 }, {  58,   0 }, {   6,   0 }, {  83,   1 }, {   5,   1 }, {  59,   3 },
+  {  45,   6 }, {  61,  12 }, {  76,  21 }, {  60,  24 }, {  69,  30 }, {  66,  39 },
+  {  43,   0 }, {  44,   0 }, {  47,   0 }, {   9,   0 }, {  67,   0 }, {  58,   0 },
+  {   6,   0 }, {  83,   1 }, {   5,   1 }, {  45,   1 }, {  59,   5 }, {  61,  12 },
+  {  76,  21 }, {  60,  24 }, {  69,  30 }, {  66,  41 }, {  89,   0 }, {   3,   1 },
+  {  78,   9 }, {  40,  18 }, {  41,  27 }, {  89,   0 }, {   9,   0 }, {  51,   0 },
+  {  84,   0 }, {  29,   0 }, {  23,   0 }, {   3,   1 }, {  78,   9 }, {  40,  18 },
+  {   7,  24 }, {  41,  27 }, {  89,   0 }, {  43,   0 }, {  63,   0 }, {  64,   0 },
+  {  41,   0 }, {   6,   0 }, {  75,   0 }, {  83,   1 }, {   2,   1 }, {  76,  32 },
+  {  79,  44 }, {   7,   0 }, {  69,   0 }, {  89,   0 }, {  43,   0 }, {  13,   0 },
+  {   9,   0 }, {  63,   0 }, {  51,   0 }, {  58,   0 }, {  64,   0 }, {  41,   0 },
+  {   6,   0 }, {  75,   0 }, {  83,   1 }, {   2,   1 }, {  76,  34 }, {  79,  52 },
+  {  72,   0 }, {  43,   0 }, {  73,   0 }, {  23,   0 }, {   3,   1 }, {  82,   3 },
+  {   6,  19 }, {  72,   0 }, {  43,   0 }, {   8,   0 }, {   9,   0 }, {  73,   0 },
+  {  24,   0 }, {  23,   0 }, {   3,   1 }, {   6,   1 }, {  89,   0 }, {  79,   0 },
+  {  60,   0 }, {  64,   0 }, {   6,   0 }, {  23,   0 }, {   3,   1 }, {  49,   3 },
+  {  50,  12 }, {  51,  36 }, {  89,   0 }, {  79,   0 }, {  60,   0 }, {  64,   0 },
+  {   6,   0 }, {  23,   0 }, {   3,   1 }, {  49,   3 }, {  50,  12 }, {  51,  39 },
+  {   7,   0 }, {  89,   0 }, {   9,   0 }, {  79,   0 }, {  60,   0 }, {  64,   0 },
+  {   6,   0 }, {  23,   0 }, {   3,   1 }, {  49,   3 }, {  50,  12 }, {  51,  39 },
+  {  71,   0 }, {  63,   0 }, {  60,   0 }, {  64,   0 }, {   6,   0 }, {  24,   0 },
+  {  49,   1 }, {  48,   1 }, {  86,   4 }, {  50,  12 }, {  51,  36 }, {  71,   0 },
+  {  63,   0 }, {  60,   0 }, {  64,   0 }, {   6,   0 }, {  24,   0 }, {  49,   1 },
+  {  48,   1 }, {  50,  12 }, {  86,  24 }, {  51,  39 }, {   7,   0 }, {  12,   0 },
+  {  71,   0 }, {   9,   0 }, {  31,   0 }, {  63,   0 }, {  60,   0 }, {  58,   0 },
+  {  64,   0 }, {   6,   0 }, {  24,   0 }, {  22,   0 }, {  49,   1 }, {  48,   1 },
+  {  50,  12 }, {  86,  24 }, {  51,  39 }, {   8,   0 }, {  47,   0 }, {  32,   0 },
+  {  18,   0 }, {   6,   0 }, {  16,   1 }, {  45,   9 }, {   8,   0 }, {  47,   0 },
+  {  19,   0 }, {   9,   0 }, {  32,   0 }, {  18,   0 }, {   6,   0 }, {  16,   1 },
+  {  45,   9 }, {  71,   0 }, {  32,  35 }, {  33,  44 }, {  71,   0 }, {  32,  36 },
+  {  33,  50 }, {  71,   0 }, {   9,   0 }, {  32,  36 }, {  33,  52 }, {  76,   0 },
+  {   7,   0 }, {  43,   0 }, {  73,   0 }, {  64,   0 }, {   1,   1 }, {  82,   4 },
+  {   8,  37 }, {  29,  42 }, {  76,   0 }, {   7,   0 }, {  43,   0 }, {   9,   0 },
+  {  73,   0 }, {  58,   0 }, {  64,   0 }, {  75,   0 }, {  55,   1 }, {   1,   1 },
+  {  82,   4 }, {   8,  44 }, {  29,  52 }, {  29,   0 }, {   6,   0 }, {  24,   0 },
+  {  23,   0 }, {   5,   4 }, {  20,  13 }, {  21,  15 }, {  76,  46 }, {  55,   0 },
+  {  84,   0 }, {  10,   1 }, {  83,   4 }, {   4,  16 }, {  56,  28 }, {  57,  32 },
+  {  75,  36 }, {   8,  48 }, {  76,   0 }, {   9,   0 }, {  55,   0 }, {  58,   0 },
+  {  84,   0 }, {   8,   1 }, {  10,   1 }, {  83,   4 }, {   4,  16 }, {  56,  28 },
+  {  57,  32 }, {  75,  36 }, {  70,  37 }, {   7,   0 }, {  41,   0 }, {  25,   1 },
+  {  28,  12 }, {  29,  43 }, {   7,   0 }, {   9,   0 }, {  41,   0 }, {  25,   1 },
+  {  28,  12 }, {  29,  48 }, {  33,   0 }, {  89,   0 }, {  72,   0 }, {  32,   0 },
+  {  51,   0 }, {  41,   0 }, {  18,   0 }, {  17,   0 }, {  15,   1 }, {  16,   1 },
+  {  38,   4 }, {  25,   5 }, {  63,   8 }, {  86,  17 }, {  64,  32 }, {  19,  41 },
+  {  33,   0 }, {  89,   0 }, {  72,   0 }, {   9,   0 }, {  32,   0 }, {  51,   0 },
+  {  41,   0 }, {  18,   0 }, {  17,   0 }, {  15,   1 }, {  38,   1 }, {  16,   1 },
+  {  25,   5 }, {  63,   9 }, {  86,  17 }, {  64,  32 }, {  19,  43 }, {  33,   0 },
+  {   7,   0 }, {   9,   0 }, {  32,   0 }, {  73,   0 }, {  51,   0 }, {  64,   0 },
+  {  18,   0 }, {  17,   0 }, {   3,   1 }, {  19,  55 }, {  53,   0 }, {   6,   0 },
+  {  24,   0 }, {  23,   0 }, {  57,   0 }, {  25,   1 }, {  54,   1 }, {  84,   7 },
+  {  52,   8 }, {  85,  12 }, {  76,  24 }, {  56,  48 }, {   9,   0 }, {  53,   0 },
+  {   6,   0 }, {  24,   0 }, {  23,   0 }, {  57,   0 }, {  25,   1 }, {  54,   1 },
+  {  84,   7 }, {  85,  12 }, {  52,  18 }, {  76,  24 }, {  56,  56 }, {  58,   0 },
+  {  29,   0 }, {  23,   0 }, {   1,   1 }, {  53,  10 }, {  71,  20 }, {  70,  25 },
+  {   9,   0 }, {  58,   0 }, {  29,   0 }, {  75,   0 }, {  24,   0 }, {  23,   0 },
+  {   1,   1 }, {  53,  18 }, {  71,  20 }, {  70,  25 }, {  71,   0 }, {  58,   0 },
+  {  23,   0 }, {  21,  11 }, {  84,  28 }, {   9,  48 }, {  71,   0 }, {  58,   0 },
+  {  23,   0 }, {  21,  11 }, {  84,  28 }, {   9,  54 }, {  71,   0 }, {  58,   0 },
+  {  24,   0 }, {  23,   0 }, {  21,  11 }, {  84,  28 }, {   9,  56 }, {  20,   1 },
+  {   1,   1 }, {   7,   0 }, {  71,   0 }, {  24,   0 }, {  20,   1 }, {  39,  19 },
+  {  69,  39 }, {  23,  44 }, {   7,   0 }, {  81,   0 }, {  66,   0 }, {  12,   0 },
+  {  13,   0 }, {  71,   0 }, {   9,   0 }, {  67,   0 }, {  60,   0 }, {  58,   0 },
+  {   6,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {  39,   1 }, {  69,   1 },
+  {  76,   0 }, {  89,   0 }, {  79,   0 }, {  60,   0 }, {  84,   0 }, {  64,   0 },
+  {  23,   0 }, {  49,   1 }, {  82,   4 }, {  50,  15 }, {  51,  39 }, {  86,  43 },
+  {  76,   0 }, {  89,   0 }, {  71,   0 }, {   9,   0 }, {  79,   0 }, {  60,   0 },
+  {  84,   0 }, {  64,   0 }, {  23,   0 }, {  49,   1 }, {  82,   4 }, {  50,  15 },
+  {  51,  39 }, {  86,  45 }, {  89,   0 }, {  14,   0 }, {  13,   0 }, {  51,   0 },
+  {  29,   0 }, {  11,   4 }, {  63,  13 }, {  64,  36 }, {  89,   0 }, {  14,   0 },
+  {  13,   0 }, {  51,   0 }, {  29,   0 }, {  11,   1 }, {  63,  13 }, {  64,  36 },
+  {  89,   0 }, {  14,   0 }, {  13,   0 }, {   9,   0 }, {  51,   0 }, {  29,   0 },
+  {  11,   1 }, {  63,   1 }, {  64,   1 }, {  43,   0 }, {   8,   0 }, {  70,   0 },
+  {  58,   0 }, {  18,   0 }, {   6,   0 }, {  57,   0 }, {   2,   1 }, {  68,   3 },
+  {  83,   4 }, {  65,  10 }, {  66,  18 }, {  69,  24 }, {  80,  27 }, {  75,  39 },
+  {  67,  42 }, {  43,   0 }, {   8,   0 }, {  70,   0 }, {  58,   0 }, {  18,   0 },
+  {   6,   0 }, {  57,   0 }, {  68,   1 }, {   2,   1 }, {  83,   4 }, {  65,  10 },
+  {  66,  18 }, {  69,  24 }, {  80,  27 }, {  75,  41 }, {  67,  46 }, {   7,   0 },
+  {  43,   0 }, {   8,   0 }, {  44,   0 }, {   9,   0 }, {  70,   0 }, {  60,   0 },
+  {  58,   0 }, {  18,   0 }, {   6,   0 }, {  57,   0 }, {  68,   1 }, {   2,   1 },
+  {  83,   4 }, {  65,  10 }, {  66,  18 }, {  69,  24 }, {  80,  27 }, {  75,  41 },
+  {  67,  46 }, {   7,   0 }, {  69,   0 }, {  43,   0 }, {  32,   0 }, {  31,   0 },
+  {  73,   0 }, {  60,   0 }, {  58,   0 }, {  18,   0 }, {  57,   0 }, {  82,   5 },
+  {  33,  39 }, {   7,   0 }, {  81,   0 }, {  69,   0 }, {  43,   0 }, {   8,   0 },
+  {  44,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 }, {  73,   0 }, {  60,   0 },
+  {  58,   0 }, {  18,   0 }, {  75,   0 }, {  57,   0 }, {  82,   5 }, {  33,  41 },
+  {  33,   0 }, {   7,   0 }, {  71,   0 }, {   9,   0 }, {  30,  13 }, {  61,  20 },
+  {  32,  25 }, {  86,  44 }, {  29,  50 }, {  41,   0 }, {  25,   1 }, {  54,   1 },
+  {  39,   4 }, {  28,  12 }, {   7,  36 }, {  86,  40 }, {  56,  44 }, {   9,   0 },
+  {  41,   0 }, {  25,   1 }, {  39,   1 }, {   7,   1 }, {  54,   1 }, {  28,  12 },
+  {   5,  13 }, {   6,  20 }, {  76,  24 }, {  86,  40 }, {  56,  44 }, {  43,   0 },
+  {  44,   0 }, {  60,   0 }, {  41,   0 }, {  18,   0 }, {  24,   0 }, {   1,   1 },
+  {  16,   1 }, {  21,   9 }, {  23,  45 }, {  76,   0 }, {  81,   0 }, {  43,   0 },
+  {  60,   0 }, {  58,   0 }, {  75,   0 }, {   3,   1 }, {   6,  21 }, {  37,  50 },
+  {  76,   0 }, {  81,   0 }, {  43,   0 }, {   8,   0 }, {   9,   0 }, {  60,   0 },
+  {  58,   0 }, {  75,   0 }, {   3,   1 }, {   6,  21 }, {  37,  56 }, {   7,   0 },
+  {  89,   0 }, {  43,   0 }, {  44,   0 }, {  12,   0 }, {  13,   0 }, {  71,   0 },
+  {   9,   0 }, {  60,   0 }, {  58,   0 }, {  41,   0 }, {  18,   0 }, {  22,   0 },
+  {  83,   1 }, {   2,   1 }, {  68,   5 }, {  65,  18 }, {  69,  25 }, {  66,  27 },
+  {  70,  45 }, {  67,  50 }, {   7,   0 }, {  43,   0 }, {   8,   0 }, {  12,   0 },
+  {  32,   0 }, {  31,   0 }, {  51,   0 }, {  60,   0 }, {  58,   0 }, {  22,   0 },
+  {   3,   8 }, {  63,  20 }, {  64,  36 }, {  44,  45 }, {   7,   0 }, {  43,   0 },
+  {   8,   0 }, {  12,   0 }, {  71,   0 }, {  47,   0 }, {   9,   0 }, {  32,   0 },
+  {  31,   0 }, {  51,   0 }, {  60,   0 }, {  58,   0 }, {  29,   0 }, {  22,   0 },
+  {  23,   0 }, {   3,   1 }, {  63,  20 }, {  64,  36 }, {  44,  50 }, {  89,   0 },
+  {  43,   0 }, {  71,   0 }, {  58,   0 }, {  84,   0 }, {  57,   0 }, {   2,   1 },
+  {  83,   6 }, {  70,  54 }, {  75,  57 }, {  89,   0 }, {  43,   0 }, {  71,   0 },
+  {   9,   0 }, {  58,   0 }, {  84,   0 }, {  57,   0 }, {   2,   1 }, {  83,   6 },
+  {  70,  57 }, {  75,  63 }, {  78,   0 }, {   7,   0 }, {  44,   0 }, {  70,   0 },
+  {  67,   0 }, {  60,   0 }, {  58,   0 }, {  18,   0 }, {  83,   1 }, {   1,   1 },
+  {   4,  10 }, {  55,  41 }, {  75,  45 }, {  76,   0 }, {   7,   0 }, {  81,   0 },
+  {  47,   0 }, {  60,   0 }, {  58,   0 }, {   6,   0 }, {  83,   1 }, {  10,   1 },
+  {   5,   1 }, {   4,   5 }, {  45,  10 }, {   8,  34 }, {  76,   0 }, {   7,   0 },
+  {  81,   0 }, {   8,   0 }, {  47,   0 }, {   9,   0 }, {  70,   0 }, {  60,   0 },
+  {  58,   0 }, {   6,   0 }, {  83,   1 }, {  10,   1 }, {   4,   5 }, {  45,  10 },
+  {   8,   0 }, {  47,   0 }, {  58,   0 }, {  64,   0 }, {   6,   0 }, {  83,   1 },
+  {   4,   5 }, {  79,  14 }, {  89,  46 }, {   8,   0 }, {  47,   0 }, {   9,   0 },
+  {  58,   0 }, {  64,   0 }, {   6,   0 }, {  83,   1 }, {   4,   5 }, {  79,  14 },
+  {  89,  46 }, {   7,   0 }, {  43,   0 }, {  14,   0 }, {  12,   0 }, {  58,   0 },
+  {  29,   0 }, {  22,   0 }, {  62,   1 }, {   1,   1 }, {  52,  15 }, {  78,  44 },
+  {  13,  47 }, {  71,   0 }, {  60,   0 }, {  58,   0 }, {  84,   0 }, {  76,   6 },
+  {  68,  11 }, {  52,  16 }, {  69,  21 }, {  70,  26 }, {  43,  28 }, {  57,  32 },
+  {  89,   0 }, {  58,   0 }, {  84,   0 }, {  65,   1 }, {   1,   1 }, {  68,   8 },
+  {  69,  25 }, {   7,  44 }, {  79,  56 }, {  67,  60 }, {  89,   0 }, {  58,   0 },
+  {  84,   0 }, {  65,   1 }, {   1,   1 }, {  68,   9 }, {  69,  25 }, {   7,  44 },
+  {  79,  60 }, {  67,  66 }, {  89,   0 }, {  80,   0 }, {  44,   0 }, {  14,   0 },
+  {  13,   0 }, {  71,   0 }, {  47,   0 }, {  19,   0 }, {  60,   0 }, {  58,   0 },
+  {  84,   0 }, {  18,   0 }, {  65,   1 }, {   1,   1 }, {  68,   9 }, {  69,  25 },
+  {   7,  44 }, {  79,  60 }, {  67,  68 }, {   9,  76 }, {   7,   0 }, {  14,   0 },
+  {  13,   0 }, {  51,   0 }, {  29,   0 }, {  11,   1 }, {  85,   1 }, {  25,  10 },
+  {  54,  10 }, {  52,  24 }, {  84,  30 }, {  56,  42 }, {   8,  50 }, {  78,  54 },
+  {   7,   0 }, {  13,   0 }, {  47,   0 }, {   9,   0 }, {  51,   0 }, {  29,   0 },
+  {   8,   1 }, {  11,   1 }, {  85,   1 }, {  25,  10 }, {  54,  10 }, {  52,  24 },
+  {  84,  30 }, {  56,  42 }, {  78,  54 }, {  14,  70 }, {   7,   0 }, {   8,   0 },
+  {  71,   0 }, {   9,   0 }, {  55,   0 }, {  58,   0 }, {   6,   0 }, {  57,   0 },
+  {  83,   1 }, {   5,   1 }, {  70,  25 }, {  75,  37 }, {   7,   0 }, {   8,   0 },
+  {  44,   0 }, {   9,   0 }, {  70,   0 }, {  55,   0 }, {  58,   0 }, {   6,   0 },
+  {  57,   0 }, {  83,   1 }, {   5,   1 }, {  60,  25 }, {  75,  37 }, {   7,   0 },
+  {   8,   0 }, {   9,   0 }, {  55,   0 }, {  58,   0 }, {  29,   0 }, {   6,   0 },
+  {  57,   0 }, {  83,   1 }, {   5,   1 }, {  75,  37 }, {   7,   0 }, {  81,   0 },
+  {  47,   0 }, {   9,   0 }, {  51,   0 }, {  58,   0 }, {  41,   0 }, {   1,   1 },
+  {  83,   5 }, {  68,   7 }, {  79,  22 }, {  76,  25 }, {  69,  40 }, {  89,  67 },
+  {   7,   0 }, {  81,   0 }, {  71,   0 }, {  47,   0 }, {   9,   0 }, {  51,   0 },
+  {  58,   0 }, {  41,   0 }, {  22,   0 }, {  23,   0 }, {   1,   1 }, {  21,   1 },
+  {  83,   5 }, {  68,   7 }, {  20,  14 }, {  79,  22 }, {  76,  25 }, {  69,  40 },
+  {  24,  47 }, {  89,  67 }, {   7,   0 }, {   8,   0 }, {  66,   0 }, {  80,   0 },
+  {  47,   0 }, {   9,   0 }, {  51,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 },
+  {  29,   0 }, {   6,   0 }, {  65,   1 }, {  61,  15 }, {  69,  16 }, {  13,  22 },
+  {  14,  64 }, {  67,  80 }, {   7,   0 }, {   8,   0 }, {  80,   0 }, {  71,   0 },
+  {  47,   0 }, {   9,   0 }, {  51,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 },
+  {   6,   0 }, {  22,   0 }, {  65,   1 }, {  61,  15 }, {  69,  16 }, {  23,  22 },
+  {  66,  32 }, {  24,  64 }, {  67,  80 }, {   7,   0 }, {  43,   0 }, {  47,   0 },
+  {   9,   0 }, {  79,   0 }, {  51,   0 }, {  58,   0 }, {  41,   0 }, {   1,   1 },
+  {  83,   5 }, {  68,   7 }, {  59,  19 }, {  81,  22 }, {  75,  25 }, {  60,  35 },
+  {  69,  41 }, {  44,  49 }, {  67,  70 }, {   7,   0 }, {  66,   0 }, {  80,   0 },
+  {  71,   0 }, {  47,   0 }, {   9,   0 }, {  70,   0 }, {  51,   0 }, {  60,   0 },
+  {  58,   0 }, {  64,   0 }, {   6,   0 }, {  65,   1 }, {  61,  15 }, {  32,  22 },
+  {  33,  56 }, {  67,  72 }, {   8,   0 }, {   9,   0 }, {  55,   0 }, {  58,   0 },
+  {  18,   0 }, {   6,   0 }, {  57,   0 }, {  83,   1 }, {  75,  49 }, {  19,  63 },
+  {  72,   0 }, {  12,   0 }, {   9,   0 }, {  31,   0 }, {  73,   0 }, {  58,   0 },
+  {  64,   0 }, {   6,   0 }, {  75,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 },
+  {   5,   6 }, {  49,  11 }, {  50,  31 }, {  51,  57 }, {  33,   0 }, {  89,   0 },
+  {  13,   0 }, {  71,   0 }, {  47,   0 }, {  32,   0 }, {  70,   0 }, {  54,   0 },
+  {  51,   0 }, {  29,   0 }, {   6,   0 }, {  24,   0 }, {  23,   0 }, {   5,   1 },
+  {  84,   7 }, {  57,  42 }, {  56,  55 }, {   9,  73 }, {  43,   0 }, {  70,   0 },
+  {  60,   0 }, {  58,   0 }, {  41,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 },
+  {  22,   0 }, {  82,   1 }, {   1,   1 }, {  26,   5 }, {  68,  11 }, {  53,  18 },
+  {  81,  39 }, {   7,  42 }, {  43,   0 }, {  70,   0 }, {  60,   0 }, {  58,   0 },
+  {  41,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 }, {  22,   0 }, {  82,   1 },
+  {   1,   1 }, {  26,   5 }, {  68,  11 }, {  53,  19 }, {  81,  38 }, {   7,  43 },
+  {  69,   0 }, {  43,   0 }, {   8,   0 }, {  66,   0 }, {  44,   0 }, {   9,   0 },
+  {  70,   0 }, {  60,   0 }, {  58,   0 }, {  41,   0 }, {  29,   0 }, {   6,   0 },
+  {  75,   0 }, {  22,   0 }, {  82,   1 }, {   1,   1 }, {  26,   5 }, {  68,  11 },
+  {  53,  19 }, {  81,  44 }, {   7,  48 }, {  76,   0 }, {  29,   0 }, {   6,   0 },
+  {   2,   1 }, {  11,   5 }, {  50,  17 }, {  13,  35 }, {  51,  41 }, {  14,  48 },
+  {  76,   0 }, {  12,   0 }, {  29,   0 }, {   6,   0 }, {  22,   0 }, {   2,   1 },
+  {  11,   5 }, {  50,  18 }, {  13,  41 }, {  51,  48 }, {  14,  55 }, {  76,   0 },
+  {  72,   0 }, {  12,   0 }, {   9,   0 }, {  79,   0 }, {  63,   0 }, {  29,   0 },
+  {   6,   0 }, {  22,   0 }, {   2,   1 }, {  64,   1 }, {  11,   5 }, {  50,  18 },
+  {  13,  42 }, {  51,  51 }, {  14,  61 }, {  33,   0 }, {  43,   0 }, {  32,   0 },
+  {  60,   0 }, {  58,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 }, {  82,   1 },
+  {   3,   1 }, {  15,   5 }, {  16,   5 }, {   5,   8 }, {  62,  10 }, {  19,  48 },
+  {  33,   0 }, {  89,   0 }, {  43,   0 }, {  32,   0 }, {  31,   0 }, {  60,   0 },
+  {  58,   0 }, {  18,   0 }, {   6,   0 }, {  75,   0 }, {  17,   0 }, {  82,   1 },
+  {   3,   1 }, {  16,   1 }, {  15,   5 }, {   5,   8 }, {  62,  10 }, {  19,  55 },
+  {  33,   0 }, {  89,   0 }, {  43,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 },
+  {  60,   0 }, {  58,   0 }, {  18,   0 }, {   6,   0 }, {  75,   0 }, {  17,   0 },
+  {  82,   1 }, {   3,   1 }, {  16,   1 }, {  15,   5 }, {   5,   8 }, {  62,  10 },
+  {  19,  60 }, {  81,   0 }, {  70,   0 }, {  60,   0 }, {  58,   0 }, {  41,   0 },
+  {  18,   0 }, {  76,   1 }, {  83,   1 }, {   1,   3 }, {   5,   7 }, {  43,  24 },
+  {  75,  33 }, {  44,  36 }, {   7,   0 }, {  81,   0 }, {  12,   0 }, {   9,   0 },
+  {  31,   0 }, {  70,   0 }, {  60,   0 }, {  58,   0 }, {  41,   0 }, {  18,   0 },
+  {  22,   0 }, {  76,   1 }, {  83,   1 }, {   1,   1 }, {   5,   7 }, {  43,  28 },
+  {  75,  43 }, {  44,  48 }, {   8,   0 }, {   6,   0 }, {  75,   0 }, {  82,   1 },
+  {   1,   1 }, {   5,   5 }, {  11,  10 }, {  10,  10 }, {  76,  13 }, {  47,  50 },
+  {   8,   0 }, {  14,   0 }, {  13,   0 }, {   6,   0 }, {  75,   0 }, {  82,   1 },
+  {   1,   1 }, {   5,   6 }, {  10,  10 }, {  76,  13 }, {  11,  17 }, {  47,  64 },
+  {  81,   0 }, {   8,   0 }, {  14,   0 }, {  13,   0 }, {   9,   0 }, {  29,   0 },
+  {   6,   0 }, {  75,   0 }, {  82,   1 }, {   1,   1 }, {   5,   6 }, {  10,  10 },
+  {  76,  13 }, {  11,  17 }, {  47,  74 }, {  85,   1 }, {   1,   1 }, {  52,  15 },
+  {  52,   0 }, {  52,   0 }, {   9,   0 }, {  51,   0 }, {  29,   0 }, {   6,   0 },
+  {  50,  17 }, {  56,  35 }, {   7,   0 }, {  89,   0 }, {  43,   0 }, {   8,   0 },
+  {  14,   0 }, {  58,   0 }, {  29,   0 }, {   6,   0 }, {  83,   1 }, {   1,   1 },
+  {  11,   5 }, {  13,  36 }, {  69,  39 }, {   7,   0 }, {  89,   0 }, {  43,   0 },
+  {   8,   0 }, {  14,   0 }, {  58,   0 }, {  29,   0 }, {   6,   0 }, {   9,   1 },
+  {  83,   1 }, {   1,   1 }, {  11,   5 }, {  13,  38 }, {  69,  42 }, {  72,   0 },
+  {  51,   0 }, {   6,   0 }, {   1,   1 }, {  26,   1 }, {  27,  15 }, {  74,  41 },
+  {  29,  48 }, {  72,   0 }, {  51,   0 }, {   6,   0 }, {   1,   1 }, {  26,   1 },
+  {  27,  15 }, {  74,  46 }, {  29,  58 }, {  72,   0 }, {   9,   0 }, {  51,   0 },
+  {   6,   0 }, {  29,   1 }, {  74,   5 }, {   7,   0 }, {  43,   0 }, {  73,   0 },
+  {  60,   0 }, {  58,   0 }, {  29,   0 }, {  18,   0 }, {   1,   1 }, {  26,   7 },
+  {  27,  13 }, {  81,  34 }, {   8,  38 }, {   7,   0 }, {  43,   0 }, {   9,   0 },
+  {  73,   0 }, {  60,   0 }, {  58,   0 }, {  29,   0 }, {  18,   0 }, {   1,   1 },
+  {  26,   7 }, {  27,  13 }, {  81,  34 }, {   8,  40 }, {  44,  60 }, {  81,   0 },
+  {  89,   0 }, {  43,   0 }, {  12,   0 }, {  31,   0 }, {  70,   0 }, {  60,   0 },
+  {  58,   0 }, {  41,   0 }, {  18,   0 }, {  75,   0 }, {  22,   0 }, {  83,   1 },
+  {   1,   1 }, {  34,  12 }, {   7,  33 }, {  69,  33 }, {  81,   0 }, {  89,   0 },
+  {  43,   0 }, {  66,   0 }, {  44,   0 }, {  12,   0 }, {   9,   0 }, {  31,   0 },
+  {  70,   0 }, {  67,   0 }, {  60,   0 }, {  58,   0 }, {  41,   0 }, {  18,   0 },
+  {  75,   0 }, {  22,   0 }, {  57,   0 }, {  83,   1 }, {   1,   1 }, {  34,  12 },
+  {   7,  35 }, {  69,  35 }, {  89,   0 }, {  43,   0 }, {  58,   0 }, {  18,   0 },
+  {  82,   1 }, {   1,   1 }, {  68,  22 }, {  89,   0 }, {  79,   0 }, {  73,   0 },
+  {  51,   0 }, {  64,   0 }, {   6,   0 }, {  23,   0 }, {  83,   1 }, {   2,   1 },
+  {  49,   9 }, {  50,  17 }, {  89,   0 }, {  43,   0 }, {   9,   0 }, {  79,   0 },
+  {  73,   0 }, {  64,   0 }, {   6,   0 }, {  23,   0 }, {  83,   1 }, {   2,   1 },
+  {  49,   9 }, {  50,  17 }, {  51,  40 }, {  71,   0 }, {  60,   0 }, {  58,   0 },
+  {  84,   0 }, {   1,   1 }, {  70,  36 }, {  75,  44 }, {  71,   0 }, {  60,   0 },
+  {  58,   0 }, {  84,   0 }, {   1,   1 }, {  70,  38 }, {  75,  50 }, {  71,   0 },
+  {   9,   0 }, {  60,   0 }, {  58,   0 }, {  84,   0 }, {  64,   0 }, {  70,   1 },
+  {  75,   1 }, {   1,   1 }, {  72,   0 }, {  71,   0 }, {  79,   0 }, {  23,   0 },
+  {  51,  27 }, {  74,  31 }, {  72,   0 }, {  71,   0 }, {   9,   0 }, {  79,   0 },
+  {  24,   0 }, {  23,   0 }, {  51,  27 }, {  74,  31 }, {  78,   0 }, {  72,   0 },
+  {  13,   0 }, {  51,   0 }, {  18,   0 }, {  23,   0 }, {   1,   1 }, {  85,  21 },
+  {  73,  33 }, {  78,   0 }, {  72,   0 }, {  13,   0 }, {   9,   0 }, {  51,   0 },
+  {  18,   0 }, {  24,   0 }, {  23,   0 }, {   1,   1 }, {  85,  21 }, {  73,  33 },
+  {  89,   0 }, {  13,   0 }, {  79,   0 }, {  51,   0 }, {  60,   0 }, {   6,   0 },
+  {  23,   0 }, {  10,   1 }, {   1,   1 }, {  48,  13 }, {  50,  15 }, {  89,   0 },
+  {  13,   0 }, {   9,   0 }, {  79,   0 }, {  51,   0 }, {  60,   0 }, {   6,   0 },
+  {  23,   0 }, {  10,   1 }, {   1,   1 }, {  48,  13 }, {  50,  15 }, {  33,   0 },
+  {  43,   0 }, {  44,   0 }, {  32,   0 }, {  60,   0 }, {  58,   0 }, {  84,   0 },
+  {  41,   0 }, {  18,   0 }, {  75,   0 }, {  57,   0 }, {   2,   1 }, {  16,   4 },
+  {  61,  20 }, {  33,   0 }, {  81,   0 }, {  43,   0 }, {  66,   0 }, {  44,   0 },
+  {   9,   0 }, {  32,   0 }, {  60,   0 }, {  58,   0 }, {  84,   0 }, {  41,   0 },
+  {  18,   0 }, {  75,   0 }, {  57,   0 }, {   2,   1 }, {  16,   4 }, {  61,  20 },
+  {  67,   0 }, {  73,   0 }, {  64,   0 }, {  18,   0 }, {  23,   0 }, {  17,   0 },
+  {   1,   1 }, {  39,   5 }, {  16,  10 }, {  15,  12 }, {  41,  38 }, {  19,  42 },
+  {   9,   0 }, {  73,   0 }, {  64,   0 }, {  18,   0 }, {  24,   0 }, {  23,   0 },
+  {  17,   0 }, {   1,   1 }, {  16,   1 }, {  15,  12 }, {  39,  15 }, {  41,  38 },
+  {  19,  42 }, {  67,  66 }, {  33,   0 }, {  89,   0 }, {  71,   0 }, {  19,   0 },
+  {  32,   0 }, {  60,   0 }, {  41,   0 }, {  18,   0 }, {  17,   0 }, {  16,   1 },
+  {  15,  12 }, {  75,  25 }, {  33,   0 }, {   7,   0 }, {  71,   0 }, {  19,   0 },
+  {   9,   0 }, {  32,   0 }, {  60,   0 }, {  64,   0 }, {  41,   0 }, {  18,   0 },
+  {  17,   0 }, {  16,   1 }, {  15,  12 }, {  75,  25 }, {  89,  57 }, {  76,   0 },
+  {  89,   0 }, {  43,   0 }, {  60,   0 }, {  18,   0 }, {   6,   0 }, {   3,   4 },
+  {  21,   6 }, {   5,  12 }, {  23,  36 }, {  24,  44 }, {  76,   0 }, {  89,   0 },
+  {  43,   0 }, {  12,   0 }, {   9,   0 }, {  60,   0 }, {  29,   0 }, {  18,   0 },
+  {   6,   0 }, {  22,   0 }, {   3,   1 }, {   5,   1 }, {  24,   1 }, {  21,   1 },
+  {  23,   1 }, {   7,   0 }, {  89,   0 }, {  43,   0 }, {  80,   0 }, {  70,   0 },
+  {  67,   0 }, {  73,   0 }, {  58,   0 }, {   1,   1 }, {  61,   8 }, {  68,  16 },
+  {  60,  28 }, {  69,  32 }, {  66,  36 }, {  44,  44 }, {   7,   0 }, {  89,   0 },
+  {  43,   0 }, {  80,   0 }, {   9,   0 }, {  70,   0 }, {  67,   0 }, {  73,   0 },
+  {  58,   0 }, {   1,   1 }, {  68,  16 }, {  61,  26 }, {  60,  28 }, {  69,  32 },
+  {  66,  36 }, {  44,  47 }, {   7,   0 }, {  89,   0 }, {  71,   0 }, {  70,   0 },
+  {  67,   0 }, {  60,   0 }, {  58,   0 }, {  23,   0 }, {  82,   1 }, {  61,   8 },
+  {  59,  10 }, {  30,  20 }, {  32,  40 }, {  33,  52 }, {   9,  56 }, {   7,   0 },
+  {  89,   0 }, {  44,   0 }, {  71,   0 }, {  70,   0 }, {  67,   0 }, {  51,   0 },
+  {  60,   0 }, {  58,   0 }, {  24,   0 }, {  23,   0 }, {  82,   1 }, {  59,  10 },
+  {  30,  20 }, {  61,  26 }, {  32,  42 }, {  33,  60 }, {   9,  63 }, {   7,   0 },
+  {  72,   0 }, {  43,   0 }, {   9,   0 }, {  51,   0 }, {  64,   0 }, {  68,   1 },
+  {  82,   1 }, {   1,   1 }, {   5,   6 }, {   6,  11 }, {  73,  25 }, {  74,  37 },
+  {   8,  43 }, {  76,   0 }, {   7,   0 }, {  81,   0 }, {  43,   0 }, {  12,   0 },
+  {  47,   0 }, {   9,   0 }, {  70,   0 }, {  60,   0 }, {  58,   0 }, {   6,   0 },
+  {  22,   0 }, {  57,   0 }, {   1,   1 }, {  34,   4 }, {  45,   4 }, {  36,  24 },
+  {  75,  40 }, {  37,  44 }, {  76,   0 }, {  72,   0 }, {  43,   0 }, {   9,   0 },
+  {   6,   0 }, {  22,   0 }, {  23,   0 }, {   1,   5 }, {  21,   7 }, {  73,  42 },
+  {  24,  45 }, {   7,   0 }, {  72,   0 }, {   8,   0 }, {  71,   0 }, {   9,   0 },
+  {  70,   0 }, {  51,   0 }, {   1,   1 }, {  59,   5 }, {  61,  20 }, {  60,  35 },
+  {  74,  50 }, {  67,   0 }, {  60,   0 }, {  41,   0 }, {  23,   0 }, {  15,   1 },
+  {   1,   1 }, {  25,   5 }, {  16,   5 }, {   7,  32 }, {  19,  43 }, {  33,   0 },
+  {  32,   0 }, {  67,   0 }, {  60,   0 }, {  41,   0 }, {  24,   0 }, {  23,   0 },
+  {  15,   1 }, {   1,   1 }, {  16,   1 }, {  25,   5 }, {   7,  32 }, {  33,   0 },
+  {  66,   0 }, {  44,   0 }, {  14,   0 }, {  12,   0 }, {  13,   0 }, {  19,   0 },
+  {   9,   0 }, {  32,   0 }, {  60,   0 }, {  58,   0 }, {  41,   0 }, {  18,   0 },
+  {  24,   0 }, {  22,   0 }, {  23,   0 }, {  15,   1 }, {   1,   1 }, {  16,   1 },
+  {  25,   5 }, {   7,  32 }, {  67,  55 }, {  72,   0 }, {   9,   0 }, {  51,   0 },
+  {   6,   0 }, {   1,   4 }, {  71,  36 }, {  73,  40 }, {  89,   0 }, {  43,   0 },
+  {  63,   0 }, {  51,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 },
+  {   1,   1 }, {  89,   0 }, {  43,   0 }, {  44,   0 }, {   9,   0 }, {  63,   0 },
+  {  51,   0 }, {  60,   0 }, {  58,   0 }, {  64,   0 }, {  29,   0 }, {  57,   0 },
+  {   1,   1 }, {  89,   0 }, {  14,   0 }, {  13,   0 }, {  51,   0 }, {  60,   0 },
+  {  58,   0 }, {  41,   0 }, {  29,   0 }, {  27,  12 }, {  64,  36 }, {  89,   0 },
+  {  14,   0 }, {  13,   0 }, {   9,   0 }, {  79,   0 }, {  51,   0 }, {  60,   0 },
+  {  58,   0 }, {  41,   0 }, {  29,   0 }, {  74,   1 }, {  27,  12 }, {  64,  36 },
+  {   7,   0 }, {  71,   0 }, {  32,   0 }, {  60,   0 }, {  58,   0 }, {  18,   0 },
+  {   1,   3 }, {  68,  15 }, {  69,  29 }, {  86,  30 }, {  33,  37 }, {   8,  42 },
+  {  44,   0 }, {  71,   0 }, {  19,   0 }, {   9,   0 }, {  32,   0 }, {  70,   0 },
+  {  60,   0 }, {  58,   0 }, {  18,   0 }, {   7,   1 }, {   1,   1 }, {  68,  21 },
+  {  86,  30 }, {  69,  33 }, {  33,  41 }, {   8,  46 }, {  89,   0 }, {  66,   0 },
+  {  47,   0 }, {  67,   0 }, {  51,   0 }, {  64,   0 }, {  29,   0 }, {   6,   0 },
+  {  57,   0 }, {   1,   1 }, {  25,   5 }, {  54,   5 }, {  68,  13 }, {  45,  16 },
+  {  76,  18 }, {  84,  40 }, {   7,   0 }, {  89,   0 }, {   8,   0 }, {  66,   0 },
+  {  80,   0 }, {  13,   0 }, {  47,   0 }, {   9,   0 }, {  67,   0 }, {  51,   0 },
+  {  64,   0 }, {  29,   0 }, {   6,   0 }, {  57,   0 }, {   1,   1 }, {  25,   5 },
+  {  54,   5 }, {  68,  13 }, {  45,  16 }, {  76,  18 }, {  84,  40 }, {   7,   0 },
+  {  72,   0 }, {  71,   0 }, {   9,   0 }, {  73,   0 }, {  51,   0 }, {  60,   0 },
+  {   6,   0 }, {  24,   0 }, {  23,   0 }, {   1,   1 }, {  30,  10 }, {  74,  35 },
+  {  55,  44 }, {  67,  80 }, {   7,   0 }, {  66,   0 }, {  47,   0 }, {  60,   0 },
+  {  64,   0 }, {   6,   0 }, {  89,  40 }, {  51,  45 }, {   9,  85 }, {   7,   0 },
+  {   9,   0 }, {  60,   0 }, {  58,   0 }, {   6,   0 }, {  68,   1 }, {  43,  10 },
+  {  69,  32 }, {  44,  55 }, {  80,  72 }, {  67,  80 }, {  78,   0 }, {   7,   0 },
+  {  72,   0 }, {  71,   0 }, {   9,   0 }, {  73,   0 }, {  51,   0 }, {   6,   0 },
+  {   1,   1 }, {  59,   5 }, {  61,  27 }, {  60,  49 }, {  74,  50 }, {  89,   0 },
+  {  12,   0 }, {   9,   0 }, {  31,   0 }, {   6,   0 }, {  22,   0 }, {  23,   0 },
+  {  49,   1 }, {  50,  15 }, {  64,  55 }, {  79,  68 }, {  51,  75 }, {  43,   0 },
+  {   8,   0 }, {  44,   0 }, {  14,   0 }, {  13,   0 }, {  71,   0 }, {   9,   0 },
+  {  60,   0 }, {  58,   0 }, {  41,   0 }, {  29,   0 }, {  16,   1 }, {  83,   6 },
+  {   7,  46 }, {  19,  50 }, {  63,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 },
+  {   1,   1 }, {  82,   4 }, {  10,   8 }, {  27,  14 }, {  79,  24 }, {   4,  29 },
+  {  63,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 }, {   1,   1 }, {  82,   4 },
+  {  10,   8 }, {  27,  14 }, {  79,  30 }, {   4,  33 }, {  81,   0 }, {   9,   0 },
+  {  63,   0 }, {  64,   0 }, {  29,   0 }, {   6,   0 }, {  75,   0 }, {   1,   1 },
+  {  82,   4 }, {  10,   8 }, {  27,  14 }, {  79,  30 }, {   4,  33 }, {   7,   0 },
+  {  81,   0 }, {  69,   0 }, {   8,   0 }, {  14,   0 }, {  54,   0 }, {  79,   0 },
+  {  75,   0 }, {   2,   1 }, {  11,   3 }, {  82,   4 }, {  62,   6 }, {  83,  11 },
+  {  68,  15 }, {  13,  30 }, {  67,  46 }, {   7,   0 }, {  81,   0 }, {  69,   0 },
+  {   8,   0 }, {  14,   0 }, {  54,   0 }, {  79,   0 }, {  75,   0 }, {  11,   1 },
+  {   2,   1 }, {  82,   4 }, {  62,   8 }, {  83,  11 }, {  68,  15 }, {  13,  40 },
+  {  67,  55 }, {   7,   0 }, {  69,   0 }, {  89,   0 }, {   8,   0 }, {  44,   0 },
+  {  14,   0 }, {  12,   0 }, {   9,   0 }, {  70,   0 }, {  54,   0 }, {  79,   0 },
+  {  75,   0 }, {  22,   0 }, {  81,   1 }, {  11,   1 }, {   2,   1 }, {  82,   4 },
+  {  62,   8 }, {  83,  11 }, {  68,  15 }, {  13,  44 }, {  67,  60 }, {  78,   0 },
+  {  33,   0 }, {  32,   0 }, {  73,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 },
+  {   3,   1 }, {  16,   3 }, {  82,   4 }, {  74,  33 }, {  19,  36 }, {  78,   0 },
+  {  33,   0 }, {   7,   0 }, {  32,   0 }, {  73,   0 }, {  18,   0 }, {   6,   0 },
+  {  17,   0 }, {   3,   1 }, {  16,   1 }, {  82,   4 }, {  74,  42 }, {  19,  50 },
+  {  78,   0 }, {  33,   0 }, {   7,   0 }, {  72,   0 }, {   9,   0 }, {  32,   0 },
+  {  73,   0 }, {  51,   0 }, {  64,   0 }, {  18,   0 }, {   6,   0 }, {  17,   0 },
+  {   3,   1 }, {  16,   1 }, {  82,   4 }, {  74,  44 }, {  19,  55 }, {  47,   0 },
+  {  75,   0 }, {  10,   1 }, {  82,   3 }, {  58,   9 }, {   4,  21 }, {  84,  25 },
+  {  46,  27 }, {  47,   0 }, {   6,   0 }, {  75,   0 }, {  10,   1 }, {  82,   3 },
+  {  58,   9 }, {   4,  24 }, {  84,  29 }, {  46,  32 }, {  71,   0 }, {  47,   0 },
+  {   9,   0 }, {   6,   0 }, {  75,   0 }, {  10,   1 }, {  82,   3 }, {  58,   9 },
+  {   4,  24 }, {  84,  30 }, {  46,  34 }, {  43,   0 }, {   8,   0 }, {  44,   0 },
+  {   1,   1 }, {  83,   3 }, {  68,  19 }, {  69,  34 }, {   7,   0 }, {  43,   0 },
+  {   8,   0 }, {  44,   0 }, {  12,   0 }, {   9,   0 }, {  31,   0 }, {  70,   0 },
+  {  22,   0 }, {   1,   1 }, {  83,   3 }, {  68,  19 }, {  69,  39 }, {  84,   0 },
+  {  23,   0 }, {  85,   4 }, {  68,  10 }, {  52,  10 }, {  20,  16 }, {  69,  22 },
+  {  57,  25 }, {  43,  28 }, {  84,   0 }, {  24,   0 }, {  23,   0 }, {  85,   4 },
+  {  68,  10 }, {  52,  13 }, {  20,  16 }, {  69,  25 }, {  57,  31 }, {  43,  37 },
+  {  71,   0 }, {   9,   0 }, {  84,   0 }, {  29,   0 }, {   6,   0 }, {  24,   0 },
+  {  69,   1 }, {  23,   1 }, {  57,   1 }, {  85,   4 }, {  68,  10 }, {  52,  13 },
+  {  20,  16 }, {  56,  31 }, {  43,  37 }, {  76,  49 }, {  47,  50 }, {  78,   0 },
+  {   7,   0 }, {  81,   0 }, {  43,   0 }, {  44,   0 }, {  31,   0 }, {  70,   0 },
+  {  60,   0 }, {   6,   0 }, {  22,   0 }, {  15,   1 }, {  58,   5 }, {  83,   9 },
+  {  78,   0 }, {  33,   0 }, {   7,   0 }, {  81,   0 }, {  43,   0 }, {  44,   0 },
+  {   9,   0 }, {  32,   0 }, {  70,   0 }, {  60,   0 }, {   6,   0 }, {  22,   0 },
+  {  15,   1 }, {  31,   1 }, {  58,   5 }, {  83,   9 }, {  47,   0 }, {   6,   0 },
+  {  75,   0 }, {   3,   1 }, {  82,   4 }, {  10,   6 }, {  76,  43 }, {  52,   0 },
+  {  54,   0 }, {  73,   0 }, {  51,   0 }, {   6,   0 }, {  25,   1 }, {  56,  26 },
+  {  72,  31 }, {  76,   0 }, {  52,   0 }, {   9,   0 }, {  54,   0 }, {  73,   0 },
+  {  51,   0 }, {  29,   0 }, {   6,   0 }, {  25,   1 }, {  56,  28 }, {  72,  35 },
+  {   7,   0 }, {  43,   0 }, {   8,   0 }, {  70,   0 }, {  73,   0 }, {  75,   0 },
+  {  83,   1 }, {   1,   1 }, {  68,   7 }, {  59,  12 }, {  60,  32 }, {  69,  36 },
+  {  76,   0 }, {   7,   0 }, {  81,   0 }, {  43,   0 }, {   8,   0 }, {  70,   0 },
+  {  73,   0 }, {   6,   0 }, {  75,   0 }, {  83,   1 }, {   5,   1 }, {   1,   1 },
+  {  68,   7 }, {  59,  12 }, {  60,  34 }, {  69,  40 }, {  44,   0 }, {  32,   0 },
+  {  18,   0 }, {  17,   0 }, {  82,   1 }, {  16,   1 }, {   8,  41 }, {  19,  44 },
+  {  33,   0 }, {  19,   0 }, {  32,   0 }, {  41,   0 }, {  18,   0 }, {  38,   1 },
+  {  10,   5 }, {  68,   9 }, {  86,  20 }, {  53,  25 }, {  33,   0 }, {   7,   0 },
+  {  19,   0 }, {   9,   0 }, {  32,   0 }, {  41,   0 }, {  18,   0 }, {  38,   1 },
+  {  10,   5 }, {  68,   9 }, {  86,  20 }, {  53,  25 }, {   7,   0 }, {   8,   0 },
+  {  70,   0 }, {  60,   0 }, {  58,   1 }, {  44,  36 }, {   7,   0 }, {   8,   0 },
+  {   9,   0 }, {  70,   0 }, {  60,   0 }, {  58,   1 }, {  44,  40 }, {  33,   0 },
+  {  56,   0 }, {  19,   0 }, {  32,   0 }, {  18,   0 }, {  17,   0 }, {  57,   0 },
+  {  15,   1 }, {  16,   1 }, {  52,   4 }, {  68,   8 }, {  69,  24 }, {  54,  29 },
+  {  33,   0 }, {   7,   0 }, {  56,   0 }, {  19,   0 }, {   9,   0 }, {  32,   0 },
+  {  18,   0 }, {  17,   0 }, {  57,   0 }, {  15,   1 }, {  16,   1 }, {  52,  13 },
+  {  68,  21 }, {  69,  26 }, {  54,  33 }, {  52,   0 }, {  54,   0 }, {  75,   0 },
+  {  27,  10 }, {  57,  30 }, {  29,  41 }, {  52,   0 }, {   9,   0 }, {  54,   0 },
+  {  75,   0 }, {  29,   1 }, {  27,  10 }, {  57,  30 }, {  78,   0 }, {  41,   0 },
+  {  29,   0 }, {  25,   1 }, {  28,  12 }, {  72,  32 }, {  74,  39 }, {  78,   0 },
+  {   9,   0 }, {  41,   0 }, {  29,   0 }, {  25,   1 }, {  28,  12 }, {  72,  38 },
+  {  74,  44 }, {  76,   0 }, {  66,   0 }, {  14,   0 }, {  54,   0 }, {  41,   0 },
+  {   6,   0 }, {   2,   1 }, {  11,   5 }, {  65,  13 }, {  79,  25 }, {  13,  40 },
+  {  76,   0 }, {   7,   0 }, {  66,   0 }, {  80,   0 }, {  14,   0 }, {   9,   0 },
+  {  54,   0 }, {  41,   0 }, {   6,   0 }, {   3,   1 }, {   2,   1 }, {  11,   5 },
+  {  65,  13 }, {  79,  25 }, {  13,  44 }, {  81,   0 }, {  44,   0 }, {  31,   0 },
+  {  70,   0 }, {  60,   0 }, {  75,   0 }, {  22,   0 }, {  83,   1 }, {   1,   1 },
+  {   8,  44 }, {   7,   0 }, {  81,   0 }, {  66,   0 }, {  44,   0 }, {   9,   0 },
+  {  31,   0 }, {  70,   0 }, {  60,   0 }, {  75,   0 }, {  22,   0 }, {  83,   1 },
+  {   1,   1 }, {   8,  54 }, {  72,   0 }, {  73,   0 }, {  29,   0 }, {   6,   0 },
+  {  27,  12 }, {  72,   0 }, {  73,   0 }, {  29,   0 }, {   6,   0 }, {  27,  13 },
+  {  72,   0 }, {   9,   0 }, {  73,   0 }, {  29,   0 }, {   6,   0 }, {  27,  13 },
+  {  37,  49 }, {  78,   0 }, {  72,   0 }, {   9,   0 }, {  29,   0 }, {   6,   0 },
+  {  26,   3 }, {  73,  39 }, {   7,   0 }, {  44,   0 }, {   9,   0 }, {  50,   0 },
+  {  60,   0 }, {  64,   0 }, {   6,   0 }, {  24,   0 }, {  23,   0 }, {  49,   1 },
+  {  79,  25 }, {  51,  43 }, {   7,   0 }, {  44,   0 }, {   9,   0 }, {  70,   0 },
+  {  60,   0 }, {  64,   0 }, {   1,   1 }, {  83,   4 }, {  58,   5 }, {  81,  32 },
+  {   8,  36 }, {  56,   0 }, {  54,   0 }, {  84,   0 }, {  18,   0 }, {   6,   0 },
+  {  17,   0 }, {  33,   0 }, {  56,   0 }, {  81,   0 }, {  89,   0 }, {   9,   0 },
+  {  32,   0 }, {  70,   0 }, {  54,   0 }, {  60,   0 }, {  84,   0 }, {  41,   0 },
+  {  18,   0 }, {   6,   0 }, {  17,   0 }, {  57,   0 }, {  58,   4 }, {  52,  10 },
+  {  75,  16 }, {  53,  36 }, {  78,   0 }, {  44,   0 }, {  71,   0 }, {  63,   0 },
+  {  51,   0 }, {  60,   0 }, {  41,   0 }, {  25,   1 }, {  28,  15 }, {  64,  41 },
+  {  78,   0 }, {   7,   0 }, {  44,   0 }, {  71,   0 }, {   9,   0 }, {  63,   0 },
+  {  51,   0 }, {  60,   0 }, {  41,   0 }, {  25,   1 }, {  28,  15 }, {  64,  41 },
+  {  84,   0 }, {  86,  37 }, {  66,   0 }, {   9,   0 }, {  60,   0 }, {   6,   0 },
+  {  75,   0 }, {   1,   1 }, {  57,  35 }, {  70,  45 }, {   8,  55 }, {  66,   0 },
+  {  13,   0 }, {  71,   0 }, {   9,   0 }, {  32,   0 }, {  67,   0 }, {  60,   0 },
+  {  64,   0 }, {  18,   0 }, {   6,   0 }, {  75,   0 }, {  23,   0 }, {  70,   1 },
+  {   1,   1 }, {  68,  15 }, {  57,  35 }, {  69,  45 }, {   8,  55 }, {  72,   0 },
+  {  44,   0 }, {   9,   0 }, {  70,   0 }, {  51,   0 }, {  60,   0 }, {  29,   0 },
+  {   1,   1 }, {   6,  15 }, {  61,  17 }, {   8,  43 }, {   7,   0 }, {  81,   0 },
+  {   8,   0 }, {  44,   0 }, {   9,   0 }, {  70,   0 }, {  73,   0 }, {  60,   0 },
+  {  75,   0 }, {  81,   0 }, {  66,   0 }, {  44,   0 }, {  14,   0 }, {  71,   0 },
+  {   9,   0 }, {  70,   0 }, {  67,   0 }, {  29,   0 }, {   1,   1 }, {  11,   4 },
+  {  13,  29 }, {   7,  32 }, {  76,   0 }, {   9,   0 }, {  70,   0 }, {   6,   0 },
+  {  24,   0 }, {  23,   0 }, {   1,   1 }, {  21,  15 }, {  20,  17 }, {  53,  30 },
+  {  81,   0 }, {  89,   0 }, {  72,   0 }, {   9,   0 }, {  54,   0 }, {  63,   0 },
+  {  51,   0 }, {  84,   0 }, {  64,   0 }, {  75,   0 }, {  24,   0 }, {  23,   0 },
+  {  57,   0 }, {   2,   1 }, {  73,  46 }, {  76,   0 }, {  33,   0 }, {  81,   0 },
+  {  19,   0 }, {   9,   0 }, {  32,   0 }, {  51,   0 }, {  18,   0 }, {  75,   0 },
+  {  17,   0 }, {  16,   1 }, {  49,   9 }, {  68,  12 }, {  48,  25 }, {  69,  28 },
+  {  84,  36 }, {  78,   0 }, {  33,   0 }, {  66,   0 }, {  80,   0 }, {  44,   0 },
+  {  14,   0 }, {  13,   0 }, {  19,   0 }, {   9,   0 }, {  32,   0 }, {  73,   0 },
+  {  60,   0 }, {  64,   0 }, {  29,   0 }, {  18,   0 }, {   6,   0 }, {  24,   0 },
+  {  23,   0 }, {  65,  21 }, {  47,  45 }, {  67,  53 }, {  44,   0 }, {  71,   0 },
+  {  19,   0 }, {   9,   0 }, {  70,   0 }, {  60,   0 }, {  29,   0 }, {  18,   0 },
+  {  75,   0 }, {  25,   1 }, {  28,   5 }, {  64,  36 }, {   7,   0 }, {  81,   0 },
+  {  44,   0 }, {  70,   0 }, {  60,   0 }, {  75,   0 }, {  57,   0 }, {   1,   1 },
+  {  83,   5 }, {  84,  24 }, {  66,  32 }, {  80,  40 }, {  67,  44 }, {   7,   0 },
+  {  81,   0 }, {   8,   0 }, {  44,   0 }, {  70,   0 }, {  60,   0 }, {  75,   0 },
+  {  57,   0 }, {   1,   1 }, {  83,   5 }, {  84,  24 }, {  66,  32 }, {  80,  44 },
+  {  67,  50 }, {   7,   0 }, {  81,   0 }, {   8,   0 }, {  44,   0 }, {  12,   0 },
+  {  13,   0 }, {  71,   0 }, {   9,   0 }, {  31,   0 }, {  70,   0 }, {  60,   0 },
+  {  75,   0 }, {  22,   0 }, {  57,   0 }, {   1,   1 }, {  83,   5 }, {  84,  24 },
+  {  66,  32 }, {  80,  44 }, {  67,  52 }, {  72,   0 }, {  47,   0 }, {   9,   0 },
+  {  70,   0 }, {   6,   0 }, {  24,   0 }, {  22,   0 }, {  23,   0 }, {   5,   1 },
+  {  21,   1 }, {  20,   8 }, {  84,  20 }, {  76,  35 }, {  72,   0 }, {   9,   0 },
+  {  73,   0 }, {  51,   0 }, {  64,   0 }, {  24,   0 }, {  23,   0 }, {  49,   1 },
+  {  48,   8 }, {  50,  14 }, {  74,  58 }, {  81,   0 }, {  72,   0 }, {   9,   0 },
+  {  60,   0 }, {  29,   0 }, {  75,   0 }, {  58,   1 }, {  28,  20 }, {  55,  53 },
+  {  33,   0 }, {  72,   0 }, {   9,   0 }, {  32,   0 }, {  31,   0 }, {  73,   0 },
+  {  64,   0 }, {  17,   0 }, {  16,   1 }, {  18,  40 }, {  19,  58 }, {  74,  60 },
+  {  76,   0 }, {   7,   0 }, {   8,   0 }, {  44,   0 }, {  14,   0 }, {  13,   0 },
+  {   9,   0 }, {  67,   0 }, {  51,   0 }, {  60,   0 }, {   6,   0 }, {  24,   0 },
+  {  23,   0 }, {  70,   7 }, {  71,  23 }, {  69,  37 }, {  29,  47 }, {  76,   0 },
+  {  33,   0 }, {  72,   0 }, {  47,   0 }, {  32,   0 }, {  29,   0 }, {   6,   0 },
+  {  24,   0 }, {  23,   0 }, {  49,   1 }, {  63,   7 }, {  64,  23 }, {  74,  47 },
+  {  51,  49 }, {   9,  73 }, {   7,   0 }, {  72,   0 }, {  70,   0 }, {  51,   0 },
+  {  60,   0 }, {  41,   0 }, {  24,   0 }, {  23,   0 }, {   3,   1 }, {  39,   5 },
+  {  48,  13 }, {   7,   0 }, {  44,   0 }, {  70,   0 }, {  67,   0 }, {  60,   0 },
+  {  31,   1 }, {  22,   1 }, {  81,  13 }, {  54,  29 }, {  33,   0 }, {   9,   0 },
+  {  32,   0 }, {  67,   0 }, {  83,   5 }, {   6,   7 }, {  52,  15 }, {  76,  37 },
+  {  56,  53 }, {  37,  67 }, {  72,   0 }, {   9,   0 }, {  29,   0 }, {  24,   0 },
+  {  21,   1 }, {  20,  20 }, {  22,  23 }, {  23,  37 }, {   7,   0 }, {  44,   0 },
+  {  14,   0 }, {  13,   0 }, {  47,   0 }, {   9,   0 }, {  55,   0 }, {  60,   0 },
+  {  29,   0 }, {  25,   1 }, {   1,   1 }, {  28,  13 }, {  70,  29 }, {  71,  37 },
+  {   8,  65 }, {  84,   0 }, {  27,   5 }, {  75,  37 }, {  57,  47 }, {  78,   0 },
+  {  89,   0 }, {  66,   0 }, {  44,   0 }, {  14,   0 }, {  13,   0 }, {   9,   0 },
+  {  70,   0 }, {  67,   0 }, {  60,   0 }, {  41,   0 }, {  68,   1 }, {  65,   1 },
+  {  69,  30 }, {   7,  35 }, {   7,   0 }, {  89,   0 }, {  80,   0 }, {  44,   0 },
+  {  71,   0 }, {   9,   0 }, {  70,   0 }, {  67,   0 }, {  51,   0 }, {  60,   0 },
+  {  29,   0 }, {   6,   0 }, {  75,   0 }, {  57,   0 }, {  49,   1 }, {  76,   0 },
+  {   7,   0 }, {  72,   0 }, {   9,   0 }, {  32,   0 }, {  73,   0 }, {  51,   0 },
+  {  64,   0 }, {  29,   0 }, {   6,   0 }, {  23,   0 }, {  30,  17 }, {  50,  30 },
+  {  71,  41 }, {  70,  60 }, {  76,   0 }, {  81,   0 }, {   9,   0 }, {  70,   0 },
+  {  67,   0 }, {  60,   0 }, {  64,   0 }, {   6,   0 }, {  12,   1 }, {  31,   1 },
+  {  22,   1 }, {  53,   0 }, {  41,   0 }, {  39,   1 }, {  82,   1 }, {  10,   1 },
+  {   4,   7 }, {  79,  31 }, {  89,   0 }, {  66,   0 }, {  80,   0 }, {  14,   0 },
+  {  13,   0 }, {  47,   0 }, {   9,   0 }, {  54,   0 }, {  67,   0 }, {  53,   0 },
+  {  41,   0 }, {   6,   0 }, {  23,   0 }, {  57,   0 }, {  39,   1 }, {  82,   1 },
+  {  10,   1 }, {   4,   7 }, {  79,  31 }, {   7,   0 }, {  44,   0 }, {  71,   0 },
+  {   1,   1 }, {  60,   5 }, {  59,   5 }, {  70,  43 }, {   8,  61 }, {  89,   0 },
+  {  12,   0 }, {  13,   0 }, {   9,   0 }, {  51,   0 }, {  29,   0 }, {  11,  10 },
+  {  63,  15 }, {  14,  37 }, {  64,  41 }, {  81,   0 }, {  12,   0 }, {   9,   0 },
+  {  67,   0 }, {  73,   0 }, {   6,   0 }, {  24,   0 }, {  23,   0 }, {   2,   1 },
+  {  20,   1 }, {   5,   8 }, {  22,  29 }, {  76,  80 }, {  23,   0 }, {  21,  27 },
+  {  71,  40 }, {   7,   0 }, {  44,   0 }, {  32,   0 }, {  31,   0 }, {  70,   0 },
+  {  60,   0 }, {  29,   0 }, {  24,   0 }, {  23,   0 }, {  22,   1 }, {  21,  27 },
+  {  71,  40 }, {   9,  90 },
+};
+
+static const uint16_t LEARN_OFS[DEX_COUNT + 2] = {
+      0,     0,    13,    26,    41,    63,    85,   112,   130,   148,   171,   174,
+    174,   188,   191,   191,   208,   215,   222,   230,   246,   264,   274,   286,
+    301,   317,   335,   354,   370,   388,   403,   419,   448,   463,   479,   509,
+    539,   570,   582,   598,   625,   653,   666,   682,   692,   702,   713,   725,
+    739,   754,   771,   783,   796,   813,   831,   853,   876,   896,   917,   932,
+    950,   965,   985,  1008,  1020,  1037,  1057,  1074,  1091,  1109,  1118,  1130,
+   1143,  1160,  1178,  1192,  1207,  1223,  1235,  1251,  1272,  1299,  1309,  1320,
+   1331,  1344,  1358,  1369,  1382,  1398,  1419,  1431,  1447,  1462,  1477,  1498,
+   1510,  1527,  1546,  1561,  1578,  1587,  1597,  1607,  1620,  1642,  1666,  1678,
+   1694,  1723,  1735,  1748,  1767,  1796,  1824,  1837,  1866,  1880,  1895,  1910,
+   1927,  1944,  1963,  1983,  1995,  2012,  2032,  2048,  2062,  2083,  2085,  2109,
+   2131,  2131,  2140,  2159,  2175,  2190,  2208,  2222,  2241,  2260,  2284,  2303,
+   2336,  2348,  2361,  2375,  2395,  2415,  2444,  2478,  2537,  2544,  2552,  2563,
+   2575,  2588,  2609,  2627,  2646,  2670,  2691,  2714,  2729,  2747,  2757,  2769,
+   2784,  2801,  2816,  2832,  2849,  2860,  2876,  2889,  2906,  2925,  2933,  2943,
+   2954,  2969,  2986,  2996,  3012,  3029,  3041,  3059,  3066,  3073,  3081,  3097,
+   3105,  3116,  3131,  3146,  3162,  3176,  3190,  3201,  3227,  3241,  3241,  3242,
+   3261,  3272,  3286,  3305,  3320,  3335,  3358,  3384,  3401,  3415,  3423,  3439,
+   3456,  3474,  3493,  3504,  3517,  3528,  3542,  3560,  3575,  3592,  3601,  3620,
+   3636,  3651,  3667,  3684,  3694,  3706,  3721,  3737,  3737,  3744,  3755,  3765,
+   3780,  3792,  3811,  3835,  3852,  3868,  3887,  3904,  3921,  3950,  3969,  3986,
+   3997,  4013,  4030,  4053,  4068,  4086,  4108,  4124,  4142,  4163,  4174,  4187,
+   4201,  4217,  4221,  4223,  4235,  4237,  4250,  4262,  4280,  4300,  4312,  4330,
+   4350,  4356,  4363,  4375,  4389,  4401,  4414,  4430,  4445,  4462,  4470,  4484,
+   4503,  4526,  4550,  4558,  4572,  4582,  4594,  4610,  4631,  4645,  4661,  4668,
+   4683,  4695,  4709,  4727,  4747,  4756,  4765,  4792,  4808,  4825,  4837,  4850,
+   4860,  4870,  4885,  4899,  4910,  4923,  4939,  4951,  4966,  4977,  4990,  5004,
+   5020,  5032,  5044,  5062,  5071,  5081,  5097,  5120,  5132,  5146,  5159,  5180,
+   5205,  5221,  5237,  5253,  5266,  5282,  5300,  5322,  5333,  5347,  5356,  5369,
+   5380,  5394,  5401,  5415,  5427,  5444,  5454,  5466,  5476,  5493,  5505,  5516,
+   5537,  5538,  5545,  5556,  5567,  5578,  5594,  5599,  5609,  5621,  5636,  5644,
+   5659,  5674,  5693,  5695,  5712,  5729,  5745,  5760,  5774,  5795,  5816,  5831,
+   5851,  5877,  5895,  5916,  5929,  5942,  5959,  5976,  5993,  6014,  6031,  6049,
+   6073,  6081,  6089,  6098,  6112,  6130,  6135,  6147,  6159,  6171,  6186,  6196,
+   6208,  6230,  6256,  6272,  6290,  6293,  6305,  6315,  6317,  6328,  6342,  6359,
+   6379,  6385,  6393,  6405,  6422,  6439,  6450,  6462,  6477,  6496,  6510,  6520,
+   6530,  6542,  6550,  6567,  6585,  6596,  6611,  6618,  6629,  6638,  6645,  6653,
+   6669,  6686,  6705,  6731,  6746,  6767,  6777,  6789,  6805,  6825,  6839,  6855,
+   6863,  6875,  6888,  6903,  6913,  6928,  6946,  6959,  6984,  7010,  7023,  7044,
+   7061,  7081,  7098,  7113,  7127,  7144,  7159,  7177,  7199,  7216,  7234,  7247,
+   7255,  7271,  7289,  7306,  7324,  7343,  7359,  7374,  7389,  7405,  7416,  7431,
+   7448,  7458,  7496,  7512,  7520,  7528,  7540,  7550,  7563,  7579,  7591,  7603,
+   7619,  7628,  7641,  7650,  7660,  7673,  7681,  7691,  7700,  7707,  7718,  7727,
+   7739,  7749,  7758,  7767,  7773,  7779,  7786,  7794,  7804,  7809,  7814,  7822,
+   7829,  7837,  7846,  7858,  7879,  7890,  7901,  7915,  7922,  7930,  7943,  7954,
+   7964,  7970,  7976,  7986,  7995,  8004,  8020,  8026,  8037,  8041,  8046,  8059,
+   8069,  8081,  8096,  8106,  8122,  8128,  8136,  8145,  8162,  8183,  8196,  8201,
+   8207,  8221,  8237,  8250,  8266,  8271,  8282,  8293,  8310,  8317,  8326,  8336,
+   8346,  8358,  8369,  8380,  8397,  8404,  8413,  8416,  8419,  8423,  8432,  8445,
+   8453,  8462,  8475,  8480,  8486,  8502,  8519,  8530,  8542,  8555,  8562,  8572,
+   8578,  8584,  8591,  8593,  8600,  8616,  8628,  8642,  8650,  8658,  8667,  8683,
+   8699,  8719,  8731,  8748,  8757,  8765,  8777,  8787,  8796,  8807,  8828,  8842,
+   8861,  8871,  8882,  8895,  8908,  8922,  8931,  8941,  8953,  8964,  8974,  8984,
+   9004,  9018,  9034,  9046,  9059,  9070,  9084,  9104,  9122,  9141,  9159,  9176,
+   9186,  9202,  9220,  9236,  9252,  9273,  9282,  9293,  9309,  9324,  9342,  9361,
+   9374,  9392,  9402,  9414,  9429,  9432,  9433,  9440,  9453,  9467,  9475,  9483,
+   9489,  9501,  9515,  9532,  9554,  9561,  9572,  9585,  9592,  9599,  9608,  9614,
+   9622,  9631,  9642,  9653,  9665,  9679,  9696,  9708,  9722,  9734,  9749,  9760,
+   9775,  9790,  9806,  9821,  9839,  9853,  9872,  9883,  9895,  9905,  9917,  9939,
+   9946,  9955,  9967,  9977,  9990, 10002, 10018, 10034, 10055, 10070, 10079, 10090,
+  10103, 10115, 10130, 10140, 10150, 10163, 10179, 10195, 10217, 10229, 10242, 10259,
+  10267, 10276, 10287, 10294, 10307, 10316, 10326, 10343, 10356, 10372, 10379, 10387,
+  10398, 10410, 10426, 10434, 10444, 10456, 10462, 10469, 10482, 10497, 10503, 10510,
+  10517, 10525, 10536, 10551, 10561, 10574, 10579, 10584, 10591, 10598, 10610, 10621,
+  10627, 10646, 10656, 10668, 10670, 10679, 10697, 10708, 10717, 10730, 10740, 10755,
+  10771, 10792, 10804, 10817, 10831, 10851, 10864, 10875, 10884, 10896, 10896, 10896,
+  10913, 10928, 10939, 10948, 10958, 10966, 10981, 10985, 11000, 11015, 11030, 11041,
+  11048, 11067, 11075, 11085, 11098, 11101, 11114,
+};
+
+// Regional forms added after National Dex 809 reuse the corresponding
+// Kanto learnset. This avoids rewriting the generated 809-species offset table.
+static inline int16_t canonicalLearnDex(int16_t dex) {
+  switch (dex) {
+    case DEX_A_RATTATA: return 19; case DEX_A_RATICATE: return 20;
+    case DEX_A_RAICHU: return 26; case DEX_A_SANDSHREW: return 27;
+    case DEX_A_SANDSLASH: return 28; case DEX_A_VULPIX: return 37;
+    case DEX_A_NINETALES: return 38; case DEX_A_DIGLETT: return 50;
+    case DEX_A_DUGTRIO: return 51; case DEX_A_MEOWTH: return 52;
+    case DEX_A_PERSIAN: return 53; case DEX_A_GEODUDE: return 74;
+    case DEX_A_GRAVELER: return 75; case DEX_A_GOLEM: return 76;
+    case DEX_A_GRIMER: return 88; case DEX_A_MUK: return 89;
+    case DEX_A_EXEGGUTOR: return 103; case DEX_A_MAROWAK: return 105;
+    default:
+      // v3.61 generated catalog: every independent form records its owning
+      // National-Dex species. Forms of #1..809 can therefore reuse the exact
+      // original learnset automatically, without another hand-maintained list.
+      if (dex >= 1 && dex <= DEX_COUNT) {
+        uint16_t owner = DEX_NATDEX[dex];
+        if (owner >= 1 && owner <= 809) return (int16_t)owner;
+      }
+      return dex;
+  }
+}
+
+// Legacy 1..809 learnset access. v3.63.0 layers a small deterministic
+// level-up supplement on top instead of replacing this generated table.
+// Keeping the old table and move IDs intact preserves existing saves/LAN data.
+static inline uint8_t legacyLearnCount(int16_t dex) {
+  dex = canonicalLearnDex(dex);
+  if (dex < 1 || dex > 809) return 0;
+  return (uint8_t)(LEARN_OFS[dex + 1] - LEARN_OFS[dex]);
+}
+
+static inline uint8_t legacyLearnMove(int16_t dex, uint8_t i) {
+  dex = canonicalLearnDex(dex);
+  uint8_t n = legacyLearnCount(dex);
+  if (i >= n) return MV_STRUGGLE;
+  return LEARN_TBL[LEARN_OFS[dex] + i].move;
+}
+
+static inline uint8_t legacyLearnLevel(int16_t dex, uint8_t i) {
+  dex = canonicalLearnDex(dex);
+  uint8_t n = legacyLearnCount(dex);
+  if (i >= n) return 0;
+  return LEARN_TBL[LEARN_OFS[dex] + i].level;
+}
+
+static inline uint8_t legacyNaturalLearnCount(int16_t dex) {
+  uint8_t n = legacyLearnCount(dex), w = 0;
+  for (uint8_t i = 0; i < n; ++i) if (legacyLearnLevel(dex, i) > 0) ++w;
+  return w;
+}
+
+static inline bool legacyHasMove(int16_t dex, uint8_t mv) {
+  if (!mv || mv >= MOVE_COUNT) return false;
+  uint8_t n = legacyLearnCount(dex);
+  for (uint8_t i = 0; i < n; ++i) if (legacyLearnMove(dex, i) == mv) return true;
+  return false;
+}
+
+static inline bool legacyHasNaturalMove(int16_t dex, uint8_t mv) {
+  if (!mv || mv >= MOVE_COUNT) return false;
+  uint8_t n = legacyLearnCount(dex);
+  for (uint8_t i = 0; i < n; ++i)
+    if (legacyLearnLevel(dex, i) > 0 && legacyLearnMove(dex, i) == mv) return true;
+  return false;
+}
+
+// Post-809 species are playable even though the legacy generated learnset ends
+// at National Dex 809. v3.61.6 gives them a level-scaled, type-representative
+// four-move kit instead of Tackle + one weak move + Swift. Alternate forms of
+// #1..809 still use canonicalLearnDex() and retain their canonical move pool.
+static inline uint8_t fallbackWeakMoveForType(uint8_t t) {
+  switch (t) {
+    case T_FIRE: return MV_EMBER; case T_WATER: return MV_WATER_GUN;
+    case T_ELECTRIC: return MV_THUNDERSHOCK; case T_GRASS: return MV_VINE_WHIP;
+    case T_ICE: return MV_AURORA_BEAM; case T_FIGHTING: return MV_KARATE_CHOP;
+    case T_POISON: return MV_POISON_STING; case T_GROUND: return MV_BONE_CLUB;
+    case T_FLYING: return MV_PECK; case T_PSYCHIC: return MV_CONFUSION;
+    case T_BUG: return MV_BUG_BITE; case T_ROCK: return MV_ROCK_THROW;
+    case T_GHOST: return MV_LICK; case T_DRAGON: return MV_DRAGON_RAGE;
+    case T_DARK: return MV_BITE; case T_STEEL: return MV_IRON_HEAD;
+    case T_FAIRY: return MV_DAZZLE_GLEAM; default: return MV_TACKLE;
+  }
+}
+static inline uint8_t fallbackMidMoveForType(uint8_t t) {
+  switch (t) {
+    case T_FIRE: return MV_FIRE_PUNCH; case T_WATER: return MV_WATERFALL;
+    case T_ELECTRIC: return MV_SPARK; case T_GRASS: return MV_RAZOR_LEAF;
+    case T_ICE: return MV_ICE_PUNCH; case T_FIGHTING: return MV_ROCK_SMASH;
+    case T_POISON: return MV_SLUDGE; case T_GROUND: return MV_DIG;
+    case T_FLYING: return MV_WING_ATTACK; case T_PSYCHIC: return MV_PSYBEAM;
+    case T_BUG: return MV_X_SCISSOR; case T_ROCK: return MV_ROCK_SLIDE;
+    case T_GHOST: return MV_NIGHT_SHADE; case T_DRAGON: return MV_DRAGON_CLAW;
+    case T_DARK: return MV_CRUNCH; case T_STEEL: return MV_IRON_HEAD;
+    case T_FAIRY: return MV_DAZZLE_GLEAM; default: return MV_SWIFT;
+  }
+}
+static inline uint8_t fallbackStrongMoveForType(uint8_t t) {
+  switch (t) {
+    case T_FIRE: return MV_FLAMETHROWER; case T_WATER: return MV_SURF;
+    case T_ELECTRIC: return MV_THUNDERBOLT; case T_GRASS: return MV_SOLAR_BEAM;
+    case T_ICE: return MV_ICE_BEAM; case T_FIGHTING: return MV_HI_JUMP_KICK;
+    case T_POISON: return MV_SLUDGE_BOMB; case T_GROUND: return MV_EARTHQUAKE;
+    case T_FLYING: return MV_DRILL_PECK; case T_PSYCHIC: return MV_PSYCHIC;
+    case T_BUG: return MV_MEGAHORN; case T_ROCK: return MV_ROCK_SLIDE;
+    case T_GHOST: return MV_SHADOW_BALL; case T_DRAGON: return MV_OUTRAGE;
+    case T_DARK: return MV_DARK_PULSE; case T_STEEL: return MV_FLASH_CANNON;
+    case T_FAIRY: return MV_MOONBLAST; default: return MV_BODY_SLAM;
+  }
+}
+
+// v3.63.0 learnset expansion -------------------------------------------------
+// The old generated learnset has excellent TM coverage but 296 of the first
+// 809 species have four or fewer *natural* level-up entries. National Dex
+// 810+ had no natural table at all and therefore never produced a learn prompt.
+//
+// We keep every existing entry untouched and add only a small supplemental
+// layer. Legacy species draw the extra moves from moves they were already
+// allowed to use (their level-0/TM pool), so this does not invent a completely
+// unrelated attack. Truly special sparse species (Ditto/cocoons/Magikarp-like
+// tiny pools) stay sparse. 810+ receive a conservative type progression until
+// a generated per-species table is available in a future data refresh.
+struct SupplementalLearnEntry { uint8_t move; uint8_t level; };
+
+static inline uint8_t supplementGateForMove(uint8_t mv, uint8_t ordinal) {
+  if (!mv || mv >= MOVE_COUNT) return 255;
+  const MoveEntry &m = MOVE_TBL[mv];
+  uint8_t byPower;
+  if (m.cat == MC_STATUS) byPower = 28;
+  else if (m.power <= 40) byPower = 8;
+  else if (m.power <= 60) byPower = 16;
+  else if (m.power <= 75) byPower = 24;
+  else if (m.power <= 90) byPower = 34;
+  else if (m.power <= 100) byPower = 44;
+  else byPower = 54;
+  static const uint8_t MILESTONE[7] = { 7, 13, 20, 28, 36, 46, 58 };
+  uint8_t floor = MILESTONE[ordinal < 7 ? ordinal : 6];
+  uint8_t gate = byPower > floor ? byPower : floor;
+  uint16_t spaced = (uint16_t)gate + (uint16_t)ordinal * 3U;
+  return (uint8_t)(spaced > 72 ? 72 : spaced);
+}
+
+static inline uint8_t post809SupplementEntry(int16_t dex, uint8_t idx,
+                                              SupplementalLearnEntry &e) {
+  if (dex < 1 || dex > DEX_COUNT || DEX_NATDEX[dex] <= 809 || idx >= 9) return 0;
+  const DexEntry &d = DEX_TBL[dex];
+  const bool dual = d.type2 != T_NONE && d.type2 != d.type1;
+  const SupplementalLearnEntry cand[] = {
+    { MV_TACKLE, 1 },
+    { fallbackWeakMoveForType(d.type1), 7 },
+    { (uint8_t)(dual ? fallbackWeakMoveForType(d.type2) : MV_SCRATCH), 13 },
+    { MV_QUICK_ATTACK, 18 },
+    { fallbackMidMoveForType(d.type1), 24 },
+    { (uint8_t)(dual ? fallbackMidMoveForType(d.type2) : MV_SWIFT), 31 },
+    { MV_LEER, 34 },
+    { MV_SWIFT, 38 },
+    { fallbackStrongMoveForType(d.type1), 46 },
+    { (uint8_t)(dual ? fallbackStrongMoveForType(d.type2) : MV_BODY_SLAM), 56 },
+    { MV_BODY_SLAM, 60 },
+    { MV_DOUBLE_EDGE, 68 },
+  };
+  uint8_t produced = 0;
+  for (uint8_t i = 0; i < sizeof(cand) / sizeof(cand[0]); ++i) {
+    uint8_t mv = cand[i].move;
+    if (!mv || mv >= MOVE_COUNT) continue;
+    bool dup = false;
+    for (uint8_t j = 0; j < i; ++j)
+      if (cand[j].move == mv) { dup = true; break; }
+    if (dup) continue;
+    if (produced++ == idx) { e = cand[i]; return 1; }
+    if (produced >= 9 && idx >= 9) break;
+  }
+  return 0;
+}
+
+static inline uint8_t legacySupplementTarget(int16_t dex) {
+  uint8_t total = legacyLearnCount(dex);
+  uint8_t natural = legacyNaturalLearnCount(dex);
+  // Preserve intentionally tiny gimmick learnsets rather than turning every
+  // cocoon/transform-only species into a generic attacker.
+  if (total <= 2 || natural >= 7) return 0;
+  return (uint8_t)(7 - natural);
+}
+
+static inline uint8_t legacySupplementEntry(int16_t dex, uint8_t idx,
+                                             SupplementalLearnEntry &e) {
+  uint8_t need = legacySupplementTarget(dex);
+  if (idx >= need || dex < 1 || dex > DEX_COUNT) return 0;
+  const DexEntry &d = DEX_TBL[dex];
+  uint8_t produced = 0;
+  uint8_t total = legacyLearnCount(dex);
+  // Prefer legal STAB attacks, then other legal attacks, then useful status.
+  for (uint8_t pass = 0; pass < 3; ++pass) {
+    for (uint8_t i = 0; i < total; ++i) {
+      if (legacyLearnLevel(dex, i) != 0) continue;  // only promote existing TM/legal entries
+      uint8_t mv = legacyLearnMove(dex, i);
+      if (!mv || mv >= MOVE_COUNT || legacyHasNaturalMove(dex, mv)) continue;
+      const MoveEntry &m = MOVE_TBL[mv];
+      bool stab = (m.type == d.type1 || m.type == d.type2);
+      if (pass == 0 && (m.cat == MC_STATUS || !stab)) continue;
+      if (pass == 1 && (m.cat == MC_STATUS || stab)) continue;
+      if (pass == 2 && m.cat != MC_STATUS) continue;
+      // The legacy table can contain the same TM more than once in odd forms.
+      bool dup = false;
+      for (uint8_t j = 0; j < i; ++j)
+        if (legacyLearnLevel(dex, j) == 0 && legacyLearnMove(dex, j) == mv) { dup = true; break; }
+      if (dup) continue;
+      if (produced == idx) {
+        e.move = mv;
+        e.level = supplementGateForMove(mv, produced);
+        return 1;
+      }
+      if (++produced >= need) return 0;
+    }
+  }
+  return 0;
+}
+
+static inline uint8_t supplementalLearnCount(int16_t dex) {
+  if (dex < 1 || dex > DEX_COUNT) return 0;
+  if (DEX_NATDEX[dex] > 809) {
+    uint8_t n = 0; SupplementalLearnEntry e{};
+    for (uint8_t i = 0; i < 9; ++i) if (post809SupplementEntry(dex, i, e)) ++n;
+    return n;
+  }
+  uint8_t need = legacySupplementTarget(dex), n = 0;
+  SupplementalLearnEntry e{};
+  for (uint8_t i = 0; i < need; ++i) if (legacySupplementEntry(dex, i, e)) ++n;
+  return n;
+}
+
+// Hand-picked species moves. DEX_NATDEX keeps alternate forms on the same
+// species rule while leaving the generated legacy table untouched.
+static inline uint8_t signatureLearnEntry(int16_t dex, uint8_t idx,
+                                           SupplementalLearnEntry &e) {
+  if (idx || dex < 1 || dex > DEX_COUNT) return 0;
+  switch (DEX_NATDEX[dex]) {
+    case 25: case 26: e = { MV_VOLT_TACKLE, 45 }; break;
+    case 150: e = { MV_PSYSTRIKE, 70 }; break;
+    case 249: e = { MV_AEROBLAST, 60 }; break;
+    case 250: e = { MV_SACRED_FIRE, 60 }; break;
+    case 382: e = { MV_ORIGIN_PULSE, 60 }; break;
+    case 383: e = { MV_PRECIPICE_BLADES, 60 }; break;
+    case 483: e = { MV_ROAR_OF_TIME, 70 }; break;
+    case 484: e = { MV_SPACIAL_REND, 70 }; break;
+    case 487: e = { MV_SHADOW_FORCE, 70 }; break;
+    case 643: e = { MV_FUSION_FLARE, 64 }; break;
+    case 644: e = { MV_FUSION_BOLT, 64 }; break;
+    case 647: e = { MV_SECRET_SWORD, 55 }; break;
+    case 716: e = { MV_GEOMANCY, 65 }; break;
+    case 717: e = { MV_OBLIVION_WING, 65 }; break;
+    case 791: e = { MV_SUNSTEEL_STRIKE, 55 }; break;
+    case 792: e = { MV_MOONGEIST_BEAM, 55 }; break;
+    case 802: e = { MV_SPECTRAL_THIEF, 60 }; break;
+    case 812: e = { MV_DRUM_BEATING, 46 }; break;
+    case 815: e = { MV_PYRO_BALL, 46 }; break;
+    case 818: e = { MV_SNIPE_SHOT, 46 }; break;
+    case 908: e = { MV_FLOWER_TRICK, 46 }; break;
+    case 911: e = { MV_TORCH_SONG, 46 }; break;
+    case 914: e = { MV_AQUA_STEP, 46 }; break;
+    case 956: e = { MV_LUMINA_CRASH, 42 }; break;
+    case 894: e = { MV_THUNDER_CAGE, 60 }; break;
+    case 895: e = { MV_DRAGON_ENERGY, 60 }; break;
+    case 903: e = { MV_DIRE_CLAW, 50 }; break;
+    case 905: e = { MV_SPRINGTIDE_STORM, 55 }; break;
+    case 925: e = { MV_POPULATION_BOMB, 40 }; break;
+    case 934: e = { MV_SALT_CURE, 35 }; break;
+    case 936: e = { MV_ARMOR_CANNON, 48 }; break;
+    case 937: e = { MV_BITTER_BLADE, 48 }; break;
+    case 983: e = { MV_KOWTOW_CLEAVE, 52 }; break;
+    case 1000: e = { MV_MAKE_IT_RAIN, 56 }; break;
+    default: return 0;
+  }
+  return 1;
+}
+
+// Public learnset accessors: old table first, supplemental level-up entries
+// after it. All callers (relearn, level-up queue, move picker, AI setup) now see
+// one consistent pool.
+static inline uint8_t learnCount(int16_t dex) {
+  SupplementalLearnEntry e{};
+  uint16_t n = (uint16_t)legacyLearnCount(dex) + supplementalLearnCount(dex) +
+               signatureLearnEntry(dex, 0, e);
+  return (uint8_t)(n > 255 ? 255 : n);
+}
+
+static inline uint8_t learnMove(int16_t dex, uint8_t i) {
+  if (dex < 1 || dex > DEX_COUNT) return MV_STRUGGLE;
+  uint8_t base = legacyLearnCount(dex);
+  if (i < base) return legacyLearnMove(dex, i);
+  SupplementalLearnEntry e{};
+  uint8_t si = (uint8_t)(i - base);
+  uint8_t supp = supplementalLearnCount(dex);
+  if (si >= supp) {
+    if (signatureLearnEntry(dex, (uint8_t)(si - supp), e)) return e.move;
+    return MV_STRUGGLE;
+  }
+  if (DEX_NATDEX[dex] > 809) {
+    if (post809SupplementEntry(dex, si, e)) return e.move;
+  } else if (legacySupplementEntry(dex, si, e)) return e.move;
+  return MV_STRUGGLE;
+}
+
+static inline uint8_t learnLevel(int16_t dex, uint8_t i) {
+  if (dex < 1 || dex > DEX_COUNT) return 0;
+  uint8_t base = legacyLearnCount(dex);
+  if (i < base) return legacyLearnLevel(dex, i);
+  SupplementalLearnEntry e{};
+  uint8_t si = (uint8_t)(i - base);
+  uint8_t supp = supplementalLearnCount(dex);
+  if (si >= supp) {
+    if (signatureLearnEntry(dex, (uint8_t)(si - supp), e)) return e.level;
+    return 0;
+  }
+  if (DEX_NATDEX[dex] > 809) {
+    if (post809SupplementEntry(dex, si, e)) return e.level;
+  } else if (legacySupplementEntry(dex, si, e)) return e.level;
+  return 0;
+}
+
+static inline uint8_t fallbackMovesForDex(int16_t dex, uint8_t lvl, uint8_t *out, uint8_t cap) {
+  if (!out || !cap || dex < 1 || dex > DEX_COUNT) return 0;
+  const DexEntry &d = DEX_TBL[dex];
+  uint8_t n = 0;
+  auto add = [&](uint8_t mv) {
+    if (!mv || n >= cap) return;
+    for (uint8_t i=0;i<n;i++) if (out[i] == mv) return;
+    out[n++] = mv;
+  };
+  add(lvl < 12 ? MV_TACKLE : MV_QUICK_ATTACK);
+  add(lvl < 18 ? fallbackWeakMoveForType(d.type1) : fallbackMidMoveForType(d.type1));
+  if (d.type2 != T_NONE)
+    add(lvl < 28 ? fallbackWeakMoveForType(d.type2) : fallbackMidMoveForType(d.type2));
+  if (lvl >= 32) add(fallbackStrongMoveForType(d.type1));
+  else if (lvl >= 20) add(MV_SWIFT);
+  if (n < 4 && lvl >= 42 && d.type2 != T_NONE) add(fallbackStrongMoveForType(d.type2));
+  return n;
+}

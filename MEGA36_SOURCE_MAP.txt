@@ -1,0 +1,45 @@
+TamaPoke v3.62.0 Mega36 PMDCollab source map
+검증 기준일: 2026-09-06
+정책: 실제 PMDCollab behavior sprite가 충분한 36종만 허용
+진화: 원본 종 -> Mega 폼, Lv.70 영구 진화 / 도감 별도 등록
+표시명: m.<한국어 종명>; 리자몽X/뮤츠Y만 X/Y 접미사 유지
+리자몽은 Mega Charizard X만, 뮤츠는 Mega Mewtwo Y만 허용
+그 외 Mega X/Y/Z 변형 및 행동 sprite 미완성 Mega는 제외
+
+NatDex | TamaPoke 표시 | PMDCollab 대상
+#0006 | m.리자몽X | Mega Charizard X
+#0065 | m.후딘 | Mega Alakazam
+#0080 | m.야도란 | Mega Slowbro
+#0094 | m.팬텀 | Mega Gengar
+#0115 | m.캥카 | Mega Kangaskhan
+#0142 | m.프테라 | Mega Aerodactyl
+#0150 | m.뮤츠Y | Mega Mewtwo Y
+#0208 | m.강철톤 | Mega Steelix
+#0227 | m.무장조 | Mega Skarmory
+#0229 | m.헬가 | Mega Houndoom
+#0248 | m.마기라스 | Mega Tyranitar
+#0282 | m.가디안 | Mega Gardevoir
+#0302 | m.깜까미 | Mega Sableye
+#0303 | m.입치트 | Mega Mawile
+#0308 | m.요가램 | Mega Medicham
+#0310 | m.썬더볼트 | Mega Manectric
+#0323 | m.폭타 | Mega Camerupt
+#0334 | m.파비코리 | Mega Altaria
+#0354 | m.다크펫 | Mega Banette
+#0362 | m.얼음귀신 | Mega Glalie
+#0380 | m.라티아스 | Mega Latias
+#0381 | m.라티오스 | Mega Latios
+#0384 | m.레쿠쟈 | Mega Rayquaza
+#0428 | m.이어롭 | Mega Lopunny
+#0448 | m.루카리오 | Mega Lucario
+#0475 | m.엘레이드 | Mega Gallade
+#0491 | m.다크라이 | Mega Darkrai
+#0530 | m.몰드류 | Mega Excadrill
+#0604 | m.저리더프 | Mega Eelektross
+#0670 | m.플라엣테 | Mega Floette
+#0691 | m.드래캄 | Mega Dragalge
+#0718 | m.지가르데 | Mega Zygarde
+#0719 | m.디안시 | Mega Diancie
+#0780 | m.할비롱 | Mega Drampa
+#0807 | m.제라오라 | Mega Zeraora
+#0978 | m.싸리용 | Mega Tatsugiri (Curly 계열 경로 허용)

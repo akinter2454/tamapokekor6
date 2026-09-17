@@ -1,0 +1,400 @@
+#include "i18n.h"
+#include "pet.h"        // MED_COUNT
+#include "moves.h"      // MOVE_TBL / MOVE_COUNT
+#include "dex.h"        // DEX_TBL / DEX_COUNT
+#include "ko_species.h" // display-only Korean species names
+#include <Preferences.h>
+
+Lang gLang = LANG_DEFAULT;
+
+// String table [language][id]. Legacy Latin translations remain ASCII for the
+// original 5x7 font; Korean is UTF-8 and rendered with the CJK bitmap font.
+static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
+  // ---------------- ES ----------------
+  {
+    "Esta evolucionando!", "Nam nam!", "Le gusta!", "Tiene hambre!", "Necesita un bano!",
+    "Esta agotado...", "Esta triste...", "Esta rellenito...", "Es SHINY!!", "Esta feliz",
+    "GRACIAS! Hasta siempre", "Se ha escapado...", "Adios! Se despide...",
+    "HUEVO", "Huevo legendario!?", "Huevo raro!", "Toca el huevo...", "Se mueve!", "Esta a punto!",
+    "POKEDEX %u/%u",
+    "%s%s Nv.%u",
+    "Soltar a %s?", "SI", "NO",
+    "%u GOLPES", "FUERZA +%u", "NUEVO RECORD!", "RECORD: %u", "APORREA RAPIDO!",
+    "PUNTOS: %u", "Que felicidad!", "+felicidad",
+    "AJUSTAR HORA", "HORA", "MIN", "desliza arriba: cancelar", "Idioma",
+    "MEDALLA!", "GENIAL!", "RACHA %u DIAS!",
+    "RACHA %u  rec %u", "VIN", "BAYA ???", "BAYA ROJA", "BAYA AZUL", "BAYA VERDE",
+    "%s   EDAD %lud", "toca el nombre: renombrar",
+    "COMBATE", "FUE", "DEF", "VEL", "PES", "ENTRENAR FUERZA",
+    "MEDALLAS %d/%d", "toca: volver",
+    "NOMBRE:", "toca para volver",
+    "COM", "FEL", "ENE", "LIM",
+    "REC %u",
+    "PROGRESO", "Nv.%u", "%u min para Nv.%u", "EVOLUCION", "Forma final",
+    "Listo para evolucionar!", "Sube todo a 40 para evolucionar",
+    "Evoluciona en %u niv.", "Descuidos: %u",
+    "SON ON", "SON OFF",
+    "EVOLUCIONAR", "%s quiere decirte algo...", "%s se siente abandonado...",
+    "Evolucionar?", "Mantener forma", "Despedirse?", "Despedirse", "Quedaros juntos",
+    "Elige tu inicial",
+    "Sin sprites", "Cargalos en la SD",
+    "PS", "IV %u",
+    "MENU", "AJUSTES", "CERRAR", "EQUIPO %u/6", "- vacio -", "%s se une al equipo!", "Equipo lleno: elige a quien sustituir", "Dejarlo ir",
+    "STATS", "ENTRENAR", "FUERZA", "VELOCIDAD", "DEFENSA", "Sube sola si esta a gusto",
+    "MOVIMIENTOS", "- vacio -", "Elige movimiento", "Toca para cambiar", "POT %u", "ESTADO",
+    "%s quiere aprender", "No aprender",
+    "%s usa %s", "Es muy eficaz!", "No es muy eficaz...", "No le afecta...",
+    "%s ha fallado!", "Golpe critico!", "%s se debilita!", "Se ha herido!",
+    "%s: %s", "PARALISIS", "QUEMADURA", "VENENO", "DORMIDO", "CONGELADO", "CONFUSION",
+    "Has ganado!", "Has perdido...",
+    "%s saca a %s", "Adelante, %s!", "GIMNASIOS", "MEDALLAS %u/8", "ENTRENADOR", "VELOCIDAD +%u", "toca: cambiar avatar", "%u en total", "NORMAL", "DIFICIL",
+ "ELEGIDOS %u/%u", "LUCHAR", "BLOQUEADO", "POKEMON", "%s derrotado!", "MEDALLA NUEVA!", "VOL %u", "CAJA %u/%u", "cambiar con %s: elige hueco", "CAJA", "TRAER", "solo con un huevo", "COMBATE LAN", "CREAR", "UNIRSE", "buscando...", "listo!", "version distinta", "crear o unirse", "rival: %u mons", "el rival se fue", "esperando al rival...", "OTRA VEZ", "HUIR", "de que region viene el huevo", "%s +%u", "ya no puede entrenar mas", "ELIGE TU REGION", "RETIRAR", "Retirarla ya?", "la siguiente evoluciona mas tarde", "evolucion retrasada",   "FALTA PACK", "SOLTAR", "se va para siempre", "AL EQUIPO", "no se unira a tu equipo", },
+  // ---------------- EN ----------------
+  {
+    "Evolving!", "Yum yum!", "It likes it!", "It's hungry!", "Needs a bath!",
+    "Worn out...", "Feeling sad...", "A bit chubby...", "It's SHINY!!", "It's happy",
+    "THANKS! Farewell", "It ran away...", "Bye! Waving goodbye...",
+    "EGG", "Legendary egg!?", "Rare egg!", "Tap the egg...", "It moves!", "Almost there!",
+    "POKEDEX %u/%u",
+    "%s%s Lv.%u",
+    "Release %s?", "YES", "NO",
+    "%u HITS", "STR +%u", "NEW RECORD!", "BEST: %u", "HIT FAST!",
+    "SCORE: %u", "So much fun!", "+happiness",
+    "SET TIME", "HOUR", "MIN", "swipe up: cancel", "Lang",
+    "MEDAL!", "AWESOME!", "%u DAY STREAK!",
+    "STREAK %u  best %u", "BOND", "BERRY ???", "RED BERRY", "BLUE BERRY", "GREEN BERRY",
+    "%s   AGE %lud", "tap name: rename",
+    "BATTLE", "ATK", "DEF", "SPD", "WGT", "TRAIN STRENGTH",
+    "MEDALS %d/%d", "tap: back",
+    "NAME:", "tap to go back",
+    "FOOD", "JOY", "ENE", "HYG",
+    "BEST %u",
+    "PROGRESS", "Lv.%u", "%u min to Lv.%u", "EVOLUTION", "Final form",
+    "Ready to evolve!", "All needs >=40 to evolve",
+    "Evolves in %u lv.", "Slip-ups: %u",
+    "SND ON", "SND OFF",
+    "EVOLVE!", "%s wants to tell you...", "%s feels abandoned...",
+    "Evolve?", "Keep form", "Say goodbye?", "Goodbye", "Stay together",
+    "Choose your starter",
+    "No sprites", "Load them onto the SD",
+    "HP", "IV %u",
+    "MENU", "SETTINGS", "CLOSE", "PARTY %u/6", "- empty -", "%s joined the party!", "Party full: pick who to replace", "Let it go",
+    "STATS", "TRAINING", "STRENGTH", "SPEED", "DEFENCE", "Grows on its own when happy",
+    "MOVES", "- empty -", "Choose a move", "Tap a slot to change", "PWR %u", "STATUS",
+    "%s wants to learn", "Do not learn",
+    "%s used %s", "Super effective!", "Not very effective...", "It had no effect...",
+    "%s missed!", "Critical hit!", "%s fainted!", "It hurt itself!",
+    "%s: %s", "PARALYSED", "BURNED", "POISONED", "ASLEEP", "FROZEN", "CONFUSED",
+    "You win!", "You lost...",
+    "%s sends out %s", "Go, %s!", "GYMS", "BADGES %u/8", "TRAINER",
+ "SPEED +%u", "tap: change avatar", "%u earned in all", "EASY", "HARD", "CHOSEN %u/%u", "FIGHT", "LOCKED", "POKEMON", "%s defeated!", "NEW BADGE!", "VOL %u", "BOX %u/%u", "swap with %s: pick a slot", "BOX", "BRING BACK", "only while an egg waits", "LAN BATTLE", "HOST", "JOIN", "searching...", "ready!", "different version", "host or join", "rival: %u mons", "the rival left", "waiting for the rival...", "AGAIN", "RUN", "where this egg comes from", "%s +%u", "trained as far as it can go", "CHOOSE A REGION", "RETIRE", "Retire it early?", "the next one evolves later", "evolution is delayed",
+   "NEEDS PACK", "RELEASE", "gone for good", "TO PARTY", "it will not join your party", },
+  // ---------------- FR ----------------
+  {
+    "Il evolue!", "Miam miam!", "Il aime ca!", "Il a faim!", "Besoin d'un bain!",
+    "Epuise...", "Triste...", "Un peu rond...", "C'est SHINY!!", "Il est content",
+    "MERCI! Adieu", "Il s'est enfui...", "Au revoir!",
+    "OEUF", "Oeuf legendaire!?", "Oeuf rare!", "Touche l'oeuf...", "Il bouge!", "Presque la!",
+    "POKEDEX %u/%u",
+    "%s%s Niv.%u",
+    "Relacher %s?", "OUI", "NON",
+    "%u COUPS", "FORCE +%u", "NOUVEAU RECORD!", "RECORD: %u", "FRAPPE VITE!",
+    "SCORE: %u", "Trop bien!", "+bonheur",
+    "REGLER L'HEURE", "HEURE", "MIN", "glisse haut: annuler", "Langue",
+    "MEDAILLE!", "SUPER!", "SERIE %u JOURS!",
+    "SERIE %u  rec %u", "LIEN", "BAIE ???", "BAIE ROUGE", "BAIE BLEUE", "BAIE VERTE",
+    "%s   AGE %lud", "touche le nom: renommer",
+    "COMBAT", "ATQ", "DEF", "VIT", "PDS", "ENTRAINER FORCE",
+    "MEDAILLES %d/%d", "touche: retour",
+    "NOM:", "touche pour revenir",
+    "NOUR", "JOIE", "ENE", "HYG",
+    "REC %u",
+    "PROGRES", "Niv.%u", "%u min pour Niv.%u", "EVOLUTION", "Forme finale",
+    "Pret a evoluer!", "Tout a 40 pour evoluer",
+    "Evolue dans %u niv.", "Negligences: %u",
+    "SON ON", "SON OFF",
+    "EVOLUER", "%s veut te parler...", "%s se sent abandonne...",
+    "Evoluer?", "Garder forme", "Dire adieu?", "Adieu", "Rester ensemble",
+    "Choisis ton starter",
+    "Pas de sprites", "Charge-les sur la SD",
+    "PV", "IV %u",
+    "MENU", "REGLAGES", "FERMER", "EQUIPE %u/6", "- vide -", "%s rejoint l'equipe!", "Equipe pleine: qui remplacer?", "Le laisser partir",
+    "STATS", "ENTRAINEMENT", "FORCE", "VITESSE", "DEFENSE", "Monte seule s'il est heureux",
+    "CAPACITES", "- vide -", "Choisis une capacite", "Touche pour changer", "PUI %u", "STATUT",
+    "%s veut apprendre", "Ne pas apprendre",
+    "%s utilise %s", "Tres efficace!", "Peu efficace...", "Aucun effet...",
+    "%s a rate!", "Coup critique!", "%s est K.O.!", "Il se blesse!",
+    "%s: %s", "PARALYSIE", "BRULURE", "POISON", "ENDORMI", "GELE", "CONFUSION",
+    "Gagne!", "Perdu...",
+    "%s envoie %s", "Vas-y, %s!", "ARENES", "BADGES %u/8", "DRESSEUR", "VITESSE +%u", "touche: changer d'avatar", "%u au total", "NORMAL", "DIFFICILE", "CHOISIS %u/%u", "COMBATTRE", "VERROUILLE", "POKEMON", "%s vaincu!", "NOUVEAU BADGE!", "VOL %u", "BOITE %u/%u", "echanger avec %s: choisis", "BOITE", "RAMENER", "seulement avec un oeuf", "COMBAT LAN", "CREER", "REJOINDRE", "recherche...", "pret!", "version differente", "creer ou rejoindre", "rival: %u mons", "le rival est parti", "en attente du rival...", "ENCORE", "FUIR", "d ou vient cet oeuf", "%s +%u", "ne peut plus progresser", "CHOISIS TA REGION", "RETIRER", "Retirer maintenant?", "le suivant evolue plus tard", "evolution retardee",
+   "PACK REQUIS", "RELACHER", "parti pour de bon", "A L EQUIPE", "ne rejoindra pas l equipe", },
+  // ---------------- DE ----------------
+  {
+    "Entwickelt sich!", "Mampf mampf!", "Gefaellt ihm!", "Hat Hunger!", "Braucht ein Bad!",
+    "Erschoepft...", "Traurig...", "Etwas rundlich...", "Es ist SHINY!!", "Es ist froh",
+    "DANKE! Lebwohl", "Es ist weg...", "Tschuess! Winkt",
+    "EI", "Legendaeres Ei!?", "Seltenes Ei!", "Beruehre das Ei...", "Es bewegt sich!", "Fast soweit!",
+    "POKEDEX %u/%u",
+    "%s%s Lv.%u",
+    "%s freilassen?", "JA", "NEIN",
+    "%u TREFFER", "KRAFT +%u", "NEUER REKORD!", "REKORD: %u", "SCHNELL HAUEN!",
+    "PUNKTE: %u", "Wie schoen!", "+Freude",
+    "ZEIT STELLEN", "STD", "MIN", "hoch wischen: abbruch", "Sprache",
+    "MEDAILLE!", "TOLL!", "%u TAGE SERIE!",
+    "SERIE %u  rek %u", "BND", "BEERE ???", "ROTE BEERE", "BLAUE BEERE", "GRUENE BEERE",
+    "%s   ALTER %lud", "Name tippen: umbenennen",
+    "KAMPF", "ANG", "VER", "INI", "GEW", "KRAFT TRAINIEREN",
+    "MEDAILLEN %d/%d", "tippen: zurueck",
+    "NAME:", "tippen zum zurueck",
+    "ESS", "FRO", "ENE", "HYG",
+    "REK %u",
+    "FORTSCHRITT", "Lv.%u", "%u min bis Lv.%u", "ENTWICKLUNG", "Endform",
+    "Bereit zur Entwicklung!", "Alles >=40 zur Entwicklung",
+    "Entwickelt in %u Lv.", "Patzer: %u",
+    "TON AN", "TON AUS",
+    "ENTWICKELN", "%s will dir etwas sagen...", "%s fuehlt sich verlassen...",
+    "Entwickeln?", "Form behalten", "Abschied?", "Lebwohl", "Zusammen bleiben",
+    "Waehle dein Starter",
+    "Keine Sprites", "Auf die SD laden",
+    "KP", "IV %u",
+    "MENU", "EINSTELLUNGEN", "SCHLIESSEN", "TEAM %u/6", "- leer -", "%s kommt ins Team!", "Team voll: wen ersetzen?", "Ziehen lassen",
+    "WERTE", "TRAINING", "STAERKE", "TEMPO", "ABWEHR", "Steigt von selbst bei guter Laune",
+    "ATTACKEN", "- leer -", "Attacke waehlen", "Tippen zum Aendern", "STK %u", "STATUS",
+    "%s will lernen", "Nicht lernen",
+    "%s setzt %s ein", "Sehr effektiv!", "Nicht sehr effektiv...", "Keine Wirkung...",
+    "%s hat verfehlt!", "Volltreffer!", "%s wurde besiegt!", "Es verletzt sich!",
+    "%s: %s", "PARALYSE", "VERBRANNT", "VERGIFTET", "SCHLAEFT", "GEFROREN", "VERWIRRT",
+    "Gewonnen!", "Verloren...",
+    "%s schickt %s", "Los, %s!", "ARENEN", "ORDEN %u/8", "TRAINER", "TEMPO +%u", "tippen: Avatar wechseln", "%u insgesamt", "NORMAL", "SCHWER", "GEWAEHLT %u/%u", "KAEMPFEN", "GESPERRT", "POKEMON", "%s besiegt!", "NEUER ORDEN!", "LAUT %u", "BOX %u/%u", "mit %s tauschen: waehle", "BOX", "ZURUECK", "nur mit einem Ei", "LAN KAMPF", "HOSTEN", "BEITRETEN", "suche...", "bereit!", "andere Version", "hosten oder beitreten", "Gegner: %u", "der Gegner ist weg", "warte auf den Gegner...", "NOCHMAL", "FLUCHT", "woher dieses Ei kommt", "%s +%u", "kann nicht weiter trainieren", "WAEHLE DEINE REGION", "VERABSCHIEDEN", "Jetzt verabschieden?", "das naechste entwickelt sich spaeter", "Entwicklung verzoegert",
+   "PACK FEHLT", "FREILASSEN", "fuer immer weg", "INS TEAM", "kommt nicht ins team", },
+  // ---------------- IT ----------------
+  {
+    "Si evolve!", "Gnam gnam!", "Gli piace!", "Ha fame!", "Vuole un bagno!",
+    "Esausto...", "Triste...", "Un po' cicciotto...", "E' SHINY!!", "E' felice",
+    "GRAZIE! Addio", "E' scappato...", "Ciao! Saluta",
+    "UOVO", "Uovo leggendario!?", "Uovo raro!", "Tocca l'uovo...", "Si muove!", "Ci siamo quasi!",
+    "POKEDEX %u/%u",
+    "%s%s Lv.%u",
+    "Liberare %s?", "SI", "NO",
+    "%u COLPI", "FORZA +%u", "NUOVO RECORD!", "RECORD: %u", "COLPISCI VELOCE!",
+    "PUNTI: %u", "Che gioia!", "+felicita",
+    "IMPOSTA ORA", "ORA", "MIN", "scorri su: annulla", "Lingua",
+    "MEDAGLIA!", "GRANDE!", "SERIE %u GIORNI!",
+    "SERIE %u  rec %u", "LEG", "BACCA ???", "BACCA ROSSA", "BACCA BLU", "BACCA VERDE",
+    "%s   ETA %lud", "tocca il nome: rinomina",
+    "LOTTA", "ATT", "DIF", "VEL", "PES", "ALLENA FORZA",
+    "MEDAGLIE %d/%d", "tocca: indietro",
+    "NOME:", "tocca per tornare",
+    "CIB", "GIO", "ENE", "IGI",
+    "REC %u",
+    "PROGRESSI", "Lv.%u", "%u min per Lv.%u", "EVOLUZIONE", "Forma finale",
+    "Pronto a evolvere!", "Tutto a 40 per evolvere",
+    "Evolve tra %u liv.", "Disattenzioni: %u",
+    "AUD ON", "AUD OFF",
+    "EVOLVI", "%s vuole dirti qualcosa...", "%s si sente abbandonato...",
+    "Evolvere?", "Mantieni forma", "Salutare?", "Addio", "Restare insieme",
+    "Scegli l'iniziale",
+    "Senza sprite", "Caricali sulla SD",
+    "PS", "IV %u",
+    "MENU", "IMPOSTAZIONI", "CHIUDI", "SQUADRA %u/6", "- vuoto -", "%s entra in squadra!", "Squadra piena: chi sostituire?", "Lasciarlo andare",
+    "STATS", "ALLENAMENTO", "FORZA", "VELOCITA", "DIFESA", "Sale da sola se sta bene",
+    "MOSSE", "- vuoto -", "Scegli una mossa", "Tocca per cambiare", "POT %u", "STATO",
+    "%s vuole imparare", "Non imparare",
+    "%s usa %s", "Superefficace!", "Non molto efficace...", "Nessun effetto...",
+    "%s ha mancato!", "Brutto colpo!", "%s e\' esausto!", "Si e ferito!",
+    "%s: %s", "PARALISI", "SCOTTATURA", "VELENO", "ADDORMENTATO", "CONGELATO", "CONFUSIONE",
+    "Hai vinto!", "Hai perso...",
+    "%s manda %s", "Vai, %s!", "PALESTRE", "MEDAGLIE %u/8", "ALLENATORE", "VELOCITA +%u", "tocca: cambia avatar", "%u in totale", "NORMALE", "DIFFICILE", "SCELTI %u/%u", "LOTTA", "BLOCCATO", "POKEMON", "%s sconfitto!", "NUOVA MEDAGLIA!", "VOL %u", "BOX %u/%u", "scambia con %s: scegli", "BOX", "RIPORTA", "solo con un uovo", "LOTTA LAN", "CREA", "ENTRA", "ricerca...", "pronto!", "versione diversa", "crea o entra", "rivale: %u mons", "il rivale se n' e andato", "in attesa del rivale...", "ANCORA", "FUGGI", "da quale regione viene l uovo", "%s +%u", "non puo allenarsi oltre", "SCEGLI LA REGIONE", "RITIRARE", "Ritirarla adesso?", "il prossimo evolve piu tardi", "evoluzione ritardata",
+   "MANCA PACK", "LIBERA", "via per sempre", "AL GRUPPO", "non entrera nel gruppo", },
+  // ---------------- PT ----------------
+  {
+    "Evoluindo!", "Nham nham!", "Ele gosta!", "Esta com fome!", "Precisa de banho!",
+    "Exausto...", "Triste...", "Um pouco gordinho...", "E SHINY!!", "Esta feliz",
+    "OBRIGADO! Adeus", "Fugiu...", "Tchau! Acena",
+    "OVO", "Ovo lendario!?", "Ovo raro!", "Toque no ovo...", "Mexe-se!", "Quase la!",
+    "POKEDEX %u/%u",
+    "%s%s Niv.%u",
+    "Soltar %s?", "SIM", "NAO",
+    "%u GOLPES", "FORCA +%u", "NOVO RECORDE!", "RECORDE: %u", "BATA RAPIDO!",
+    "PONTOS: %u", "Que alegria!", "+alegria",
+    "AJUSTAR HORA", "HORA", "MIN", "deslize cima: cancelar", "Idioma",
+    "MEDALHA!", "OTIMO!", "%u DIAS SEGUIDOS!",
+    "SEQ %u  rec %u", "LACO", "BAGA ???", "BAGA VERMELHA", "BAGA AZUL", "BAGA VERDE",
+    "%s   IDADE %lud", "toque no nome: renomear",
+    "COMBATE", "ATQ", "DEF", "VEL", "PES", "TREINAR FORCA",
+    "MEDALHAS %d/%d", "toque: voltar",
+    "NOME:", "toque para voltar",
+    "COM", "ALE", "ENE", "HIG",
+    "REC %u",
+    "PROGRESSO", "Niv.%u", "%u min para Niv.%u", "EVOLUCAO", "Forma final",
+    "Pronto a evoluir!", "Tudo a 40 para evoluir",
+    "Evolui em %u niv.", "Descuidos: %u",
+    "SOM ON", "SOM OFF",
+    "EVOLUIR", "%s quer dizer-te algo...", "%s sente-se abandonado...",
+    "Evoluir?", "Manter forma", "Despedir?", "Adeus", "Ficar juntos",
+    "Escolhe o inicial",
+    "Sem sprites", "Carrega-os no SD",
+    "PS", "IV %u",
+    "MENU", "AJUSTES", "FECHAR", "EQUIPA %u/6", "- vazio -", "%s junta-se a equipa!", "Equipa cheia: quem substituir?", "Deixa-lo ir",
+    "STATS", "TREINO", "FORCA", "VELOCIDADE", "DEFESA", "Sobe sozinha se estiver bem",
+    "GOLPES", "- vazio -", "Escolhe um golpe", "Toca para mudar", "POT %u", "ESTADO",
+    "%s quer aprender", "Nao aprender",
+    "%s usa %s", "Super eficaz!", "Pouco eficaz...", "Nao teve efeito...",
+    "%s falhou!", "Acerto critico!", "%s desmaiou!", "Feriu-se!",
+    "%s: %s", "PARALISIA", "QUEIMADURA", "VENENO", "A DORMIR", "CONGELADO", "CONFUSAO",
+    "Ganhaste!", "Perdeste...",
+    "%s envia %s", "Vai, %s!", "GINASIOS", "MEDALHAS %u/8", "TREINADOR", "VELOCIDADE +%u", "toca: mudar avatar", "%u no total", "NORMAL", "DIFICIL", "ESCOLHIDOS %u/%u", "LUTAR", "BLOQUEADO", "POKEMON", "%s derrotado!", "NOVA MEDALHA!", "VOL %u", "CAIXA %u/%u", "trocar com %s: escolhe", "CAIXA", "TRAZER", "so com um ovo", "COMBATE LAN", "CRIAR", "ENTRAR", "a procurar...", "pronto!", "versao diferente", "criar ou entrar", "rival: %u mons", "o rival saiu", "a esperar pelo rival...", "OUTRA VEZ", "FUGIR", "de que regiao vem o ovo", "%s +%u", "ja nao pode treinar mais", "ESCOLHE A REGIAO", "REFORMAR", "Reformar agora?", "o proximo evolui mais tarde", "evolucao atrasada",
+   "FALTA PACK", "SOLTAR", "vai para sempre", "A EQUIPA", "nao entrara na equipa", },
+  // ---------------- KO ----------------
+  {
+    "진화 중!", "냠냠!", "맛있대요!", "배고파요!", "목욕이 필요해요!",
+    "지쳤어요...", "슬퍼해요...", "조금 통통해요...", "이로치다!!", "행복해요",
+    "고마워요! 안녕", "도망가 버렸어요...", "안녕! 손을 흔들어요...", "알", "전설의 알!?",
+    "희귀한 알!", "알을 터치하세요...", "알이 움직여요!", "곧 부화해요!", "도감 %u/%u",
+    "%s%s Lv.%u", "놓아줄까요? %s", "예", "아니오", "%u회 명중",
+    "힘 +%u", "신기록!", "최고: %u", "빠르게 터치!", "점수: %u",
+    "정말 즐거워요!", "행복 +", "시간 설정", "시", "분",
+    "위로 밀기: 취소", "언어", "메달!", "최고!", "%u일 연속!",
+    "연속 %u일  최고 %u", "유대", "열매 ???", "빨간 열매", "파란 열매",
+    "초록 열매", "%s   나이 %lu일", "이름 터치: 변경", "배틀", "공격",
+    "방어", "속도", "체중", "힘 훈련", "메달 %d/%d",
+    "터치: 뒤로", "이름:", "터치해서 돌아가기", "먹이", "기쁨",
+    "기력", "청결", "최고 %u", "성장", "Lv.%u",
+    "%u분 후 Lv.%u", "진화", "최종 진화", "진화 준비 완료!", "모든 상태 40 이상 필요",
+    "%u레벨 후 진화", "돌봄 실수: %u", "소리 켬", "소리 끔", "진화!",
+    "%s: 할 말이 있어요...", "%s: 외로워해요...", "진화할까요?", "그대로 두기", "작별할까요?",
+    "작별하기", "계속 함께", "파트너를 고르세요", "스프라이트 없음", "SD에 파일을 넣으세요",
+    "HP", "IV %u", "메뉴", "설정", "닫기",
+    "파티 %u/6", "- 비어 있음 -", "%s 파티 합류!", "파티가 가득 찼어요: 교체 선택", "보내주기",
+    "능력치", "훈련", "힘", "스피드", "방어",
+    "방어: 움직이는 바늘이 가운데 올 때 터치", "기술", "- 비어 있음 -", "기술 선택", "슬롯 터치: 변경",
+    "위력 %u", "변화", "%s: 새 기술을 배울까요?", "배우지 않기", "%s 사용: %s",
+    "효과가 굉장했다!", "효과가 별로인 듯하다...", "효과가 없는 것 같다...", "%s의 공격이 빗나갔다!", "급소에 맞았다!",
+    "%s 쓰러짐!", "혼란으로 스스로 공격!", "%s: %s", "마비", "화상",
+    "독", "잠듦", "얼음", "혼란", "승리!",
+    "패배...", "%s: %s 출전", "가라, %s!", "체육관", "배지 %u/8",
+    "트레이너", "스피드 +%u", "터치: 아바타 변경", "총 %u개 획득", "쉬움",
+    "어려움", "선택 %u/%u", "배틀", "잠김", "포켓몬",
+    "%s 격파!", "새 배지!", "음량 %u", "박스 %u/%u", "%s와 교체: 슬롯 선택",
+    "박스", "데려오기", "알이 기다릴 때만 가능", "LAN 배틀", "방 만들기",
+    "참가", "검색 중...", "준비 완료!", "버전이 달라요", "방 만들기 또는 참가",
+    "상대: %u마리", "상대가 나갔어요", "상대를 기다리는 중...", "다시", "도망",
+    "이 알이 온 지역", "%s +%u", "더 이상 훈련할 수 없어요", "지역을 선택하세요", "은퇴",
+    "지금 은퇴할까요?", "다음 친구는 진화가 조금 늦어져요", "진화가 조금 늦어져요", "팩 필요", "놓아주기",
+    "영원히 떠나요", "파티로", "파티에 합류하지 않아요",
+  },
+};
+
+// Nombres de medalla en sus tres longitudes [idioma][medalla].
+static const char *const MED_NAME[LANG_COUNT][MED_COUNT] = {
+  { "Nv.10", "Nv.25", "Nv.50", "BAYA", "RACHA 7", "VINCULO", "FORMA TOPE", "EN FORMA" },
+  { "Lv.10", "Lv.25", "Lv.50", "BERRY", "7 STREAK", "BOND", "TOP FORM", "IN SHAPE" },
+  { "Niv.10", "Niv.25", "Niv.50", "BAIE", "SERIE 7", "LIEN", "FORME MAX", "EN FORME" },
+  { "Lv.10", "Lv.25", "Lv.50", "BEERE", "7 SERIE", "BINDUNG", "ENDFORM", "FIT" },
+  { "Lv.10", "Lv.25", "Lv.50", "BACCA", "SERIE 7", "LEGAME", "FORMA MAX", "IN FORMA" },
+  { "Niv.10", "Niv.25", "Niv.50", "BAGA", "SEQ 7", "LACO", "FORMA MAX", "EM FORMA" },
+  { "Lv.10", "Lv.25", "Lv.50", "열매", "7일 연속", "유대", "최종 진화", "건강" },
+};
+static const char *const MED_LBL[LANG_COUNT][MED_COUNT] = {
+  { "Nv10", "Nv25", "Nv50", "BAYA", "7DIAS", "VINC", "TOPE", "SANO" },
+  { "Lv10", "Lv25", "Lv50", "BERRY", "7DAYS", "BOND", "TOP", "FIT" },
+  { "Niv10", "Niv25", "Niv50", "BAIE", "7JRS", "LIEN", "MAX", "FORME" },
+  { "Lv10", "Lv25", "Lv50", "BEERE", "7TAGE", "BND", "END", "FIT" },
+  { "Lv10", "Lv25", "Lv50", "BACCA", "7GG", "LEG", "MAX", "FIT" },
+  { "Niv10", "Niv25", "Niv50", "BAGA", "7DIAS", "LACO", "MAX", "FIT" },
+  { "Lv10", "Lv25", "Lv50", "열매", "7일", "유대", "최종", "건강" },
+};
+static const char *const MED_DSC[LANG_COUNT][MED_COUNT] = {
+  { "NIVEL 10", "NIVEL 25", "NIVEL 50", "BAYA HALLADA",
+    "RACHA 7 DIAS", "VINCULO MAX", "FORMA FINAL", "EN FORMA" },
+  { "LEVEL 10", "LEVEL 25", "LEVEL 50", "BERRY FOUND",
+    "7 DAY STREAK", "MAX BOND", "FINAL FORM", "IN SHAPE" },
+  { "NIVEAU 10", "NIVEAU 25", "NIVEAU 50", "BAIE TROUVEE",
+    "SERIE 7 JOURS", "LIEN MAX", "FORME FINALE", "EN FORME" },
+  { "LEVEL 10", "LEVEL 25", "LEVEL 50", "BEERE GEFUNDEN",
+    "7 TAGE SERIE", "MAX BINDUNG", "ENDFORM", "FIT" },
+  { "LIVELLO 10", "LIVELLO 25", "LIVELLO 50", "BACCA TROVATA",
+    "SERIE 7 GIORNI", "LEGAME MAX", "FORMA FINALE", "IN FORMA" },
+  { "NIVEL 10", "NIVEL 25", "NIVEL 50", "BAGA ACHADA",
+    "SEQ 7 DIAS", "LACO MAX", "FORMA FINAL", "EM FORMA" },
+  { "레벨 10", "레벨 25", "레벨 50", "열매 발견", "7일 연속", "유대 최대", "최종 진화", "건강 상태" },
+};
+
+const char *T(StrId id) { return STRINGS[gLang][id]; }
+const char *medalName(int i)  { return MED_NAME[gLang][i]; }
+const char *medalLabel(int i) { return MED_LBL[gLang][i]; }
+const char *medalDesc(int i)  { return MED_DSC[gLang][i]; }
+
+
+const char *localizedSpeciesName(uint16_t dex) {
+  if (dex < 1 || dex > DEX_COUNT) return "?";
+  return (gLang == LANG_KO) ? KO_SPECIES_NAMES[dex] : DEX_TBL[dex].name;
+}
+
+const char *localizedMoveName(uint8_t moveId) {
+  static const char *const KO[MOVE_COUNT] = {
+    "-", "몸통박치기", "할퀴기", "막치기", "마구찌르기", "전광석화",
+    "스피드스타", "누르기", "이판사판태클", "파괴광선", "쪼기", "불꽃세례",
+    "불꽃펀치", "화염방사", "불대문자", "거품", "물대포", "폭포오르기",
+    "파도타기", "하이드로펌프", "스파크", "전기쇼크", "번개펀치", "10만볼트",
+    "번개", "흡수", "덩굴채찍", "잎날가르기", "메가드레인", "솔라빔",
+    "오로라빔", "냉동펀치", "냉동빔", "눈보라", "태권당수", "지구던지기",
+    "지옥의바퀴", "무릎차기", "독침", "용해액", "오물공격", "오물폭탄",
+    "뼈다귀치기", "구멍파기", "지진", "날개치기", "회전부리", "공중날기",
+    "사이코웨이브", "염동력", "환상빔", "사이코키네시스", "벌레먹기", "바늘미사일",
+    "흡혈", "메가혼", "벌레의야단법석", "시저크로스", "바위깨기", "돌떨구기",
+    "스톤샤워", "원시의힘", "핥기", "나이트헤드", "섀도볼", "용의분노",
+    "드래곤크루", "역린", "물기", "깨물어부수기", "아이언헤드", "러스터캐논",
+    "매지컬샤인", "치근거리기", "문포스", "칼춤", "고속이동", "배리어",
+    "망각술", "나쁜음모", "용의춤", "벌크업", "울음소리", "째려보기",
+    "싫은소리", "실뿜기", "HP회복", "알낳기", "발버둥", "악의파동",
+    "볼트태클", "성스러운불꽃", "에어로블라스트", "근원의파동", "단애의칼", "시간의포효",
+    "공간절단", "섀도다이브", "사이코브레이크", "크로스플레임", "크로스썬더", "신비의칼",
+    "지오컨트롤", "데스윙", "메테오드라이브", "섀도레이", "섀도스틸", "드럼어택",
+    "화염볼", "노려맞히기", "트릭플라워", "플레어송", "아쿠아스텝", "루미나콜리전",
+    "썬더프리즌", "드래곤에너지", "페이탈클로", "봄의폭풍", "찍찍베기", "소금절이",
+    "아머캐논", "원념의칼", "도각참", "골드러시",
+    "데이터펄스", "디지플레어", "타이달코드", "볼트링크", "그린드라이버", "프로스트비트",
+    "브레이브임팩트", "베놈코드", "코어퀘이크", "스카이패킷", "마인드트레이스", "스웜스크립트",
+    "크래그브레이크", "고스트프로세스", "드라코스트림", "다크프로토콜", "알로이버스트", "라이트패치",
+  };
+  if (moveId >= MOVE_COUNT) return "?";
+  return (gLang == LANG_KO) ? KO[moveId] : MOVE_TBL[moveId].name;
+}
+
+const char *localizedTypeName(uint8_t typeId) {
+  static const char *const EN[18] = {
+    "NORMAL", "FIRE", "WATER", "ELECTRIC", "GRASS", "ICE", "FIGHTING", "POISON",
+    "GROUND", "FLYING", "PSYCHIC", "BUG", "ROCK", "GHOST", "DRAGON", "DARK", "STEEL", "FAIRY"
+  };
+  static const char *const KO[18] = {
+    "노말", "불꽃", "물", "전기", "풀", "얼음", "격투", "독",
+    "땅", "비행", "에스퍼", "벌레", "바위", "고스트", "드래곤", "악", "강철", "페어리"
+  };
+  if (typeId >= 18) return "?";
+  return (gLang == LANG_KO) ? KO[typeId] : EN[typeId];
+}
+
+const char *localizedRegionName(uint8_t regionId) {
+  static const char *const EN[11] = { "KANTO", "JOHTO", "HOENN", "SINNOH", "UNOVA", "KALOS", "ALOLA", "GALAR", "HISUI", "PALDEA", "ALL" };
+  static const char *const KO[11] = { "관동", "성도", "호연", "신오", "하나", "칼로스", "알로라", "가라르", "히스이", "팔데아", "전체" };
+  if (regionId >= 11) return "?";
+  return (gLang == LANG_KO) ? KO[regionId] : EN[regionId];
+}
+
+void loadLang() {
+  Preferences p;
+  p.begin("tamapoke", true);  // solo lectura
+  uint8_t v = p.getUChar("lang", LANG_DEFAULT);
+  p.end();
+  gLang = (v < LANG_COUNT) ? (Lang)v : LANG_DEFAULT;
+}
+
+void setLang(Lang l) {
+  if (l >= LANG_COUNT) return;
+  gLang = l;
+  Preferences p;
+  p.begin("tamapoke", false);
+  p.putUChar("lang", (uint8_t)l);
+  p.end();
+}

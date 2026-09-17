@@ -1,0 +1,18 @@
+TamaPoke KO v3.62.0 - PMDCollab / SpriteCollab resource notice
+
+Sprite source browser:
+https://sprites.pmdcollab.org/
+
+Source repository:
+https://github.com/PMDCollab/SpriteCollab
+
+This build intentionally uses PMDCollab behavior pixel sprites (AnimData.xml and
+behavior animation sheets) for added Pokemon/forms. It does not substitute
+static artwork when an animated behavior sprite is unavailable. v3.62.0 additionally
+whitelists only the 36 approved Mega forms listed in MEGA36_SOURCE_MAP.txt; other
+battle-gimmick forms remain excluded.
+
+Please retain the upstream PMDCollab/SpriteCollab attribution and applicable
+non-commercial / contributor-credit requirements when redistributing this build
+or the generated sprite packs. Contributor-specific credits are available from
+the PMDCollab/SpriteCollab project and its generated credit data.

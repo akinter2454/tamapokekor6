@@ -1,0 +1,5 @@
+TamaPoke KO v3.63.6 GitHub 업로드 안내
+
+이 ZIP의 내용을 GitHub 저장소 루트에 그대로 덮어쓰세요.
+tools/catalog_lock.json이 기존 저장소에 있다면 유지하는 것을 권장합니다.
+그 후 Actions에서 `TamaPoke PMDCatalog` workflow를 실행하고 build/deploy 성공을 확인하세요.

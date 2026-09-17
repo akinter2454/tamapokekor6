@@ -1,0 +1,84 @@
+#pragma once
+#include <Arduino.h>
+
+// Sprite animado TPK1 (formato heredado, camino de respaldo). El proyecto usa
+// PMD/TPK2+TPK3 (PmdMon) para todo; esta ruta queda inactiva si no hay NNN.bin en la SD.
+// Los datos indexados viven en PSRAM; la paleta es RGB565.
+struct SdMon {
+  bool loaded = false;
+  uint16_t w = 0, h = 0, frames = 0, frameMs = 100;
+  uint8_t scale = 2;       // factor de zoom entero al dibujar
+  uint16_t palCount = 0;
+  uint16_t pal[256];
+  uint8_t *data = nullptr;  // frames * w * h indices (0xFF = transparente)
+
+  bool load(int16_t dexNum, bool shiny = false);
+  void unload();
+};
+
+// acciones de los sprites PMD (TPK2 legado / TPK3 con bounds)
+enum : uint8_t {
+  PMD_IDLE = 0, PMD_WALKL, PMD_WALKR, PMD_SLEEP, PMD_EAT, PMD_HURT,
+  PMD_ATTACK, PMD_POSE, PMD_HOP, PMD_NOD, PMD_BREATH, PMD_SIT,
+  PMD_NACTS
+};
+
+struct PmdAct {
+  uint8_t w = 0, h = 0, frames = 0;
+  uint8_t base = 0;  // visible bottom row+1; used to anchor the feet
+  // Cached union of non-transparent pixels across every frame. PMD sheets for
+  // large Pokemon often contain a lot of transparent padding; scaling from the
+  // raw canvas made Dragonite and other bulky species look much smaller than
+  // Venusaur. These bounds let the renderer size the creature, not the canvas.
+  uint8_t visL = 0, visR = 0, visT = 0;  // visR is exclusive; base is visB
+  // Exact non-transparent bounds for every frame. v3.61.3 TPK3 stores these
+  // in the sprite file so large catalog entries do not need a full pixel scan
+  // when loaded from SD. Legacy TPK2 files calculate them once at load time.
+  uint8_t frameL[24] = {0}, frameR[24] = {0}, frameT[24] = {0}, frameB[24] = {0};
+  uint32_t totalMs = 0;  // cached animation duration; avoids per-frame re-summing
+  uint16_t ms[24];
+  const uint8_t *data = nullptr;  // frames * w * h en el blob
+};
+
+// sprite PMD multi-accion cargado de la SD a PSRAM
+struct PmdMon {
+  bool loaded = false;
+  // WHICH species is actually in here. It exists so a test can prove the file
+  // that got opened matches the dex that was asked for: dexNum was a uint8_t,
+  // so every species past 255 wrapped -- 258 MARSHTOMP loaded p002.bin and a
+  // Hoenn creature appeared on screen as IVYSAUR.
+  int16_t dex = 0;
+  uint16_t palCount = 0;
+  uint16_t pal[256];
+  uint8_t *blob = nullptr;
+  PmdAct acts[PMD_NACTS];
+
+  bool load(int16_t dexNum, bool shiny = false);
+  void unload();
+  bool has(uint8_t a) const { return loaded && a < PMD_NACTS && acts[a].frames > 0; }
+};
+
+// miniaturas de la galeria (thumbs.bin entero en PSRAM)
+struct SdThumbs {
+  bool loaded = false;
+  uint8_t *data = nullptr;
+  uint16_t count = 0;
+  bool load();
+  const uint8_t *get(int16_t dex) const;  // blob: w,h,palCount,pal[],idx[]
+};
+extern SdThumbs thumbs;
+
+bool sdBegin();                 // monta la SD (SDMMC 1-bit), true si hay tarjeta
+// Narrows gRegionArt to the packs actually present. `verbose` logs one line per
+// region, which is what the boot report wants; the runtime rescan passes false so
+// its output cannot interleave with the PUT transfer protocol the host is parsing.
+void sdScanRegionArt(bool verbose = true);
+bool sdSerialCommand(const String &line);  // SDINFO/PUT/DEL/LS por USB; true si la maneja
+extern bool sdReady;
+extern bool sdDirty;  // true tras recibir archivos: recargar sprite
+// A region's pack can arrive AFTER the card was mounted -- the web installer
+// streams it over PUT into the running firmware -- and gRegionArt was computed
+// once in sdBegin(). Without this the region stayed locked reading NEEDS PACK
+// until the board was rebooted, which looked exactly like the download failing.
+// The main loop rescans when this is set; the transfer itself is never delayed.
+extern bool sdArtDirty;
