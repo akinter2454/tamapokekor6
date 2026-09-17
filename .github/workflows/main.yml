@@ -1,0 +1,549 @@
+name: TamaPoke PMDCatalog - Reserved Species Guard + Training Rewards + Stability + GitHub Pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    permissions:
+      contents: write
+      actions: write
+      pages: write
+      id-token: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Python sprite tools
+        run: |
+          python3 -m pip install --quiet pillow
+
+      - name: Sync current PMDCollab Pokemon and canonical official forms
+        run: |
+          set -euxo pipefail
+          python3 "$GITHUB_WORKSPACE/tools/sync_pmd_catalog.py"
+          cat "$GITHUB_WORKSPACE/tools/pmd_catalog_report.txt"
+          grep -n '#define DEX_COUNT' "$GITHUB_WORKSPACE/dex.h" | head -1
+          grep -n '#define REGION_COUNT 11' "$GITHUB_WORKSPACE/dex.h"
+          FW_SOURCE_VERSION="$(sed -n 's/^#define FW_VERSION "\([^"]*\)"/\1/p' "$GITHUB_WORKSPACE/TamaPoke.ino" | head -1)"
+          test -n "$FW_SOURCE_VERSION"
+          [[ "$FW_SOURCE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          echo "Firmware source version: $FW_SOURCE_VERSION"
+          python3 "$GITHUB_WORKSPACE/tools/verify_evolution_levels.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_regional_evolutions.py"
+          cat "$GITHUB_WORKSPACE/tools/regional_evolution_report.txt"
+          python3 "$GITHUB_WORKSPACE/tools/verify_canonical_forms.py"
+          cat "$GITHUB_WORKSPACE/tools/canonical_forms_report.txt"
+          python3 "$GITHUB_WORKSPACE/tools/verify_base_pack_policy.py"
+          cat "$GITHUB_WORKSPACE/tools/base_pack_policy_report.txt"
+          python3 "$GITHUB_WORKSPACE/tools/verify_release_storage_policy.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_full_sd_bundle.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_sd_serial_protocol.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_runtime_stability.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_learnset_expansion.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_training_rewards.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_signature_moves.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_instant_farewell.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_iv_candy_bag.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_vitality_training.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_card_evolution.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_roster_battle_picker.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_digimon_system.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_digimon_animation_evolution.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_digimon_moves.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_digimon_type_variety.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_digimon_fusion_policy.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_digimon_fixed_branches.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_casual_energy.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_pendulum_color.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_local_includes.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_pendulum_sprite_import.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_dgi48_format.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_sd_digimon_isolation.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_reserved_species.py"
+          # Training reward amounts/probabilities are intentionally validated only by verify_training_rewards.py.
+          grep -n 'APPROVED_MEGA_COUNT = 36' "$GITHUB_WORKSPACE/tools/sync_pmd_catalog.py"
+          grep -n 'MEGA_EVOLVE_LEVEL = 70' "$GITHUB_WORKSPACE/tools/sync_pmd_catalog.py"
+          grep -n 'effectiveEvolutionTargetLevel' "$GITHUB_WORKSPACE/pet.cpp"
+          test -s "$GITHUB_WORKSPACE/tools/sprite_audit.json"
+          test -s "$GITHUB_WORKSPACE/tools/sprite_mapping_report.txt"
+          grep -n 'XITEM_IV_ATK' "$GITHUB_WORKSPACE/game_extras.h"
+          grep -n 'XITEM_GOLD_CROWN' "$GITHUB_WORKSPACE/game_extras.h"
+          grep -n 'XITEM_SHINY_BERRY' "$GITHUB_WORKSPACE/game_extras.h"
+          grep -n 'random(100) < 16 ? 8' "$GITHUB_WORKSPACE/game_extras.cpp"
+          grep -n 'random(100) < 8 ? XITEM_GOLD_CROWN' "$GITHUB_WORKSPACE/game_extras.cpp"
+          grep -n 'uint16_t A = effStat(atk, SI_ATK)' "$GITHUB_WORKSPACE/battle.cpp"
+          ! grep -q 'idx >= TRAINER_COUNT || pet.isEgg()' "$GITHUB_WORKSPACE/TamaPoke.ino"
+
+      - name: Pack every available added PMDCollab behavior sprite
+        run: |
+          set -euxo pipefail
+          rm -rf "$GITHUB_WORKSPACE/tools/sdcard/mons" "$GITHUB_WORKSPACE/tools/web_extra"
+          mkdir -p "$GITHUB_WORKSPACE/tools/sdcard/mons"
+          python3 "$GITHUB_WORKSPACE/tools/pack_pmd_catalog.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_reserved_species.py"
+          cat "$GITHUB_WORKSPACE/tools/pmd_sprite_report.txt"
+          test -d "$GITHUB_WORKSPACE/tools/web_extra/previews"
+          test "$(find "$GITHUB_WORKSPACE/tools/web_extra/previews" -type f -name 'p*.png' | wc -l)" -gt 0
+          python3 - <<'PYPREV'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('tools/sprite_audit.json').read_text(encoding='utf-8'))
+          missing=[]
+          for e in a.get('entries',[]):
+              if e.get('enabled') and int(e.get('id',0))>=810:
+                  lp=e.get('local_preview')
+                  if not lp or not (Path('tools/web_extra')/lp).is_file(): missing.append((e.get('id'),e.get('name'),lp))
+          if missing: raise SystemExit('missing generated sprite previews: '+repr(missing[:20]))
+          print('managed preview audit OK:', sum(1 for e in a.get('entries',[]) if e.get('enabled') and int(e.get('id',0))>=810))
+          PYPREV
+
+      - name: Verify catalog policy and generated TPK3 files
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          cat=json.loads(Path('tools/pmd_catalog.json').read_text(encoding='utf-8'))
+          banned=('gigantamax','g-max','gmax','dynamax','primal','eternamax',
+                  'ultra necrozma','ash-greninja','ash greninja','crowned','totem',
+                  'terastal','stellar forme','stellar form','tera forme','tera form',
+                  'altcolor','alternate','cutscene',' beta')
+          expected_mega={6,65,80,94,115,142,150,208,227,229,248,282,302,303,308,310,323,334,354,362,
+                         380,381,384,428,448,475,491,530,604,670,691,718,719,780,807,978}
+          bad=[]; missing=[]; enabled=0; forms=0; megas=[]
+          for e in cat['entries']:
+              if not e.get('enabled'): continue
+              enabled+=1
+              if e.get('kind')=='form': forms+=1
+              if e.get('mega'): megas.append(e)
+              nm=(e.get('name') or '').lower()
+              if any(x in nm for x in banned): bad.append((e['id'],e.get('name')))
+              if int(e['id'])>=810:
+                  for pref in ('p','ps'):
+                      p=Path('tools/sdcard/mons')/f"{pref}{int(e['id']):03d}.bin"
+                      if not p.is_file() or p.stat().st_size<64 or p.read_bytes()[:4]!=b'TPK3':
+                          missing.append(str(p))
+                      elif p.stat().st_size > 2800*1024:
+                          missing.append(f'{p} oversized={p.stat().st_size}')
+          got_mega={int(e['natdex']) for e in megas}
+          if len(megas)!=36 or got_mega!=expected_mega:
+              raise SystemExit(f'Mega36 pack mismatch: count={len(megas)} missing={sorted(expected_mega-got_mega)} extra={sorted(got_mega-expected_mega)}')
+          edges=cat.get('extra_edges',[])
+          edge_targets={(int(x['target']),int(x['level'])) for x in edges if x.get('reason')=='approved Mega evolution'}
+          wanted={(int(e['id']),70) for e in megas}
+          if edge_targets != wanted:
+              raise SystemExit(f'Mega evolution edge mismatch: got={sorted(edge_targets)} wanted={sorted(wanted)}')
+          bynat={int(e['natdex']):e for e in megas}
+          if 'x' not in (bynat[6].get('name') or '').lower() or 'y' not in (bynat[150].get('name') or '').lower():
+              raise SystemExit('Charizard X / Mewtwo Y one-way Mega targets missing')
+          audit=json.loads(Path('tools/sprite_audit.json').read_text(encoding='utf-8'))
+          for a in audit.get('entries',[]):
+              pp=a.get('pmd_path')
+              if pp:
+                  owner=pp.split('/',1)[0]
+                  if not owner.isdigit() or int(owner)!=int(a['natdex']):
+                      raise SystemExit(f'cross-species sprite mapping: {a}')
+          tau=[a for a in audit.get('entries',[]) if int(a.get('natdex',0))==128 and int(a.get('region',10))==9 and a.get('enabled')]
+          if any(not str(a.get('pmd_path') or '').startswith('0128/') for a in tau):
+              raise SystemExit('Paldea Tauros PMD owner mismatch: '+repr(tau))
+          print('sprite_catalog_fingerprint=',audit.get('catalog_fingerprint'),'paldea_tauros=',[(a['id'],a.get('pmd_path')) for a in tau])
+          print('national_dex_max=',cat['national_dex_max'])
+          print('dex_count=',cat['dex_count'],'enabled_managed=',enabled,'forms=',forms,'mega36=',len(megas))
+          print('excluded_gimmicks=',len(cat.get('excluded_gimmicks',[])))
+          if bad: raise SystemExit('non-approved battle gimmicks leaked into catalog: '+repr(bad[:20]))
+          if missing: raise SystemExit('missing/invalid TPK3: '+', '.join(missing[:30]))
+          if cat['national_dex_max'] < 1025:
+              print('WARNING: upstream PokeAPI National Dex currently reports below 1025')
+          PY
+
+      - name: Verify current training rewards + learnset expansion + runtime stability + storage + forms + PUT4
+        run: |
+          set -euxo pipefail
+          grep -q 'targetFrameMs = activeAnimated ? 85UL : 100UL' "$GITHUB_WORKSPACE/TamaPoke.ino"
+          grep -q '#define TAMAPOKE_FRAME_DIAG 0' "$GITHUB_WORKSPACE/TamaPoke.ino"
+          grep -q 'memcpy(dst, row0, rowBytes)' "$GITHUB_WORKSPACE/TamaPoke.ino"
+          grep -q 'canvasFillRectFast' "$GITHUB_WORKSPACE/TamaPoke.ino"
+          grep -q 'canvasPresentBand(0, 312)' "$GITHUB_WORKSPACE/TamaPoke.ino"
+          grep -q 'static bool homeCrossBandActive()' "$GITHUB_WORKSPACE/TamaPoke.ino"
+          grep -q 'gHomePanelValid = cleanHome;' "$GITHUB_WORKSPACE/TamaPoke.ino"
+          grep -q 'if (cleanHome) gHomeBottomSig = sig;' "$GITHUB_WORKSPACE/TamaPoke.ino"
+          grep -q 'frameL\[24\]' "$GITHUB_WORKSPACE/sdmon.h"
+          grep -q 'memcmp(blob, "TPK3", 4)' "$GITHUB_WORKSPACE/sdmon.cpp"
+          grep -q "f.write(b'TPK3')" "$GITHUB_WORKSPACE/tools/pack_pmd_catalog.py"
+          grep -q 'crop the union of visible pixels' "$GITHUB_WORKSPACE/tools/pack_pmd_catalog.py"
+          grep -q '#define GYM_REGIONS 9' "$GITHUB_WORKSPACE/trainers.h"
+          grep -q 'TRAINERS_GALAR' "$GITHUB_WORKSPACE/trainers.h"
+          grep -q 'TRAINERS_PALDEA' "$GITHUB_WORKSPACE/trainers.h"
+          grep -q 'gymRegionDexRegion' "$GITHUB_WORKSPACE/trainers.h"
+          grep -q 'if (screenOff) {' "$GITHUB_WORKSPACE/TamaPoke.ino"
+          grep -q 'audioSetScreenAwake(!off)' "$GITHUB_WORKSPACE/TamaPoke.ino"
+          grep -q 'Only the physical AXP2101 side button' "$GITHUB_WORKSPACE/TamaPoke.ino"
+          grep -q 'safeElapsedMs(now, lastInteract)' "$GITHUB_WORKSPACE/TamaPoke.ino"
+          grep -q '#define EVO_PENALTY_LEVELS ((uint8_t)0)' "$GITHUB_WORKSPACE/pet.h"
+          grep -q 'effectiveEvolutionLevel' "$GITHUB_WORKSPACE/pet.cpp"
+          grep -q 'evolutionTargetLevel' "$GITHUB_WORKSPACE/pet.cpp"
+          grep -q 'approved Mega evolution' "$GITHUB_WORKSPACE/tools/sync_pmd_catalog.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_evolution_levels.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_regional_evolutions.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_canonical_forms.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_runtime_stability.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_learnset_expansion.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_training_rewards.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_signature_moves.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_instant_farewell.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_iv_candy_bag.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_vitality_training.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_card_evolution.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_roster_battle_picker.py"
+          grep -q 'regional-form descendant evolution' "$GITHUB_WORKSPACE/tools/sync_pmd_catalog.py"
+          grep -q 'PRESENTATION_VARIANT_WORDS' "$GITHUB_WORKSPACE/tools/sync_pmd_catalog.py"
+          grep -q 'canonicalizeRetiredVariant' "$GITHUB_WORKSPACE/pet.cpp"
+          grep -q 'now = millis();' "$GITHUB_WORKSPACE/TamaPoke.ino"
+          test "$(grep -c 'screenOff = off;' "$GITHUB_WORKSPACE/TamaPoke.ino")" -eq 1
+          if grep -q 'uint32_t idle = now - lastInteract' "$GITHUB_WORKSPACE/TamaPoke.ino"; then
+            echo 'Unsafe stale-time idle subtraction returned'
+            exit 1
+          fi
+          grep -q 'if (!gReady || !gScreenAwake || !gQ' "$GITHUB_WORKSPACE/audio.cpp"
+          python3 - <<'PYREG'
+          def safe_elapsed(now, then):
+              d=(now-then) & 0xffffffff
+              if d & 0x80000000:
+                  return 0
+              return d
+          assert safe_elapsed(1000,1003)==0, 'future touch timestamp must be 0 idle'
+          assert safe_elapsed(1004,1003)==1
+          assert safe_elapsed(0x10,0xfffffff0)==0x20, 'millis wrap must remain valid'
+          assert safe_elapsed(301001,1000)==300001
+          print('power/touch idle regression OK')
+          PYREG
+          python3 -m py_compile "$GITHUB_WORKSPACE/tools/pack_pmd_catalog.py"
+          python3 -m py_compile "$GITHUB_WORKSPACE/tools/verify_sd_serial_protocol.py"
+          python3 "$GITHUB_WORKSPACE/tools/verify_sd_serial_protocol.py"
+
+      - name: Build chunked web sprite packs for every region
+        run: |
+          set -euxo pipefail
+          python3 "$GITHUB_WORKSPACE/tools/build_sprite_paks.py"
+          test -s "$GITHUB_WORKSPACE/tools/web_extra/sprite-manifest.json"
+          cat "$GITHUB_WORKSPACE/tools/web_extra/sprite-manifest.json"
+          python3 - <<'PYMEGADELTA'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('tools/web_extra/sprite-manifest.json').read_text(encoding='utf-8'))
+          assert m.get('schema') == 4, m
+          assert m.get('catalog_fingerprint'), m
+          assert m.get('groups',{}).get('added-all') == m.get('all'), 'added-all group mismatch'
+          parts=m.get('groups',{}).get('mega36',[])
+          assert parts, 'Mega36 delta pack list missing'
+          assert m.get('counts',{}).get('mega36_files') == 72, m.get('counts')
+          assert m.get('counts',{}).get('retired_files') == len(m.get('retired_files',[])), m.get('counts')
+          assert len(m.get('retired_files',[])) == len(set(m.get('retired_files',[]))), 'duplicate retired files'
+          for fn in parts:
+              assert (Path('tools/web_extra')/fn).is_file(), fn
+          print('Mega36 delta manifest OK:', len(parts), 'pak(s), 72 files')
+          PYMEGADELTA
+          if find "$GITHUB_WORKSPACE/tools/web_extra" -maxdepth 1 -type f -name 'sprites-extra-*.pak' -size +19M -print -quit | grep -q .; then
+            echo 'A sprite chunk exceeded the safe 19 MiB limit'
+            exit 1
+          fi
+
+      - name: Build PC full microSD sprite ZIP
+        run: |
+          set -euxo pipefail
+          python3 "$GITHUB_WORKSPACE/tools/build_full_sd_sprite_zip.py"
+          python3 - <<'PYBUNDLE'
+          import json,zipfile
+          from pathlib import Path
+          m=json.loads(Path('tools/web_extra/sprite-bundle.json').read_text(encoding='utf-8'))
+          z=Path('tools/web_extra')/m['filename']
+          assert z.is_file() and z.stat().st_size>1024*1024, z
+          with zipfile.ZipFile(z) as q:
+              bad=q.testzip(); assert bad is None,bad
+              names=set(q.namelist())
+              assert 'README-SD-KO.txt' in names and 'BUNDLE-INFO.json' in names
+              assert any(n.startswith('mons/p001.bin') for n in names)
+          print('full microSD ZIP OK:',z,z.stat().st_size)
+          PYBUNDLE
+          cat "$GITHUB_WORKSPACE/tools/web_extra/full-sprite-bundle-report.txt"
+
+      - name: Install Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+
+      - name: Install ESP32-S3 core
+        run: |
+          arduino-cli config init --overwrite
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32@3.3.10
+
+      - name: Install Arduino libraries
+        run: |
+          arduino-cli lib update-index
+          arduino-cli lib install "GFX Library for Arduino"
+          arduino-cli lib install "SensorLib"
+          arduino-cli lib install "XPowersLib"
+          arduino-cli lib install "U8g2"
+
+      - name: Prepare generated Arduino sketch
+        run: |
+          rm -rf "$GITHUB_WORKSPACE/_sketch"
+          mkdir -p "$GITHUB_WORKSPACE/_sketch/TamaPoke"
+          cp "$GITHUB_WORKSPACE"/*.ino "$GITHUB_WORKSPACE/_sketch/TamaPoke/"
+          cp "$GITHUB_WORKSPACE"/*.cpp "$GITHUB_WORKSPACE/_sketch/TamaPoke/"
+          cp "$GITHUB_WORKSPACE"/*.h "$GITHUB_WORKSPACE/_sketch/TamaPoke/"
+
+      - name: Compile current TamaPoke firmware
+        run: |
+          set -euxo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/build"
+          FQBN='esp32:esp32:esp32s3:CDCOnBoot=cdc,FlashSize=16M,PSRAM=opi,PartitionScheme=app3M_fat9M_16MB'
+          COMPILE_LOG="$GITHUB_WORKSPACE/build/compile.log"
+          if ! arduino-cli compile --fqbn "$FQBN" --output-dir "$GITHUB_WORKSPACE/build" "$GITHUB_WORKSPACE/_sketch/TamaPoke" 2>&1 | tee "$COMPILE_LOG"; then
+            echo '===== REAL COMPILER ERRORS =====' >&2
+            grep -n -C 4 -E '(^|[[:space:]])(fatal )?error:' "$COMPILE_LOG" >&2 || true
+            echo '===== END COMPILER ERRORS =====' >&2
+            exit 1
+          fi
+
+      - name: Collect four flash binaries
+        run: |
+          set -euxo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/oneclick-firmware"
+          cp "$GITHUB_WORKSPACE/build/TamaPoke.ino.bootloader.bin" "$GITHUB_WORKSPACE/oneclick-firmware/bootloader.bin"
+          cp "$GITHUB_WORKSPACE/build/TamaPoke.ino.partitions.bin" "$GITHUB_WORKSPACE/oneclick-firmware/partitions.bin"
+          cp "$GITHUB_WORKSPACE/build/TamaPoke.ino.bin" "$GITHUB_WORKSPACE/oneclick-firmware/app.bin"
+          BOOTAPP="$(find "$GITHUB_WORKSPACE/build" "$HOME/.arduino15/packages/esp32" -type f -name boot_app0.bin | head -1)"
+          test -n "$BOOTAPP"
+          cp "$BOOTAPP" "$GITHUB_WORKSPACE/oneclick-firmware/boot_app0.bin"
+
+      - name: Embed compiled firmware in installer
+        run: |
+          python3 "$GITHUB_WORKSPACE/tools/embed_tamapoke_firmware.py" \
+            "$GITHUB_WORKSPACE/TamaPoke-KO-OneClick-Installer.html" \
+            "$GITHUB_WORKSPACE/oneclick-firmware" \
+            "$GITHUB_WORKSPACE/index.html"
+          test -s "$GITHUB_WORKSPACE/index.html"
+          INSTALLER_VERSION="$(python3 - <<'PYVER'
+          import re
+          from pathlib import Path
+          s=Path('TamaPoke-KO-OneClick-Installer.html').read_text(encoding='utf-8')
+          m=re.search(r'const\s+FW_VERSION\s*=\s*["\']([^"\']+)["\']', s)
+          if not m:
+              raise SystemExit('installer FW_VERSION marker not found')
+          print(m.group(1))
+          PYVER
+          )"
+          echo "installer marker: $INSTALLER_VERSION"
+          grep -Fq "$INSTALLER_VERSION" "$GITHUB_WORKSPACE/index.html"
+
+      - name: Publish full sprite ZIP to one rolling GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euxo pipefail
+          readarray -t META < <(python3 - <<'PYREL'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('tools/web_extra/sprite-bundle.json').read_text(encoding='utf-8'))
+          print(m['version']); print(m['filename'])
+          PYREL
+          )
+          VER="${META[0]}"
+          BUILD_FILE="${META[1]}"
+          TAG="sprites-current"
+          STABLE_FILE="TamaPoke-SD-Sprites-Current-Full.zip"
+          BUILD_ASSET="$GITHUB_WORKSPACE/tools/web_extra/$BUILD_FILE"
+          STABLE_ASSET="$RUNNER_TEMP/$STABLE_FILE"
+          NOTES="$RUNNER_TEMP/sprite-release-notes.txt"
+          cp "$BUILD_ASSET" "$STABLE_ASSET"
+          cat > "$NOTES" <<EOF
+          TamaPoke KO 현재 버전(v${VER}) PC용 microSD 전체 스프라이트 ZIP입니다.
+
+          이 Release는 저장공간 낭비를 막기 위한 단일 rolling Release입니다.
+          새 빌드가 성공하면 같은 ZIP asset을 교체하므로 이전 대용량 ZIP이 누적되지 않습니다.
+
+          - microSD의 기존 /mons 폴더를 백업/삭제한 뒤 ZIP의 mons 폴더를 SD 루트에 복사하세요.
+          - AltColor / Alternate / Cutscene / Beta 표현용 슬롯은 독립 종으로 포함하지 않습니다.
+          - PMD SpriteCollab 리소스는 비상업적 사용 및 원 프로젝트의 크레딧/라이선스 조건을 따릅니다.
+          EOF
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            IMMUTABLE="$(gh release view "$TAG" --json isImmutable --jq '.isImmutable')"
+            if [ "$IMMUTABLE" = "true" ]; then
+              echo 'sprites-current Release is immutable; rolling asset replacement is impossible. Disable GitHub Immutable Releases for this repository or remove/recreate this sprite Release manually.' >&2
+              exit 1
+            fi
+            gh release edit "$TAG" --title "TamaPoke current full SD sprites (v${VER})" --notes-file "$NOTES"
+          else
+            gh release create "$TAG" --title "TamaPoke current full SD sprites (v${VER})" --notes-file "$NOTES" --latest=false
+          fi
+          gh release upload "$TAG" "$STABLE_ASSET" --clobber
+
+          # v3.62.6 and earlier created one large Release per firmware version.
+          # Remove only those auto-generated sprite Releases so the large assets do not accumulate.
+          mapfile -t OLD_TAGS < <(gh release list --limit 100 --json tagName --jq '.[].tagName' | grep -E '^sprites-v[0-9]+\.[0-9]+\.[0-9]+$' || true)
+          for OLD_TAG in "${OLD_TAGS[@]}"; do
+            [ "$OLD_TAG" = "$TAG" ] && continue
+            echo "Removing legacy auto-generated sprite Release: $OLD_TAG"
+            gh release delete "$OLD_TAG" -y --cleanup-tag
+          done
+
+          python3 - <<'PYURL'
+          import json,os
+          from pathlib import Path
+          p=Path('tools/web_extra/sprite-bundle.json')
+          m=json.loads(p.read_text(encoding='utf-8'))
+          m['generated_filename']=m.get('filename')
+          m['filename']='TamaPoke-SD-Sprites-Current-Full.zip'
+          m['release_tag']='sprites-current'
+          m['storage_policy']='single rolling GitHub Release; no full-ZIP Actions artifact'
+          m['download_url']=f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/releases/download/sprites-current/{m['filename']}"
+          p.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(m['download_url'])
+          PYURL
+
+
+      - name: Remove legacy full-sprite Actions artifact backups
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euxo pipefail
+          mapfile -t OLD_ARTIFACTS < <(
+            gh api --paginate "repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100" \
+              --jq '.artifacts[] | select(.name | test("^TamaPoke-v[0-9]+\\.[0-9]+\\.[0-9]+-full-sd-sprites$")) | [.id,.name] | @tsv' || true
+          )
+          for ROW in "${OLD_ARTIFACTS[@]}"; do
+            [ -z "$ROW" ] && continue
+            IFS=$'\t' read -r ARTIFACT_ID ARTIFACT_NAME <<< "$ROW"
+            echo "Deleting legacy large Actions artifact: $ARTIFACT_NAME (id=$ARTIFACT_ID)"
+            gh api --method DELETE "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}"
+          done
+
+      - name: Prepare complete GitHub Pages site
+        run: |
+          set -euxo pipefail
+          rm -rf "$GITHUB_WORKSPACE/site"
+          mkdir -p "$GITHUB_WORKSPACE/site"
+          cp "$GITHUB_WORKSPACE/index.html" "$GITHUB_WORKSPACE/site/index.html"
+          cp "$GITHUB_WORKSPACE/tools/web_extra/sprite-manifest.json" "$GITHUB_WORKSPACE/site/"
+          cp "$GITHUB_WORKSPACE/tools/web_extra"/sprites-extra-*.pak "$GITHUB_WORKSPACE/site/"
+          cp "$GITHUB_WORKSPACE/tools/pmd_catalog_report.txt" "$GITHUB_WORKSPACE/site/"
+          cp "$GITHUB_WORKSPACE/tools/pmd_sprite_report.txt" "$GITHUB_WORKSPACE/site/"
+          cp "$GITHUB_WORKSPACE/tools/pmd_catalog.json" "$GITHUB_WORKSPACE/site/"
+          cp "$GITHUB_WORKSPACE/tools/sprite_audit.json" "$GITHUB_WORKSPACE/site/sprite-audit.json"
+          cp "$GITHUB_WORKSPACE/tools/sprite_mapping_report.txt" "$GITHUB_WORKSPACE/site/sprite-mapping-report.txt"
+          cp "$GITHUB_WORKSPACE/tools/regional_evolution_report.txt" "$GITHUB_WORKSPACE/site/regional-evolution-report.txt"
+          cp "$GITHUB_WORKSPACE/tools/canonical_forms_report.txt" "$GITHUB_WORKSPACE/site/canonical-forms-report.txt"
+          cp "$GITHUB_WORKSPACE/tools/base_pack_policy_report.txt" "$GITHUB_WORKSPACE/site/base-pack-policy-report.txt"
+          cp "$GITHUB_WORKSPACE/tools/web_extra/sprite-bundle.json" "$GITHUB_WORKSPACE/site/sprite-bundle.json"
+          cp "$GITHUB_WORKSPACE/tools/web_extra/full-sprite-bundle-report.txt" "$GITHUB_WORKSPACE/site/full-sprite-bundle-report.txt"
+          if [ -d "$GITHUB_WORKSPACE/tools/web_extra/previews" ]; then cp -R "$GITHUB_WORKSPACE/tools/web_extra/previews" "$GITHUB_WORKSPACE/site/previews"; fi
+          cp "$GITHUB_WORKSPACE/PMDCOLLAB_CREDITS.txt" "$GITHUB_WORKSPACE/site/"
+          python3 - <<'PY'
+          import json, re
+          from pathlib import Path
+          c=json.loads(Path('tools/pmd_catalog.json').read_text(encoding='utf-8'))
+          a=json.loads(Path('tools/sprite_audit.json').read_text(encoding='utf-8'))
+          ino=Path('TamaPoke.ino').read_text(encoding='utf-8')
+          m=re.search(r'^#define\s+FW_VERSION\s+"([^"]+)"', ino, re.M)
+          if not m:
+              raise SystemExit('FW_VERSION missing from TamaPoke.ino')
+          fw=m.group(1)
+          e=[x for x in c['entries'] if x.get('enabled')]
+          f=[x for x in e if x.get('kind')=='form']
+          out=[
+            f'TamaPoke KO v{fw} PMDCatalog - Learnset Expansion + Runtime Stability + SingleRelease FullSD + BasePackGuard + Canonical Forms + Regional Evolution + Framed PUT4 + Mega36',
+            f'firmware={fw}',
+            f"national_dex_max={c['national_dex_max']}",
+            f"dex_count={c['dex_count']}",
+            f"sprite_catalog={a.get('catalog_fingerprint')}",
+            f"managed_enabled={len(e)}",
+            f"independent_forms={len(f)}",
+            f"excluded_battle_gimmicks={len(c.get('excluded_gimmicks',[]))}",
+            f"retired_presentation_variants={len(c.get('retired_presentation_variants',[]))}",
+            'forms=canonical only; PMDCollab AltColor/Alternate/Cutscene/Beta are not species',
+            'evolution=level-only; split evolution uses Eevee-style branch selection',
+            'regional_evolution=form-aware Alola/Galar/Hisui; White Basculin is Hisui-origin; Paldea Wooper guard enabled',
+            'sprites=PMDCollab behavior pixel sprites only',
+            'pc_sprite_bundle=one stable sprites-current Release asset only; no full-ZIP Actions artifact; installer reads sprite-bundle.json',
+            'power=5min auto screen-off; physical side button only wake; screen-off SFX muted',
+            'gyms=galar sword ladder + paldea gym/elite4/champion',
+            'badges=galar/paldea original device pixel emblems',
+            'mega=approved 36 PMDCollab behavior sprites; permanent level evolution at Lv.70',
+            'charizard=one-way Mega X; mewtwo=one-way Mega Y',
+            'gigantamax=excluded','dynamax=excluded','primal=excluded','terastal=excluded',
+          ]
+          Path('site/build-info.txt').write_text('\n'.join(out)+'\n',encoding='utf-8')
+          PY
+          ls -lh "$GITHUB_WORKSPACE/site" | tail -n +1
+
+      - name: Commit generated catalog lock source
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f \
+            dex.h ko_species.h noart.h \
+            tools/catalog_lock.json tools/pmd_catalog.json \
+            tools/pmd_catalog_report.txt tools/pmd_sprite_report.txt \
+            tools/sprite_audit.json tools/sprite_mapping_report.txt tools/regional_evolution_report.txt tools/canonical_forms_report.txt
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit"
+          else
+            FW_COMMIT_VERSION="$(sed -n 's/^#define FW_VERSION "\([^"]*\)"/\1/p' TamaPoke.ino | head -1)"
+            git commit -m "Build v${FW_COMMIT_VERSION} learnset-expanded runtime-stable PMDCollab catalog [skip ci]"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+
+      - name: Add GitHub Pages no-Jekyll marker
+        run: touch "$GITHUB_WORKSPACE/site/.nojekyll"
+
+      - name: Verify GitHub Pages published size
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path('site')
+          total=sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+          print(f'GitHub Pages site bytes={total:,} ({total/1024/1024:.1f} MiB)')
+          # GitHub Pages published sites are limited to 1 GB. Fail before deployment
+          # with a clear message instead of producing a confusing deploy error.
+          if total > 1024*1024*1024:
+              raise SystemExit('Generated Pages site exceeds GitHub Pages 1 GB published-site limit')
+          PY
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Show TamaPoke installer URL
+        run: |
+          echo "### TamaPoke GitHub Pages" >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ steps.deployment.outputs.page_url }}" >> "$GITHUB_STEP_SUMMARY"
