@@ -1,0 +1,21 @@
+TamaPoke v3.89.0 BASE PACK POLICY AUDIT
+
+Pinned upstream commit: 7d5a2b3f4a4bee4f107cdae77ad13949dddfc615
+Upstream repository: DylanPDao/TamaPoke
+Base pack files: sprites-kanto/johto/hoenn/sinnoh/unova/kalos/alola.pak
+Audited upstream packing policy: normal sprite = PMDCollab sprite/NNNN root; shiny = sprite/NNNN/0000/0001.
+Installer policy: immutable commit URL only; no mutable main or releases/latest fallback.
+PC full-SD bundle builder downloads and revalidates the same immutable seven base TPAKs before extracting them.
+Browser pre-transfer guard (automatic and manually selected named base packs): only mons/pNNN.bin, mons/psNNN.bin, optional mons/thumbs.bin; exact regional NatDex range; TPK2/TPK3 sprite magic; duplicate names rejected.
+Local catalog base fallback: AltColor/Alternate/Cutscene/Beta, gimmicks, and regional siblings cannot be selected as base art.
+
+Region ranges:
+  Kanto 1-151
+  Johto 152-251
+  Hoenn 252-386
+  Sinnoh 387-493
+  Unova 494-649
+  Kalos 650-721
+  Alola 722-809
+
+RESULT: PASS

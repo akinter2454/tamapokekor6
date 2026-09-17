@@ -1,0 +1,357 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TamaPoke 디지몬 SD 팩 생성기</title>
+<style>body{font-family:system-ui,sans-serif;background:#101727;color:#eef3ff;margin:0;padding:24px}.box{max-width:760px;margin:auto;background:#19243a;padding:24px;border-radius:18px}h1{font-size:26px}button,input,select{font:inherit}input,select{display:block;width:100%;box-sizing:border-box;padding:16px;background:#fff;color:#111;border-radius:12px;margin:10px 0 16px}button{padding:14px 22px;border:0;border-radius:12px;background:#49d18b;font-weight:800;cursor:pointer}button:disabled{opacity:.45}pre{white-space:pre-wrap;background:#0c1220;padding:14px;border-radius:12px;min-height:84px;max-height:320px;overflow:auto}.note{color:#b9c8e8;line-height:1.65}</style></head><body><main class="box"><h1>디지몬 SD 팩 생성기 · 일괄 변환</h1><p class="note">인터넷과 Python 없이 작동합니다. <b>0. VB~5. ME</b>, <b>p0~p5</b> 또는 <b>dmc1~dmc5/캐릭터별.zip/0.png~14.png</b> 형태의 바깥 ZIP을 선택하면 같은 이름의 디지몬도 버전별로 구분해 DGI3로 변환합니다. 검정과 투명을 분리하고 생성 직후 헤더·크기·프레임·RGB565를 다시 읽어 검증합니다.</p><label for="species">개별 ZIP 변환 시 적용할 디지몬</label><select id="species"></select><input id="src" type="file" accept=".zip,application/zip"><button id="go" disabled>전체 SD 팩 만들기</button><pre id="log">바깥 ZIP 또는 캐릭터별 ZIP을 선택하세요.</pre><p class="note">완료 후 받은 ZIP의 <b>digimon</b> 폴더를 SD 카드 최상위에 복사하세요. 기존 <b>mons</b> 폴더는 포켓몬용이므로 그대로 둡니다.</p></main>
+<script>
+let CAT=`Botamon|1|0
+Koromon|1|1
+Agumon|1|2
+Betamon|1|2
+Greymon|1|3
+Tyranomon|1|3
+Devimon|1|3
+Meramon|1|3
+Airdramon|1|3
+Seadramon|1|3
+Numemon|1|3
+MetalGreymon_Virus|1|4
+Mamemon|1|4
+Monzaemon|1|4
+BlitzGreymon|1|5
+BanchoMamemon|1|5
+ShinMonzaemon|1|5
+Punimon|2|0
+Tsunomon|2|1
+Gabumon|2|2
+Elecmon|2|2
+Kabuterimon|2|3
+Garurumon|2|3
+Angemon|2|3
+Yukidarumon|2|3
+Birdramon|2|3
+Whamon|2|3
+Vegimon|2|3
+SkullGreymon|2|4
+MetalMamemon|2|4
+Vademon|2|4
+SkullMammon|2|5
+CresGarurumon|2|5
+Ebemon|2|5
+Poyomon|3|0
+Tokomon|3|1
+Patamon|3|2
+Kunemon|3|2
+Unimon|3|3
+Centalmon|3|3
+Ogremon|3|3
+Bakemon|3|3
+Shellmon|3|3
+Drimogemon|3|3
+Scumon|3|3
+Andromon|3|4
+Giromon|3|4
+Etemon|3|4
+Chimairamon|3|4
+HiAndromon|3|5
+Gokumon|3|5
+BanchoLeomon|3|5
+Yuramon|4|0
+Tanemon|4|1
+Piyomon|4|2
+Palmon|4|2
+Monochromon|4|3
+Cockatrimon|4|3
+Leomon|4|3
+Kuwagamon|4|3
+Coelamon|4|3
+Mojyamon|4|3
+Nanimon|4|3
+Megadramon|4|4
+Piccolomon|4|4
+Digitamamon|4|4
+Darkdramon|4|5
+BloomLordmon|4|5
+Gankoomon|4|5
+Zurumon|5|0
+Pagumon|5|1
+Gazimon|5|2
+Gizamon|5|2
+DarkTyranomon|5|3
+Cyclomon|5|3
+Devidramon|5|3
+Tuskmon|5|3
+Flymon|5|3
+Deltamon|5|3
+Raremon|5|3
+MetalTyranomon|5|4
+Nanomon|5|4
+ExTyranomon|5|4
+Mugendramon|5|5
+Raidenmon|5|5
+Gaioumon|5|5
+Omnimon Alter-S|0|5
+Chaosmon|0|5
+Millenniummon|0|5
+Chaosdramon|0|5`.split('\n').map(x=>{let [name,v,s]=x.split('|');return{name,v:+v,s:+s}});
+CAT=CAT.concat(`
+Bubbmon|11|0
+Mochimon|11|1
+Angoramon|11|2
+Tentomon|11|2
+Gottsumon|11|2
+Otamamon|11|2
+SymbareAngoramon|11|3
+Kabuterimon|11|3
+Tortamon|11|3
+Tailmon|11|3
+Monochromon|11|3
+Starmon|11|3
+Gekomon|11|3
+Kuwagamon|11|3
+Lamortmon|11|4
+AtlurKabuterimonBlue|11|4
+Jyagamon|11|4
+Angewomon|11|4
+Triceramon|11|4
+Piccolomon|11|4
+TonosamaGekomon|11|4
+Okuwamon|11|4
+Diarbbitmon|11|5
+HerakleKabuterimon|11|5
+Blastmon|11|5
+Holydramon|11|5
+SaberLeomon|11|5
+ElDoradimon|11|5
+MetalEtemon|11|5
+GranKuwagamon|11|5
+Mastemon|11|5
+Tlalocmon|11|5
+Pitchmon|12|0
+Pukamon|12|1
+Gomamon|12|2
+Jellymon|12|2
+Ganimon|12|2
+Shakomon|12|2
+Rukamon|12|3
+Ikkakumon|12|3
+TeslaJellymon|12|3
+Seadramon|12|3
+Coelamon|12|3
+Ebidramon|12|3
+Octmon|12|3
+Gesomon|12|3
+WhamonPerfect|12|4
+Zudomon|12|4
+Thetismon|12|4
+MegaSeadramon|12|4
+Anomalocarimon|12|4
+Hangyomon|12|4
+Dagomon|12|4
+MarinDevimon|12|4
+MarinAngemon|12|5
+Amphimon|12|5
+Plesiomon|12|5
+JumboGamemon|12|5
+MetalSeadramon|12|5
+Cthyllamon|12|5
+Pukumon|12|5
+Vikemon|12|5
+Aegisdramon|12|5
+Mitamamon|12|5
+Mokumon|13|0
+PetitMeramon|13|1
+Bakumon|13|2
+Candmon|13|2
+Loogamon|13|2
+PicoDevimon|13|2
+Hanumon|13|3
+Garurumon|13|3
+Meramon|13|3
+Wizarmon|13|3
+Devimon|13|3
+Bakemon|13|3
+Dokugumon|13|3
+Loogarmon|13|3
+Mammon|13|4
+WereGarurumon|13|4
+DeathMeramon|13|4
+Pumpmon|13|4
+Soloogarmon|13|4
+Vamdemon|13|4
+Fantomon|13|4
+LadyDevimon|13|4
+SkullMammon|13|5
+Anubimon|13|5
+Boltmon|13|5
+NoblePumpmon|13|5
+Fenriloogamon|13|5
+Callismon|13|5
+Piemon|13|5
+Demon|13|5
+Mastemon|13|5
+Voltobautamon|13|5
+Nyokimon|14|0
+Pyocomon|14|1
+Piyomon|14|2
+Pteromon|14|2
+Palmon|14|2
+Floramon|14|2
+Mushmon|14|2
+Vdramon|14|3
+Birdramon|14|3
+Galemon|14|3
+Togemon|14|3
+Kiwimon|14|3
+RedVegimon|14|3
+Woodmon|14|3
+AeroVdramon|14|4
+Garudamon|14|4
+GrandGalemon|14|4
+Lilimon|14|4
+Blossomon|14|4
+Delumon|14|4
+Jyureimon|14|4
+Gerbemon|14|4
+UlforceVdramon|14|5
+Hououmon|14|5
+Zephagamon|14|5
+Griffomon|14|5
+Rosemon|14|5
+Rafflesimon|14|5
+Hydramon|14|5
+Pinochimon|14|5
+Mitamamon|14|5
+Cernumon|14|5
+Choromon|15|0
+Caprimon|15|1
+ToyAgumon|15|2
+Kokuwamon|15|2
+Hagurumon|15|2
+Commandramon|15|2
+Greymon|15|3
+Revolmon|15|3
+Clockmon|15|3
+Thunderballmon|15|3
+Tankmon|15|3
+Guardromon|15|3
+Mechanorimon|15|3
+HiCommandramon|15|3
+MetalGreymon|15|4
+Andromon|15|4
+Cyberdramon|15|4
+BigMamemon|15|4
+Knightmon|15|4
+Megadramon|15|4
+WaruMonzaemon|15|4
+Cargodramon|15|4
+WarGreymon|15|5
+HiAndromon|15|5
+MetalGarurumon|15|5
+Brigadramon|15|5
+ZekeGreymon|15|5
+Mugendramon|15|5
+VenomVamdemon|15|5
+Ragnamon|15|5
+Omegamon|15|5
+Chaosdramon|15|5
+YukimiBotamon|10|0
+Nyaromon|10|1
+Agumon|10|2
+Plotmon|10|2
+Gabumon|10|2
+Gammamon|10|2
+Greymon|10|3
+Leomon|10|3
+Tailmon|10|3
+Garurumon|10|3
+Angemon|10|3
+BetelGammamon|10|3
+Igamon|10|3
+KausGammamon|10|3
+WezenGammamon|10|3
+GulusGammamon|10|3
+MetalGreymon|10|4
+Asuramon|10|4
+WereGarurumon|10|4
+HolyAngemon|10|4
+Angewomon|10|4
+Canoweissmon|10|4
+MetalMamemon|10|4
+Regulusmon|10|4
+WarGreymon|10|5
+Siriusmon|10|5
+Dominimon|10|5
+MetalGarurumon|10|5
+Quantumon|10|5
+Arcturusmon|10|5
+Omegamon|10|5
+Mastemon|10|5
+Proximamon|10|5
+`.trim().split('\n').map(x=>{let [name,v,s]=x.split('|');return{name,v:+v,s:+s}}));
+const $=x=>document.getElementById(x),log=$('log'),go=$('go'),dev=v=>v>=10?`P${v-10}`:(v?`DMC ${v}`:'DF/DX');CAT.forEach((d,i)=>$('species').add(new Option(`${String(i).padStart(3,'0')} · ${d.name} · ${dev(d.v)}`,i)));$('src').onchange=()=>go.disabled=!$('src').files[0];
+const rawKey=s=>s.toLowerCase().replace(/[^a-z0-9]/g,'');
+const ALIAS={
+ tyrannomon:'tyranomon',darktyrannomon:'darktyranomon',metaltyrannomon:'metaltyranomon',extyrannomon:'extyranomon',
+ frigimon:'yukidarumon',skullmammothmon:'skullmammon',vegiemon:'vegimon',centarumon:'centalmon',
+ kimeramon:'chimairamon',reapermon:'gokumon',sukamon:'scumon',biyomon:'piyomon',
+ kokatorimon:'cockatrimon',piximon:'piccolomon',cyclonemon:'cyclomon',datamon:'nanomon',
+ machinedramon:'mugendramon',gaiomon:'gaioumon',
+ gatomon:'tailmon',magnaangemon:'holyangemon',ninjamon:'igamon',salamon:'plotmon',
+ metalgreymonvaccine:'metalgreymon',pabumon:'bubbmon',motimon:'mochimon',
+ eldradimon:'eldoradimon',gotsumon:'gottsumon',herculeskabuterimon:'heraklekabuterimon',
+ jagamon:'jyagamon',magnadramon:'holydramon',megakabuterimonred:'atlurkabuterimonblue',
+ shogungekomon:'tonosamagekomon',tortomon:'tortamon',
+ bukamon:'pukamon',crabmon:'ganimon',divemon:'hangyomon',dolphmon:'rukamon',
+ dragomon:'dagomon',marineangemon:'marinangemon',marinedevimon:'marindevimon',
+ octomon:'octmon',pichimon:'pitchmon',scorpiomon:'anomalocarimon',syakomon:'shakomon',
+ anubismon:'anubimon',apemon:'hanumon',
+ boltboutamon:'voltobautamon',candlemon:'candmon',creepymon:'demon',
+ demidevimon:'picodevimon',demimeramon:'petitmeramon',mammothmon:'mammon',
+ myotismon:'vamdemon',noblepumpkinmon:'noblepumpmon',phantomon:'fantomon',
+ piedmon:'piemon',pumpkinmon:'pumpmon',skullmeramon:'deathmeramon',wizardmon:'wizarmon',
+ aeroveedramon:'aerovdramon',cherrymon:'jyureimon',deramon:'delumon',
+ garbagemon:'gerbemon',gryphonmon:'griffomon',lillymon:'lilimon',
+ mushroomon:'mushmon',phoenixmon:'hououmon',puppetmon:'pinochimon',
+ redvegiemon:'redvegimon',ulforceveedramon:'ulforcevdramon',veedramon:'vdramon',
+ yokomon:'pyocomon',deputymon:'revolmon',galacticmon:'ragnamon',
+ kapurimon:'caprimon',mekanorimon:'mechanorimon',thundermon:'thunderballmon',
+ venommyotismon:'venomvamdemon',zeiggreymon:'zekegreymon',omnimon:'omegamon'
+};
+const key=s=>{let k=rawKey(s);return ALIAS[k]||k};
+function u16(a,o){return a[o]|a[o+1]<<8}function u32(a,o){return (a[o]|a[o+1]<<8|a[o+2]<<16|a[o+3]<<24)>>>0}
+async function inflate(data,method){if(method===0)return data;if(method!==8)throw Error('지원하지 않는 ZIP 압축 방식: '+method);if(!self.DecompressionStream)throw Error('이 브라우저는 ZIP 압축 해제를 지원하지 않습니다. 최신 Chrome 또는 Edge를 사용하세요.');let ds=new DecompressionStream('deflate-raw');return new Uint8Array(await new Response(new Blob([data]).stream().pipeThrough(ds)).arrayBuffer())}
+async function readZip(source,extensions=['.png']){let a=source instanceof Uint8Array?source:new Uint8Array(await source.arrayBuffer()),e=-1;for(let i=a.length-22;i>=Math.max(0,a.length-65557);i--)if(u32(a,i)===0x06054b50){e=i;break}if(e<0)throw Error('올바른 ZIP 파일이 아닙니다.');let n=u16(a,e+10),p=u32(a,e+16),out=[];for(let i=0;i<n;i++){if(u32(a,p)!==0x02014b50)throw Error('ZIP 목록이 손상되었습니다.');let method=u16(a,p+10),cs=u32(a,p+20),nl=u16(a,p+28),xl=u16(a,p+30),cl=u16(a,p+32),lo=u32(a,p+42),name=new TextDecoder().decode(a.slice(p+46,p+46+nl)),ln=u16(a,lo+26),lx=u16(a,lo+28),raw=a.slice(lo+30+ln+lx,lo+30+ln+lx+cs);if(extensions.some(x=>name.toLowerCase().endsWith(x)))out.push({name,data:await inflate(raw,method)});p+=46+nl+xl+cl}return out}
+function rgb565(r,g,b,a){if(a<32)return 1;let v=((r>>3)<<11)|((g>>2)<<5)|(b>>3);return v===1?0:v}
+async function pngFrames(bytes){let bmp=await createImageBitmap(new Blob([bytes],{type:'image/png'})),w=bmp.width,h=bmp.height,c=document.createElement('canvas');c.width=144;c.height=48;let x=c.getContext('2d',{willReadFrequently:true});x.imageSmoothingEnabled=false;if(w===48&&h===48){for(let f=0;f<3;f++)x.drawImage(bmp,f*48,0)}else if(w===144&&h===48)x.drawImage(bmp,0,0);else if(w===48&&h===144){for(let f=0;f<3;f++)x.drawImage(bmp,0,f*48,48,48,f*48,0,48,48)}else if(w===48&&h===64){for(let f=0;f<3;f++)x.drawImage(bmp,f*16,0,16,16,f*48,0,48,48)}else{bmp.close();throw Error(`지원하지 않는 도트 크기: ${w}×${h}`)}bmp.close();let d=x.getImageData(0,0,144,48).data,o=new Uint8Array(3*48*48*2),q=0;for(let f=0;f<3;f++)for(let y=0;y<48;y++)for(let xx=0;xx<48;xx++){let i=(y*144+f*48+xx)*4,v=rgb565(d[i],d[i+1],d[i+2],d[i+3]);o[q++]=v&255;o[q++]=v>>8}return o}
+async function pngAnimation(entries){let c=document.createElement('canvas');c.width=c.height=48;let x=c.getContext('2d',{willReadFrequently:true}),o=new Uint8Array(15*48*48*2),q=0;for(let f=0;f<15;f++){let bmp=await createImageBitmap(new Blob([entries[f].data],{type:'image/png'}));if(bmp.width!==48||bmp.height!==48){let w=bmp.width,h=bmp.height;bmp.close();throw Error(`${f}.png 크기가 48×48이 아닙니다: ${w}×${h}`)}x.clearRect(0,0,48,48);x.drawImage(bmp,0,0);bmp.close();let d=x.getImageData(0,0,48,48).data;for(let i=0;i<d.length;i+=4){let v=rgb565(d[i],d[i+1],d[i+2],d[i+3]);o[q++]=v&255;o[q++]=v>>8}}return o}
+function validateDgi(data,id,frames){let size=10+frames*48*48*2;if(data.length!==size)throw Error(`DGI 길이 검증 실패: ${data.length}/${size}`);if(new TextDecoder().decode(data.slice(0,4))!=='DGI3'||data[4]!==(id&255)||data[7]!==frames||data[8]!==48||data[9]!==48)throw Error('DGI3 헤더 왕복 검증 실패');for(let p=10;p<data.length;p+=2){let v=data[p]|data[p+1]<<8;if(v<0||v>65535)throw Error('RGB565 검증 실패')}return data}
+let crcTab;function crc32(a){if(!crcTab)crcTab=Array.from({length:256},(_,n)=>{for(let k=0;k<8;k++)n=n&1?0xedb88320^(n>>>1):n>>>1;return n>>>0});let c=0xffffffff;for(let b of a)c=crcTab[(c^b)&255]^(c>>>8);return(c^0xffffffff)>>>0}function cat(...a){let n=a.reduce((s,x)=>s+x.length,0),o=new Uint8Array(n),p=0;for(let x of a){o.set(x,p);p+=x.length}return o}function le16(v){return new Uint8Array([v&255,v>>8])}function le32(v){return new Uint8Array([v&255,v>>8,v>>16,v>>24])}
+function makeZip(files){let local=[],central=[],off=0,enc=new TextEncoder();for(let f of files){let n=enc.encode(f.name),c=crc32(f.data),h=cat(le32(0x04034b50),le16(20),le16(0),le16(0),le16(0),le16(0),le32(c),le32(f.data.length),le32(f.data.length),le16(n.length),le16(0),n,f.data);local.push(h);central.push(cat(le32(0x02014b50),le16(20),le16(20),le16(0),le16(0),le16(0),le16(0),le32(c),le32(f.data.length),le32(f.data.length),le16(n.length),le16(0),le16(0),le16(0),le16(0),le32(0),le32(off),n));off+=h.length}let cd=cat(...central),end=cat(le32(0x06054b50),le16(0),le16(0),le16(files.length),le16(files.length),le32(cd.length),le32(off),le16(0));return new Blob([...local,cd,end],{type:'application/zip'})}
+function folderVersion(path){let s=path.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim(),upload=s.match(/^([0-5])\s+(?:vb|ns|ds|wg|me)\b/);if(upload)return 10+(+upload[1]);let p=s.match(/(?:pendulum|penc|pen|p)\s*(zero|[0-5])\b/);if(p)return p[1]==='zero'?10:10+(+p[1]);let d=s.match(/(?:dmc|ver|version)\s*([1-5])\b/);return d?+d[1]:null}
+async function batchPack(inners){let files=[],made=[],duplicates=[],unmatched=[],seen=new Set(),byName=new Map();CAT.forEach((d,i)=>{let k=key(d.name),a=byName.get(k)||[];a.push(i);byName.set(k,a)});
+  for(let z=0;z<inners.length;z++){let inner=inners[z],base=inner.name.split('/').pop().replace(/\.zip$/i,'').replace(/_dmc(?:\s*\(\d+\))?$/i,'').replace(/\s*\(\d+\)$/,'');
+    log.textContent=`내부 ZIP 분석 중 ${z+1}/${inners.length}\n${inner.name}`;await new Promise(r=>setTimeout(r,0));
+    let ver=folderVersion(inner.name),special=(ver===13&&/\/Bakemon_dmc\.zip$/i.test(inner.name))?'bakumon':(ver===12&&key(base)==='whamon'?'whamonperfect':key(base)),choices=byName.get(special)||[],id=choices.length===1?choices[0]:choices.find(i=>CAT[i].v===ver);
+    if(id===undefined){unmatched.push(inner.name+' (버전 폴더 필요: dmc1~5 또는 p0~p5)');continue}if(seen.has(id)){duplicates.push(inner.name);continue}
+    let entries=await readZip(inner.data,['.png']),numeric=new Array(15);for(let f of entries){let m=f.name.match(/(?:^|\/)(\d+)\.png$/i);if(m&&+m[1]<15)numeric[+m[1]]=f}
+    if(numeric.filter(Boolean).length!==15){unmatched.push(`${inner.name} (0~14 프레임 부족)`);continue}
+    let d=CAT[id],pix=await pngAnimation(numeric),head=new Uint8Array([68,71,73,51,id,d.v,d.s,15,48,48]),data=validateDgi(cat(head,pix),id,15);files.push({name:`digimon/d${String(id).padStart(3,'0')}.dgi`,data});made.push(d.name);seen.add(id)
+  }
+  let pendulumOnly=seen.size>0&&[...seen].every(i=>CAT[i].v>=10),expected=CAT.map((_,i)=>i).filter(i=>!pendulumOnly||CAT[i].v>=10),missing=expected.filter(i=>!seen.has(i)).map(i=>CAT[i].name),scope=pendulumOnly?'pendulum-p0-p5':'all-digimon',txt=`TamaPoke Digimon SD Pack v3.85.0\nformat=DGI3 RGB565-LE transparent=0x0001\nmode=batch nested ZIP\nscope=${scope}\ncreated=${made.length}\nexpected=${expected.length}\nmissing=${missing.length}\nduplicates_skipped=${duplicates.length}\nunmatched=${unmatched.length}\n\nCREATED\n${made.join('\n')}\n\nMISSING\n${missing.join('\n')}\n\nDUPLICATES SKIPPED\n${duplicates.join('\n')}\n\nUNMATCHED\n${unmatched.join('\n')}\n`;files.push({name:'digimon/manifest.txt',data:new TextEncoder().encode(txt)});
+  let url=URL.createObjectURL(makeZip(files)),a=document.createElement('a');a.href=url;a.download='digimon-sdcard-v3.85.0-batch.zip';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);log.textContent=`일괄 변환·검증 완료!\n범위 ${pendulumOnly?'펜들럼 P0~P5':'전체 디지몬'}\n생성 ${made.length}/${expected.length}종\n중복 제외 ${duplicates.length}개\n미인식 ${unmatched.length}개\n누락 ${missing.length}종\n\nZIP의 digimon 폴더를 SD카드 최상위에 복사하세요.`}
+go.onclick=async()=>{go.disabled=true;try{
+  log.textContent='ZIP 구조를 확인하는 중...';let all=await readZip($('src').files[0],['.png','.zip']),inners=all.filter(x=>x.name.toLowerCase().endsWith('.zip'));
+  if(inners.length){await batchPack(inners);return}
+  let src=all.filter(x=>x.name.toLowerCase().endsWith('.png')),numeric=new Array(15);
+  for(let f of src){let m=f.name.match(/(?:^|\/)(\d+)\.png$/i);if(m&&+m[1]<15)numeric[+m[1]]=f}
+  let files=[],made=[],missing=[],animated=numeric.filter(Boolean).length===15;
+  if(animated){
+    let id=+$('species').value,d=CAT[id];log.textContent=`15프레임 변환 중: ${d.name}`;
+    let pix=await pngAnimation(numeric),head=new Uint8Array([68,71,73,51,id,d.v,d.s,15,48,48]),data=validateDgi(cat(head,pix),id,15);
+    files.push({name:`digimon/d${String(id).padStart(3,'0')}.dgi`,data});made.push(d.name);
+  }else{
+    let map=new Map(src.filter(x=>!x.name.startsWith('Idle Frame Only/')).map(x=>[key(x.name.split('/').pop().replace(/\.png$/i,'')),x]));
+    for(let id=0;id<CAT.length;id++){let d=CAT[id],hit=map.get(key(d.name));if(!hit){missing.push(d.name);continue}log.textContent=`3프레임 변환 중 ${id+1}/${CAT.length}: ${d.name}`;await new Promise(r=>setTimeout(r,0));let pix=await pngFrames(hit.data),head=new Uint8Array([68,71,73,51,id,d.v,d.s,3,48,48]),data=validateDgi(cat(head,pix),id,3);files.push({name:`digimon/d${String(id).padStart(3,'0')}.dgi`,data});made.push(d.name)}
+  }
+  let txt=`TamaPoke Digimon SD Pack v3.85.0\nformat=DGI3 RGB565-LE transparent=0x0001\ncreated=${made.length}\nmissing=${missing.length}\nanimated=${animated?'DGI3 15x48x48':'DGI3 3x48x48'}\n\nCREATED\n${made.join('\n')}\n\nMISSING\n${missing.join('\n')}\n`;files.push({name:'digimon/manifest.txt',data:new TextEncoder().encode(txt)});
+  let url=URL.createObjectURL(makeZip(files)),a=document.createElement('a');a.href=url;a.download=animated?`digimon-${made[0]}-animated.zip`:'digimon-sdcard-48x48.zip';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);log.textContent=`완료! ${made.join(', ')}\n\n다운로드한 ZIP의 digimon 폴더를 SD 카드 최상위에 복사하세요.`
+}catch(e){log.textContent='오류: '+e.message}finally{go.disabled=false}}
+</script></body></html>

@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TamaPoke PC UI Simulator</title>
+<style>
+  :root{
+    --bg:#111318;--panel:#1a1e26;--panel2:#242a35;--line:#343b49;--ink:#f5f7fb;
+    --muted:#aab3c3;--accent:#8fd3ff;--ok:#78d58a;--warn:#ffd369;--bad:#ff7b7b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#0d0f14,#151922);color:var(--ink);font-family:"Malgun Gothic","Noto Sans KR",system-ui,sans-serif;min-height:100vh}
+  .app{max-width:1320px;margin:0 auto;padding:18px;display:grid;grid-template-columns:minmax(520px,1fr) 420px;gap:18px;align-items:start}
+  .stage,.panel{background:rgba(24,29,38,.94);border:1px solid var(--line);border-radius:22px;box-shadow:0 18px 50px rgba(0,0,0,.28)}
+  .stage{padding:18px;display:flex;flex-direction:column;align-items:center;gap:12px}
+  .title{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .title h1{font-size:19px;margin:0}.title small{color:var(--muted)}
+  .device{position:relative;width:min(78vw,560px);aspect-ratio:1/1;border-radius:50%;padding:20px;background:radial-gradient(circle at 36% 24%,#4c5360 0 2%,#232833 34%,#0b0d11 75%);box-shadow:inset 0 0 0 3px #090a0e,0 22px 60px rgba(0,0,0,.45)}
+  .bezel{width:100%;height:100%;border-radius:50%;display:grid;place-items:center;background:#050608;box-shadow:inset 0 0 0 2px #424955}
+  canvas{width:100%;height:100%;border-radius:50%;display:block;image-rendering:auto;cursor:crosshair;touch-action:none}
+  .hint{font-size:13px;color:var(--muted);text-align:center;line-height:1.5}
+  .panel{padding:16px;max-height:calc(100vh - 36px);overflow:auto}
+  .section{border:1px solid var(--line);background:var(--panel2);border-radius:16px;padding:12px;margin-bottom:12px}
+  .section h2{font-size:14px;margin:0 0 10px;color:#e7ebf3}.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.row{display:flex;gap:8px;align-items:center}
+  label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}
+  select,input[type=text],input[type=number]{width:100%;background:#11151c;color:white;border:1px solid #3b4352;border-radius:10px;padding:8px 9px;outline:none}
+  input[type=range]{width:100%}.rangeRow{display:grid;grid-template-columns:1fr 52px;gap:8px;align-items:center}.value{font-variant-numeric:tabular-nums;background:#12161e;border:1px solid #394252;border-radius:8px;padding:5px 7px;text-align:center;font-size:12px}
+  button{border:1px solid #465064;background:#171c25;color:#f6f8fc;border-radius:10px;padding:8px 10px;cursor:pointer;font-weight:700}button:hover{background:#242b37}.primary{background:#285e7a;border-color:#397b9d}.danger{background:#6a2f34;border-color:#9b4951}
+  .screens{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.screens button.active{background:#e7f5ff;color:#0a1922;border-color:#a9defa}
+  .checks{display:flex;gap:12px;flex-wrap:wrap}.checks label{margin:0;display:flex;align-items:center;gap:5px;color:#d4dae5}
+  pre{white-space:pre-wrap;margin:0;background:#0d1118;border:1px solid #303847;border-radius:12px;padding:10px;color:#cfeaff;font-size:12px;line-height:1.5;user-select:text}
+  .statusline{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--muted);width:100%}.tag{border:1px solid #394252;border-radius:999px;padding:4px 8px;background:#10151c}
+  .footerBtns{display:flex;gap:8px;width:100%}.footerBtns button{flex:1}
+  @media(max-width:980px){.app{grid-template-columns:1fr}.panel{max-height:none}.device{width:min(92vw,560px)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <section class="stage">
+    <div class="title"><h1>TamaPoke PC UI Simulator</h1><small>v3.56 UI 기준 · 466×466</small></div>
+    <div class="device"><div class="bezel"><canvas id="screen" width="466" height="466"></canvas></div></div>
+    <div class="statusline"><span class="tag" id="touchPos">터치: -</span><span class="tag" id="fpsText">SIM 60 FPS</span><span class="tag">실기 성능/오디오/NVS는 별도 검증</span></div>
+    <div class="footerBtns"><button id="shotBtn">현재 화면 PNG 저장</button><button id="resetBtn">시뮬레이터 값 초기화</button></div>
+    <div class="hint">이 HTML은 외부 파일 없이 단독 실행됩니다. 파일을 더블클릭해도 됩니다.<br>마우스 클릭은 466×466 터치 좌표로 변환되며, 방어 게이지 화면에서는 클릭 시 판정과 브라우저 효과음이 납니다.</div>
+  </section>
+
+  <aside class="panel">
+    <div class="section">
+      <h2>화면 선택</h2>
+      <div class="screens" id="screenBtns">
+        <button data-screen="home" class="active">메인</button><button data-screen="bag">육성아이템</button><button data-screen="tm">기술머신</button>
+        <button data-screen="clock">시계</button><button data-screen="gym">체육관</button><button data-screen="defense">방어 훈련</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>메인 화면 데이터</h2>
+      <div class="grid">
+        <div><label>포켓몬 이름</label><input id="name" type="text" value="마릴" /></div>
+        <div><label>레벨</label><input id="level" type="number" min="1" max="100" value="24" /></div>
+        <div><label>타입</label><select id="type"></select></div>
+        <div><label>날씨</label><select id="weather"></select></div>
+        <div><label>시간대</label><select id="timeMode"><option value="day">낮</option><option value="dusk">해질녘</option><option value="night">밤</option></select></div>
+        <div><label>상태 문구</label><input id="status" type="text" value="행복해 보여요" /></div>
+      </div>
+      <div class="checks" style="margin-top:10px"><label><input id="shiny" type="checkbox"> 반짝이 *</label><label><input id="gridToggle" type="checkbox"> 좌표 그리드</label><label><input id="cloudToggle" type="checkbox" checked> 장식 구름</label></div>
+    </div>
+
+    <div class="section">
+      <h2>이름 글자 개발 조정</h2>
+      <label>이름 위치 Y 보정 (HEADER_NAME_Y_NUDGE)</label>
+      <div class="rangeRow"><input id="nameNudge" type="range" min="0" max="24" step="1" value="5"><div class="value" id="nameNudgeV">5</div></div>
+      <label style="margin-top:9px">이름/레벨 위로 올리기 (HEADER_TEXT_LIFT)</label>
+      <div class="rangeRow"><input id="textLift" type="range" min="-8" max="18" step="1" value="-2"><div class="value" id="textLiftV">-2</div></div>
+      <label style="margin-top:9px">이름 글자 크기</label>
+      <div class="rangeRow"><input id="nameSize" type="range" min="18" max="34" step="1" value="24"><div class="value" id="nameSizeV">24</div></div>
+    </div>
+
+    <div class="section">
+      <h2>화면 세부 조정</h2>
+      <label>구름 크기</label><div class="rangeRow"><input id="cloudScale" type="range" min="45" max="130" value="82"><div class="value" id="cloudScaleV">82%</div></div>
+      <label style="margin-top:9px">배경 화려함</label><div class="rangeRow"><input id="scenery" type="range" min="0" max="100" value="78"><div class="value" id="sceneryV">78%</div></div>
+      <label style="margin-top:9px">UI 배율 미리보기</label><div class="rangeRow"><input id="uiScale" type="range" min="90" max="115" value="100"><div class="value" id="uiScaleV">100%</div></div>
+    </div>
+
+    <div class="section">
+      <h2>현재 펌웨어에 넣을 값</h2>
+      <pre id="codeOut"></pre>
+      <div class="row" style="margin-top:8px"><button id="copyBtn" class="primary">값 복사</button><button id="presetBtn">v3.56 값</button></div>
+    </div>
+
+    <div class="section">
+      <h2>모의 데이터</h2>
+      <div class="grid">
+        <div><label>가방 페이지</label><select id="bagPage"><option value="0">1 / 2</option><option value="1">2 / 2</option></select></div>
+        <div><label>TM 페이지</label><select id="tmPage"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+        <div><label>체육관 지역</label><select id="region"><option>관동</option><option selected>성도</option><option>호연</option><option>신오</option><option>하나</option><option>칼로스</option><option>알로라</option></select></div>
+        <div><label>체육관 난이도</label><select id="hard"><option>쉬움</option><option>어려움</option></select></div>
+      </div>
+    </div>
+  </aside>
+</div>
+<script>
+(() => {
+  'use strict';
+  const W=466,H=466,CX=233,CY=233;
+  const canvas=document.getElementById('screen'),ctx=canvas.getContext('2d');
+  const $=id=>document.getElementById(id);
+  const TYPES=['노말','불꽃','물','전기','풀','얼음','격투','독','땅','비행','에스퍼','벌레','바위','고스트','드래곤','악','강철','페어리'];
+  const TYPE_KEYS=['normal','fire','water','electric','grass','ice','fighting','poison','ground','flying','psychic','bug','rock','ghost','dragon','dark','steel','fairy'];
+  const WEATHER=['맑음','비','눈','모래바람','뇌우'];
+  const palettes={
+    normal:['#9bc9e7','#e3efe8','#78bd78'], fire:['#f5aa70','#ffe39f','#733a30'], water:['#79c9ef','#e2f4fb','#5d8eaa'], electric:['#ffd54b','#fff1ad','#d6b84c'],
+    grass:['#87db89','#e4f7d4','#69b969'], ice:['#b9e1f8','#f4fbff','#e5f2fb'], fighting:['#d7a078','#f4ddb0','#b58b69'], poison:['#cf92dd','#f1d4f5','#8e5a95'],
+    ground:['#e3bd7c','#fae6b4','#cba061'], flying:['#aed4ff','#f5fbff','#c4d9eb'], psychic:['#efa2ca','#ffdef0','#d989b1'], bug:['#b7da66','#f1f9ca','#98b83e'],
+    rock:['#cab18a','#f2e4bf','#a78d69'], ghost:['#8787ae','#d8d8ec','#777194'], dragon:['#948bf2','#dddfff','#796fc5'], dark:['#696576','#b7b3c2','#595663'], steel:['#b1c4d3','#eff5f8','#9fb0bb'], fairy:['#ffbedb','#ffedf6','#f2bed5']
+  };
+  const state={screen:'home',type:4,weather:0,time:'day',name:'마릴',level:24,status:'행복해 보여요',shiny:false,grid:false,clouds:true,nameNudge:5,textLift:-2,nameSize:24,cloudScale:.82,scenery:.78,uiScale:1,bagPage:0,tmPage:0,region:'성도',hard:false,lastTouch:null,defStart:performance.now(),defFeedback:'',defUntil:0,defScore:0,defRound:0};
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const lerp=(a,b,t)=>a+(b-a)*t;
+  function hexToRgb(h){h=h.replace('#','');return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
+  function rgbToHex([r,g,b]){return '#'+[r,g,b].map(x=>Math.round(clamp(x,0,255)).toString(16).padStart(2,'0')).join('')}
+  function mix(a,b,t){const A=hexToRgb(a),B=hexToRgb(b);return rgbToHex(A.map((v,i)=>lerp(v,B[i],t)))}
+  function rr(x,y,w,h,r,fill,stroke='#222',lw=1){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
+  function txt(t,x,y,size=16,color='#111',align='center',weight=700){ctx.fillStyle=color;ctx.font=`${weight} ${size}px "Malgun Gothic","Noto Sans KR",sans-serif`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(t,x,y)}
+  function circle(x,y,r,c,stroke=null){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=c;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}}
+  function line(x1,y1,x2,y2,c,w=2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=c;ctx.lineWidth=w;ctx.stroke()}
+  function tri(a,b,c,fill){ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.lineTo(...c);ctx.closePath();ctx.fillStyle=fill;ctx.fill()}
+  function screenClip(){ctx.save();ctx.beginPath();ctx.arc(CX,CY,231,0,Math.PI*2);ctx.clip()}
+  function unclip(){ctx.restore()}
+  function currentPalette(){const k=TYPE_KEYS[state.type],p=palettes[k];let [top,bot,soil]=p;if(state.time==='night'){top=mix(top,'#07101f',.68);bot=mix(bot,'#121a2d',.58);soil=mix(soil,'#111827',.58)}else if(state.time==='dusk'){top=mix(top,'#c84e62',.28);bot=mix(bot,'#f0a15f',.22)}return {top,bot,soil,key:k}}
+  function skyGradient(top,bot,h=312){const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,top);g.addColorStop(1,bot);ctx.fillStyle=g;ctx.fillRect(0,0,W,h)}
+  function drawCloud(x,y,s=1){const c='rgba(255,255,255,.96)';circle(x,y,12*s,c);circle(x+14*s,y+2*s,10*s,c);circle(x-12*s,y+3*s,9*s,c);rr(x-13*s,y+3*s,30*s,9*s,5*s,c,null)}
+  function drawScenery(p,t){const intensity=state.scenery;const far=mix(p.bot,'#ffffff',state.time==='night'?.07:.22),mid=mix(p.soil,p.bot,.34);ctx.fillStyle=far;ctx.beginPath();ctx.ellipse(70,278,118,50,0,0,Math.PI*2);ctx.ellipse(226,267,132,58,0,0,Math.PI*2);ctx.ellipse(398,281,118,48,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=mid;ctx.beginPath();ctx.ellipse(72,310,128,42,0,0,Math.PI*2);ctx.ellipse(248,308,160,47,0,0,Math.PI*2);ctx.ellipse(418,315,108,40,0,0,Math.PI*2);ctx.fill();
+    const k=p.key;
+    if(['grass','bug','fairy','normal'].includes(k)){const trunk=mix(p.soil,'#55341f',.6),la=state.time==='night'?'#42633f':'#71b95d',lb=state.time==='night'?'#567a4f':'#96d17b';[52,410].forEach(x=>{ctx.fillStyle=trunk;ctx.fillRect(x,240,10,70);circle(x+4,226,23,la);circle(x-12,236,17,lb);circle(x+18,237,17,lb)});for(let i=0;i<Math.round(9*intensity);i++){let x=25+i*48,y=304+(i%2)*6;line(x,y+14,x,y,'#4e7a3a',2);circle(x,y,4,i%3===0?'#ffb8cf':i%3===1?'#ffe487':'#b6e6ff')}}
+    if(k==='water'){ctx.fillStyle=mix(p.soil,'#2f78a9',.32);ctx.fillRect(0,286,W,54);for(let i=0;i<7;i++)rr(20+i*66,300+(i%2)*12,34,4,2,'rgba(235,250,255,.82)',null);for(let x of [48,390]){for(let j=0;j<4;j++)line(x+j*5,320,x+j*5+(j%2?2:-2),294-j*3,'#6eaa5c',2)}}
+    if(['rock','dragon','fire'].includes(k)){tri([88,262],[26,322],[154,322],mix(p.soil,'#3d3433',.45));tri([372,274],[292,324],[448,324],mix(p.soil,'#4c3a34',.42));if(k==='fire'){rr(203,307,58,9,4,'#cf5227',null);rr(216,309,30,4,2,'#ffb14a',null)}}
+    if(k==='ice'){for(let x of [74,124,344,397]){tri([x,286],[x-10,315],[x+10,315],'#ecfaff');line(x,286,x,315,'#7fb7d7',1)}}
+    if(k==='ground'){for(let x of [84,360]){ctx.fillStyle='#70a65c';ctx.fillRect(x,280,8,34);ctx.fillRect(x-8,295,8,13);ctx.fillRect(x+8,288,8,14)}}
+    if(['ghost','dark'].includes(k)){for(let x of [68,384]){ctx.fillStyle='#746f82';ctx.fillRect(x,276,6,40);line(x+3,286,x-12,296,'#746f82',3);line(x+3,291,x+15,301,'#746f82',3)}}
+    if(k==='steel'){ctx.fillStyle='#bfcbd4';ctx.fillRect(0,294,W,35);ctx.fillStyle='#637486';for(let x of [105,233,360]){ctx.fillRect(x,244,10,66);ctx.fillRect(x-25,254,60,7)}}
+    if(k==='psychic'){for(let x of [115,350]){ctx.strokeStyle='#fff2ff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,287,22,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.arc(x,287,12,0,Math.PI*2);ctx.stroke()}}
+    if(k==='electric'){for(let x of [91,362]){ctx.fillStyle='#756d57';ctx.fillRect(x,246,6,68);ctx.fillRect(x-17,256,40,5)}tri([226,236],[204,288],[235,270],'#ffe45a');tri([238,269],[254,235],[221,257],'#ffc936')}
+    if(k==='poison'){rr(42,304,132,24,12,'#80dc6b',null);rr(242,312,152,20,10,'#8beb76',null)}
+    if(k==='fighting'){ctx.fillStyle='#d7c28f';ctx.fillRect(76,288,314,32);ctx.strokeStyle='#695943';ctx.strokeRect(76,288,314,32)}
+  }
+  function drawWeather(){const now=performance.now();if(state.weather===1){ctx.strokeStyle='rgba(190,225,245,.85)';ctx.lineWidth=2;for(let i=0;i<24;i++){const x=(i*41+now/18)%490-10,y=(i*67+now/12)%312;line(x,y,x-6,y+13,'rgba(170,211,237,.88)',2)}} else if(state.weather===2){for(let i=0;i<18;i++){const x=(i*37+now/35)%466,y=(i*53+now/25)%312;circle(x,y,2.3,'rgba(255,255,255,.95)')}} else if(state.weather===3){for(let i=0;i<22;i++){const x=(i*31+now/15)%480-8,y=70+(i*43+now/30)%230;rr(x,y,6,2,1,'rgba(226,194,127,.85)',null)}} else if(state.weather===4){for(let i=0;i<20;i++){const x=(i*43+now/16)%490-10,y=(i*59+now/10)%312;line(x,y,x-7,y+14,'rgba(170,205,237,.85)',2)}if(Math.floor(now/650)%9===0){line(118,38,95,86,'#ffef89',4);line(95,86,112,82,'#ffef89',4);line(112,82,86,132,'#ffef89',4)}}}
+  function weatherIcon(x,y){ctx.save();ctx.translate(x,y);ctx.strokeStyle='#634f2b';ctx.fillStyle='#e8b93f';ctx.lineWidth=2;if(state.weather===0){circle(8,8,5,'#f4c04b');for(let a=0;a<8;a++){const q=a*Math.PI/4;line(8+Math.cos(q)*8,8+Math.sin(q)*8,8+Math.cos(q)*12,8+Math.sin(q)*12,'#d39a2b',1.5)}} else if(state.weather===1||state.weather===4){circle(6,7,5,'#7aa8c7');circle(12,7,6,'#7aa8c7');rr(4,7,12,5,2,'#7aa8c7',null);if(state.weather===4){tri([10,11],[6,20],[11,18],'#ffd75a');tri([11,17],[16,15],[10,23],'#ffd75a')}else{line(7,13,5,18,'#5f9dca',2);line(13,13,11,18,'#5f9dca',2)}} else if(state.weather===2){for(let a=0;a<6;a++){const q=a*Math.PI/3;line(8,8,8+Math.cos(q)*9,8+Math.sin(q)*9,'#80b9df',2)}} else {line(1,5,15,5,'#b58b3d',2);line(4,10,17,10,'#b58b3d',2);line(1,15,12,15,'#b58b3d',2)}ctx.restore()}
+  function drawWeatherBadge(){const label=WEATHER[state.weather];rr(20,14,72+label.length*5,27,9,'rgba(255,252,244,.93)','#c79b44',1);weatherIcon(29,20);txt(label,55,28,12,'#111','left',700)}
+  function nameColor(p){const bg=mix(p.top,p.bot,.18),rgb=hexToRgb(bg),l=.2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2];return l<84?'#fff6df':'#111'}
+  function drawHeader(p){const name=(state.shiny?'* ':'')+state.name+' Lv.'+state.level;const size=state.nameSize;ctx.font=`700 ${size}px "Malgun Gothic","Noto Sans KR",sans-serif`;const nc=nameColor(p);const textY=52+state.nameNudge-state.textLift;txt(name,CX,textY,size,nc,'center',700);txt(state.status,CX,93,15,state.time==='night'?'#f5f1e9':'#20242d')}
+  function drawCreature(p){const k=p.key;const x=CX,y=222;ctx.save();ctx.translate(x,y);const body=mix(p.soil,'#ffffff',.25),edge=mix(body,'#111111',.25);circle(0,12,50,'rgba(0,0,0,.12)');circle(0,0,42,body,edge);circle(-27,-27,18,body);circle(27,-27,18,body);circle(-13,-5,5,'#111');circle(13,-5,5,'#111');circle(-12,-6,1.8,'#fff');circle(14,-6,1.8,'#fff');line(-8,15,0,19,edge,3);line(0,19,8,15,edge,3);if(['water','ice'].includes(k)){tri([-42,2],[-66,-10],[-52,18],body);tri([42,2],[66,-10],[52,18],body)}if(k==='electric'){tri([-30,-40],[-18,-66],[-5,-42],'#ffd84c');tri([30,-40],[18,-66],[5,-42],'#ffd84c')}if(k==='grass'){for(let a=-1;a<=1;a++)tri([a*5,-42],[a*12-7,-64],[a*12+7,-52],'#68ad57')}ctx.restore()}
+  function drawBottomPanel(){ctx.fillStyle=state.time==='night'?'#121827':'#f7f4ea';ctx.fillRect(0,312,W,154);const labels=['먹이','훈련','가방','체육관'];for(let i=0;i<4;i++){const x=34+i*101;rr(x,386,92,38,10,i===1?'#ece7d8':'#fff','#30343c',1);txt(labels[i],x+46,405,14,'#111')}}
+  function drawBars(){const bars=[['배고픔',.74,'#f0b857'],['행복',.86,'#74c47b'],['체력',.62,'#e46f6f']];bars.forEach((b,i)=>{const y=329+i*17;txt(b[0],82,y,11,state.time==='night'?'#f2eee5':'#222','right',700);rr(92,y-5,210,9,4,'#c9ccd2',null);rr(92,y-5,210*b[1],9,4,b[2],null)})}
+  function drawHome(){const p=currentPalette();skyGradient(p.top,p.bot,312);if(state.time==='night'){circle(365,82,24,'#e9eef4');circle(375,76,22,mix(p.top,p.bot,.2));for(let i=0;i<26;i++)circle((i*67)%450,20+(i*43)%170,1.8,'rgba(255,255,255,.9)')}else{circle(364,84,25,p.key==='fire'?'#ffc37a':p.key==='electric'?'#ffe158':'#ffe5a0');if(state.clouds){const s=state.cloudScale;drawCloud(52,36,s);drawCloud(405,88,s)}}drawScenery(p,performance.now());ctx.fillStyle=p.soil;ctx.fillRect(0,305,W,65);drawWeather();drawWeatherBadge();drawHeader(p);drawCreature(p);drawBottomPanel();drawBars()}
+  function drawBag(isTM=false){ctx.fillStyle='#f7f4ea';ctx.fillRect(0,0,W,H);txt(isTM?'기술머신':'육성 아이템',CX,58,25,'#111');const names=isTM?['노말 기술머신','불꽃 기술머신','물 기술머신','전기 기술머신']:state.bagPage===0?['공격 사탕','방어 사탕','스피드 사탕','체력 사탕']:['반짝 부적','에너지 사탕','',''];const subs=isTM?['가르칠 기술: 메가톤펀치','가르칠 기술: 화염방사','가르칠 기술: 물의파동','현재 배울 수 있는 기술 없음']:state.bagPage===0?['공격력을 올립니다','방어력을 올립니다','스피드를 올립니다','체력을 올립니다']:['다음 알의 특별 확률 상승','훈련 에너지 회복','',''];for(let i=0;i<4;i++){if(!names[i])continue;const y=106+i*56;const disabled=(isTM&&i===3);rr(74,y,330,48,11,disabled?'#f1efe9':'#fff',disabled?'#aaa':'#333',1);txt(names[i],94,y+16,17,disabled?'#aaa':'#111','left');txt(subs[i],94,y+36,11,disabled?'#aaa':'#777','left',500);txt('x'+(disabled?0:i+1),377,y+24,16,disabled?'#aaa':'#111','right')}
+    const pg=isTM?`${state.tmPage+1}/5`:`${state.bagPage+1}/2`;rr(119,344,234,40,10,'#fff','#111');txt(`<   ${pg}   >`,CX+3,364,17,'#111');rr(CX-73,392,152,38,10,'#111',null);txt('닫기',CX+3,411,16,'#fff')}
+  function drawClock(){ctx.fillStyle='#f7f4ea';ctx.fillRect(0,0,W,H);txt('시간 설정',CX,59,25,'#111');txt('12:34',CX,137,53,'#111');const xs=[104,170,252,318],labs=['−','+','−','+'];for(let i=0;i<4;i++){rr(xs[i],190,58,58,12,'#fff','#111');txt(labs[i],xs[i]+29,219,34,'#111')}txt('시',148,265,15,'#777');txt('분',304,265,15,'#777');drawAudioToggle(24,286,true,'music');drawVol(148,286,8);drawAudioToggle(24,324,true,'button');drawVol(148,324,9);rr(338,286,94,30,8,'#fff','#333');txt('KO',385,301,15,'#111');rr(338,324,94,30,8,'#fff','#333');txt('소리 테스트',385,339,11,'#111');rr(151,370,164,42,12,'#111',null);txt('확인',233,391,17,'#fff')}
+  function drawAudioToggle(x,y,on,kind){rr(x,y,112,30,8,on?(kind==='music'?'#6ec57b':'#efb15c'):'#fff','#111');ctx.save();ctx.translate(x+17,y+7);ctx.strokeStyle=on?'#fff':'#111';ctx.fillStyle=on?'#fff':'#111';ctx.lineWidth=2;if(kind==='music'){line(8,1,8,14,ctx.strokeStyle,2);line(17,0,17,12,ctx.strokeStyle,2);line(8,1,17,0,ctx.strokeStyle,2);circle(5,15,3,ctx.fillStyle);circle(15,13,3,ctx.fillStyle)}else{rr(0,4,13,10,3,ctx.fillStyle,null);line(15,9,19,9,ctx.strokeStyle,2);line(20,6,25,9,ctx.strokeStyle,2);line(20,12,25,9,ctx.strokeStyle,2)}ctx.restore();circle(x+94,y+15,7,on?'#2f8c4d':'#aaa');if(on){line(x+90,y+15,x+93,y+18,'#fff',2);line(x+93,y+18,x+98,y+12,'#fff',2)}}
+  function drawVol(x,y,v){for(let i=0;i<2;i++){rr(x+i*130,y,44,30,8,'#fff','#111');txt(i?'＋':'−',x+i*130+22,y+15,18,'#111')}txt('음량 '+v,233,y+9,11,'#222');rr(202,y+19,62,7,3,'#aaa',null);rr(202,y+19,62*v/10,7,3,'#6bbd78',null)}
+  const gymNames={관동:['웅','이슬','마티스','민화'],성도:['비상','호일','꼭두','유빈'],호연:['원규','철구','암페어','민지'],신오:['강석','유채','멜리사','자두'],하나:['덴트','알로에','아티','카밀레'],칼로스:['비올라','자크로','코르니','후쿠지'],알로라:['일리마','수련','키아웨','마오']};
+  function drawGym(){ctx.fillStyle='#f7f4ea';ctx.fillRect(0,0,W,H);txt(`${state.region} 체육관`,CX,54,22,'#111');rr(173,78,120,42,12,state.hard?'#d85f62':'#bfc3c9','#555');txt(state.hard?'어려움':'쉬움',233,99,17,state.hard?'#fff':'#111');const arr=gymNames[state.region]||gymNames['성도'];for(let i=0;i<4;i++){const y=138+i*52,done=i<1,open=i<2;rr(70,y,326,44,10,done?'#d5d5d5':'#f7f4ea',open?'#333':'#aaa');txt(arr[i],84,y+15,17,open?'#111':'#aaa','left');txt(open?'체육관 관장':'잠김',84,y+33,11,'#888','left',500);txt(`Lv.${12+i*5} x${i<2?2:3}`,382,y+32,11,done?'#4ba45a':open?'#111':'#aaa','right');if(done)txt('★',374,y+14,15,'#4ba45a')}
+    for(let i=0;i<3;i++){circle(CX+(i-1)*26,366,i===0?5:4,i===0?'#222':'#f7f4ea','#222')}rr(148,380,170,32,9,'#f7f4ea','#111');txt('LAN 배틀',233,396,16,'#111')}
+  function drawDefense(now){ctx.fillStyle='#111';ctx.fillRect(0,0,W,H);circle(CX,CY,231,'#edf3f8','#314151');txt('방어력 훈련',CX,62,25,'#111');txt(`${state.defRound+1} / 12`,CX,94,15,'#555');const x=58,y=205,w=350,h=42;rr(x,y,w,h,12,'#c8ccd2','#303743',2);const center=CX;const block=108,good=68,perfect=31;ctx.fillStyle='#74aedd';ctx.fillRect(center-block,y+4,block*2,h-8);ctx.fillStyle='#78d18a';ctx.fillRect(center-good,y+4,good*2,h-8);ctx.fillStyle='#ffd360';ctx.fillRect(center-perfect,y+4,perfect*2,h-8);line(center,y-6,center,y+h+6,'#111',2);const range=w-12,spd=185,oneWay=range/spd*1000,t=((now-state.defStart)%(oneWay*2)),dx=t<=oneWay?range*t/oneWay:range*(oneWay*2-t)/oneWay,nx=x+6+dx;line(nx,y-14,nx,y+h+14,'#e8393f',5);txt('PERFECT',center,y+21,11,'#4d3d14');txt('GOOD',center-good+8,y+21,10,'#184927','left');txt('BLOCK',center-block+8,y+21,10,'#173e58','left');txt('터치해서 멈추세요',CX,284,18,'#111');txt(`점수 ${state.defScore}`,CX,326,18,'#111');if(state.defFeedback&&now<state.defUntil){const col=state.defFeedback==='PERFECT'?'#d69b15':state.defFeedback==='GOOD'?'#3c9b54':state.defFeedback==='BLOCK'?'#3f7eaa':'#c84646';txt(state.defFeedback,CX,150,31,col)}return {nx,center,perfect,good,block}}
+  function grid(){if(!state.grid)return;ctx.save();ctx.strokeStyle='rgba(255,0,0,.18)';ctx.lineWidth=1;for(let x=0;x<=466;x+=20){line(x,0,x,466,'rgba(255,0,0,.16)',1)}for(let y=0;y<=466;y+=20){line(0,y,466,y,'rgba(255,0,0,.16)',1)}line(CX,0,CX,466,'rgba(0,0,0,.36)',1.5);line(0,CY,466,CY,'rgba(0,0,0,.36)',1.5);ctx.restore()}
+  function render(now){ctx.clearRect(0,0,W,H);screenClip();ctx.save();ctx.translate(CX,CY);ctx.scale(state.uiScale,state.uiScale);ctx.translate(-CX,-CY);let defData=null;if(state.screen==='home')drawHome();else if(state.screen==='bag')drawBag(false);else if(state.screen==='tm')drawBag(true);else if(state.screen==='clock')drawClock();else if(state.screen==='gym')drawGym();else if(state.screen==='defense')defData=drawDefense(now);ctx.restore();grid();if(state.lastTouch){circle(state.lastTouch.x,state.lastTouch.y,5,'rgba(255,0,0,.55)');circle(state.lastTouch.x,state.lastTouch.y,10,'rgba(255,255,255,0)','#f33')}unclip();state._defData=defData;requestAnimationFrame(render)}
+  function beep(freq=700,dur=.07){try{const A=window.AudioContext||window.webkitAudioContext,ac=beep.ac||(beep.ac=new A()),o=ac.createOscillator(),g=ac.createGain();o.type='square';o.frequency.value=freq;g.gain.value=.04;o.connect(g);g.connect(ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+dur);o.stop(ac.currentTime+dur)}catch(e){}}
+  function canvasPoint(ev){const r=canvas.getBoundingClientRect();return {x:clamp((ev.clientX-r.left)*W/r.width,0,W),y:clamp((ev.clientY-r.top)*H/r.height,0,H)}}
+  canvas.addEventListener('pointerdown',ev=>{const p=canvasPoint(ev);state.lastTouch=p;$('touchPos').textContent=`터치: ${Math.round(p.x)}, ${Math.round(p.y)}`;if(state.screen==='defense'&&state._defData){const d=Math.abs(state._defData.nx-state._defData.center);let f='MISS',pts=0,fr=230;if(d<=state._defData.perfect){f='PERFECT';pts=3;fr=1040}else if(d<=state._defData.good){f='GOOD';pts=2;fr=820}else if(d<=state._defData.block){f='BLOCK';pts=1;fr=620}state.defFeedback=f;state.defUntil=performance.now()+520;state.defScore+=pts;state.defRound=(state.defRound+1)%12;state.defStart=performance.now();beep(fr,.09)}else if(state.screen==='clock'){if(p.y>180&&p.y<260){if(p.x>100&&p.x<165)beep(420);else if(p.x>165&&p.x<235)beep(680);else if(p.x>245&&p.x<315)beep(420);else if(p.x>315&&p.x<390)beep(680)}}else if(state.screen==='gym'&&p.y>78&&p.y<125){state.hard=!state.hard;$('hard').value=state.hard?'어려움':'쉬움'}});
+  function setScreen(s){state.screen=s;document.querySelectorAll('#screenBtns button').forEach(b=>b.classList.toggle('active',b.dataset.screen===s));if(s==='defense'){state.defStart=performance.now();state.defFeedback='';state.defScore=0;state.defRound=0}}
+  document.querySelectorAll('#screenBtns button').forEach(b=>b.onclick=()=>setScreen(b.dataset.screen));
+  TYPES.forEach((t,i)=>{const o=document.createElement('option');o.textContent=t;o.value=i;if(i===state.type)o.selected=true;$('type').appendChild(o)});WEATHER.forEach((t,i)=>{const o=document.createElement('option');o.textContent=t;o.value=i;$('weather').appendChild(o)});
+  const bind=(id,key,parse=v=>v)=>{$(id).addEventListener('input',e=>{state[key]=parse(e.target.type==='checkbox'?e.target.checked:e.target.value);updateOutputs()})};
+  bind('name','name');bind('level','level',Number);bind('type','type',Number);bind('weather','weather',Number);bind('timeMode','time');bind('status','status');bind('shiny','shiny',Boolean);bind('gridToggle','grid',Boolean);bind('cloudToggle','clouds',Boolean);bind('nameNudge','nameNudge',Number);bind('textLift','textLift',Number);bind('nameSize','nameSize',Number);bind('cloudScale','cloudScale',v=>Number(v)/100);bind('scenery','scenery',v=>Number(v)/100);bind('uiScale','uiScale',v=>Number(v)/100);bind('bagPage','bagPage',Number);bind('tmPage','tmPage',v=>Number(v)-1);bind('region','region');$('hard').addEventListener('change',e=>state.hard=e.target.value==='어려움');
+  function updateOutputs(){ $('nameNudgeV').textContent=state.nameNudge;$('textLiftV').textContent=state.textLift;$('nameSizeV').textContent=state.nameSize;$('cloudScaleV').textContent=Math.round(state.cloudScale*100)+'%';$('sceneryV').textContent=Math.round(state.scenery*100)+'%';$('uiScaleV').textContent=Math.round(state.uiScale*100)+'%';$('codeOut').textContent=`// 현재 시뮬레이터 조정값
+constexpr int HEADER_NAME_Y_NUDGE = ${state.nameNudge};
+constexpr int HEADER_TEXT_LIFT = ${state.textLift};
+
+// 이름 배경 틀 없음 (v3.56)
+// firmware text Y = 52 + ${state.nameNudge} - (${state.textLift}) = ${52+state.nameNudge-state.textLift}`;saveLocal()}
+  function saveLocal(){try{localStorage.setItem('tamapokeSim_v356',JSON.stringify({nameNudge:state.nameNudge,textLift:state.textLift,nameSize:state.nameSize,cloudScale:state.cloudScale,scenery:state.scenery}))}catch(e){}}
+  function loadLocal(){try{const d=JSON.parse(localStorage.getItem('tamapokeSim_v356')||'null');if(!d)return;for(const k of Object.keys(d))if(k in state)state[k]=d[k];$('nameNudge').value=state.nameNudge;$('textLift').value=state.textLift;$('nameSize').value=state.nameSize;$('cloudScale').value=Math.round(state.cloudScale*100);$('scenery').value=Math.round(state.scenery*100)}catch(e){}}
+  $('presetBtn').onclick=()=>{state.nameNudge=5;state.textLift=-2;state.nameSize=24;$('nameNudge').value=5;$('textLift').value=-2;$('nameSize').value=24;updateOutputs()};
+  $('copyBtn').onclick=async()=>{try{await navigator.clipboard.writeText($('codeOut').textContent);$('copyBtn').textContent='복사됨';setTimeout(()=>$('copyBtn').textContent='값 복사',900)}catch(e){alert('클립보드 복사가 차단되었습니다. 아래 값을 직접 복사해주세요.') }};
+  $('shotBtn').onclick=()=>{const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download=`TamaPoke-Sim-${state.screen}.png`;a.click()};
+  $('resetBtn').onclick=()=>{localStorage.removeItem('tamapokeSim_v356');location.reload()};
+  loadLocal();updateOutputs();requestAnimationFrame(render);
+})();
+</script>
+</body>
+</html>
