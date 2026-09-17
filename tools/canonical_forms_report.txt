@@ -1,0 +1,12 @@
+TamaPoke canonical-form audit
+Presentation-only PMDCollab slots must never be species/resources.
+
+OK catalog_lock contains no AltColor/Alternate/Cutscene/Beta form records
+OK pmd_catalog contains no presentation-only species entries
+OK retired presentation IDs are tombstones only: 0 IDs
+OK evolution graph contains no retired presentation IDs
+OK retired-save migration map/helper generated
+OK Charizard has no AltColor/Alternate species branch
+OK Charizard -> Mega Charizard X remains Lv.70: 6->1200
+
+canonical-form audit OK

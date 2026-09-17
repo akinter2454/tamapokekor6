@@ -1,0 +1,2100 @@
+{
+  "forms": {
+    "0006/0001": {
+      "form_key": "0001",
+      "id": 1200,
+      "label": "Mega_X",
+      "natdex": 6
+    },
+    "0019/0001": {
+      "form_key": "0001",
+      "id": 810,
+      "label": "Alola",
+      "natdex": 19
+    },
+    "0020/0001": {
+      "form_key": "0001",
+      "id": 811,
+      "label": "Alola",
+      "natdex": 20
+    },
+    "0025/0006": {
+      "form_key": "0006",
+      "id": 1201,
+      "label": "Libre",
+      "natdex": 25
+    },
+    "0025/0007": {
+      "form_key": "0007",
+      "id": 1202,
+      "label": "Cosplay",
+      "natdex": 25
+    },
+    "0026/0001": {
+      "form_key": "0001",
+      "id": 812,
+      "label": "Alola",
+      "natdex": 26
+    },
+    "0027/0001": {
+      "form_key": "0001",
+      "id": 813,
+      "label": "Alola",
+      "natdex": 27
+    },
+    "0028/0001": {
+      "form_key": "0001",
+      "id": 814,
+      "label": "Alola",
+      "natdex": 28
+    },
+    "0037/0001": {
+      "form_key": "0001",
+      "id": 815,
+      "label": "Alola",
+      "natdex": 37
+    },
+    "0038/0001": {
+      "form_key": "0001",
+      "id": 816,
+      "label": "Alola",
+      "natdex": 38
+    },
+    "0050/0001": {
+      "form_key": "0001",
+      "id": 817,
+      "label": "Alola",
+      "natdex": 50
+    },
+    "0051/0001": {
+      "form_key": "0001",
+      "id": 818,
+      "label": "Alola",
+      "natdex": 51
+    },
+    "0052/0001": {
+      "form_key": "0001",
+      "id": 819,
+      "label": "Alola",
+      "natdex": 52
+    },
+    "0052/0002": {
+      "form_key": "0002",
+      "id": 1203,
+      "label": "Galar",
+      "natdex": 52
+    },
+    "0053/0001": {
+      "form_key": "0001",
+      "id": 820,
+      "label": "Alola",
+      "natdex": 53
+    },
+    "0058/0001": {
+      "form_key": "0001",
+      "id": 1204,
+      "label": "Hisui",
+      "natdex": 58
+    },
+    "0059/0001": {
+      "form_key": "0001",
+      "id": 1205,
+      "label": "Hisui",
+      "natdex": 59
+    },
+    "0065/0001": {
+      "form_key": "0001",
+      "id": 1206,
+      "label": "Mega",
+      "natdex": 65
+    },
+    "0074/0001": {
+      "form_key": "0001",
+      "id": 821,
+      "label": "Alola",
+      "natdex": 74
+    },
+    "0075/0001": {
+      "form_key": "0001",
+      "id": 822,
+      "label": "Alola",
+      "natdex": 75
+    },
+    "0076/0001": {
+      "form_key": "0001",
+      "id": 823,
+      "label": "Alola",
+      "natdex": 76
+    },
+    "0077/0001": {
+      "form_key": "0001",
+      "id": 1207,
+      "label": "Galar",
+      "natdex": 77
+    },
+    "0078/0001": {
+      "form_key": "0001",
+      "id": 1208,
+      "label": "Galar",
+      "natdex": 78
+    },
+    "0079/0001": {
+      "form_key": "0001",
+      "id": 1209,
+      "label": "Galar",
+      "natdex": 79
+    },
+    "0080/0001": {
+      "form_key": "0001",
+      "id": 1210,
+      "label": "Galar",
+      "natdex": 80
+    },
+    "0080/0002": {
+      "form_key": "0002",
+      "id": 1211,
+      "label": "Mega",
+      "natdex": 80
+    },
+    "0083/0001": {
+      "form_key": "0001",
+      "id": 1212,
+      "label": "Galar",
+      "natdex": 83
+    },
+    "0088/0001": {
+      "form_key": "0001",
+      "id": 824,
+      "label": "Alola",
+      "natdex": 88
+    },
+    "0089/0001": {
+      "form_key": "0001",
+      "id": 825,
+      "label": "Alola",
+      "natdex": 89
+    },
+    "0094/0001": {
+      "form_key": "0001",
+      "id": 1213,
+      "label": "Mega",
+      "natdex": 94
+    },
+    "0100/0001": {
+      "form_key": "0001",
+      "id": 1214,
+      "label": "Hisui",
+      "natdex": 100
+    },
+    "0101/0001": {
+      "form_key": "0001",
+      "id": 1215,
+      "label": "Hisui",
+      "natdex": 101
+    },
+    "0103/0001": {
+      "form_key": "0001",
+      "id": 826,
+      "label": "Alola",
+      "natdex": 103
+    },
+    "0105/0001": {
+      "form_key": "0001",
+      "id": 827,
+      "label": "Alola",
+      "natdex": 105
+    },
+    "0110/0001": {
+      "form_key": "0001",
+      "id": 1216,
+      "label": "Galar",
+      "natdex": 110
+    },
+    "0115/0001": {
+      "form_key": "0001",
+      "id": 1217,
+      "label": "Mega",
+      "natdex": 115
+    },
+    "0122/0001": {
+      "form_key": "0001",
+      "id": 1218,
+      "label": "Galar",
+      "natdex": 122
+    },
+    "0128/0001": {
+      "form_key": "0001",
+      "id": 1219,
+      "label": "Paldea",
+      "natdex": 128
+    },
+    "0128/0002": {
+      "form_key": "0002",
+      "id": 1220,
+      "label": "Paldea_Blaze",
+      "natdex": 128
+    },
+    "0128/0003": {
+      "form_key": "0003",
+      "id": 1221,
+      "label": "Paldea_Aqua",
+      "natdex": 128
+    },
+    "0142/0001": {
+      "form_key": "0001",
+      "id": 1222,
+      "label": "Mega",
+      "natdex": 142
+    },
+    "0144/0001": {
+      "form_key": "0001",
+      "id": 1223,
+      "label": "Galar",
+      "natdex": 144
+    },
+    "0145/0001": {
+      "form_key": "0001",
+      "id": 1224,
+      "label": "Galar",
+      "natdex": 145
+    },
+    "0146/0001": {
+      "form_key": "0001",
+      "id": 1225,
+      "label": "Galar",
+      "natdex": 146
+    },
+    "0150/0002": {
+      "form_key": "0002",
+      "id": 1226,
+      "label": "Mega_Y",
+      "natdex": 150
+    },
+    "0150/0003": {
+      "form_key": "0003",
+      "id": 1227,
+      "label": "Shadow",
+      "natdex": 150
+    },
+    "0157/0001": {
+      "form_key": "0001",
+      "id": 1228,
+      "label": "Hisui",
+      "natdex": 157
+    },
+    "0172/0001": {
+      "form_key": "0001",
+      "id": 1229,
+      "label": "Spiky",
+      "natdex": 172
+    },
+    "0194/0002": {
+      "form_key": "0002",
+      "id": 1230,
+      "label": "Paldea",
+      "natdex": 194
+    },
+    "0199/0001": {
+      "form_key": "0001",
+      "id": 1231,
+      "label": "Galar",
+      "natdex": 199
+    },
+    "0201/0001": {
+      "form_key": "0001",
+      "id": 1232,
+      "label": "B",
+      "natdex": 201
+    },
+    "0201/0002": {
+      "form_key": "0002",
+      "id": 1233,
+      "label": "C",
+      "natdex": 201
+    },
+    "0201/0003": {
+      "form_key": "0003",
+      "id": 1234,
+      "label": "D",
+      "natdex": 201
+    },
+    "0201/0004": {
+      "form_key": "0004",
+      "id": 1235,
+      "label": "E",
+      "natdex": 201
+    },
+    "0201/0005": {
+      "form_key": "0005",
+      "id": 1236,
+      "label": "F",
+      "natdex": 201
+    },
+    "0201/0006": {
+      "form_key": "0006",
+      "id": 1237,
+      "label": "G",
+      "natdex": 201
+    },
+    "0201/0007": {
+      "form_key": "0007",
+      "id": 1238,
+      "label": "H",
+      "natdex": 201
+    },
+    "0201/0008": {
+      "form_key": "0008",
+      "id": 1239,
+      "label": "I",
+      "natdex": 201
+    },
+    "0201/0009": {
+      "form_key": "0009",
+      "id": 1240,
+      "label": "J",
+      "natdex": 201
+    },
+    "0201/0010": {
+      "form_key": "0010",
+      "id": 1241,
+      "label": "K",
+      "natdex": 201
+    },
+    "0201/0011": {
+      "form_key": "0011",
+      "id": 1242,
+      "label": "L",
+      "natdex": 201
+    },
+    "0201/0012": {
+      "form_key": "0012",
+      "id": 1243,
+      "label": "M",
+      "natdex": 201
+    },
+    "0201/0013": {
+      "form_key": "0013",
+      "id": 1244,
+      "label": "N",
+      "natdex": 201
+    },
+    "0201/0014": {
+      "form_key": "0014",
+      "id": 1245,
+      "label": "O",
+      "natdex": 201
+    },
+    "0201/0015": {
+      "form_key": "0015",
+      "id": 1246,
+      "label": "P",
+      "natdex": 201
+    },
+    "0201/0016": {
+      "form_key": "0016",
+      "id": 1247,
+      "label": "Q",
+      "natdex": 201
+    },
+    "0201/0017": {
+      "form_key": "0017",
+      "id": 1248,
+      "label": "R",
+      "natdex": 201
+    },
+    "0201/0018": {
+      "form_key": "0018",
+      "id": 1249,
+      "label": "S",
+      "natdex": 201
+    },
+    "0201/0019": {
+      "form_key": "0019",
+      "id": 1250,
+      "label": "T",
+      "natdex": 201
+    },
+    "0201/0020": {
+      "form_key": "0020",
+      "id": 1251,
+      "label": "U",
+      "natdex": 201
+    },
+    "0201/0021": {
+      "form_key": "0021",
+      "id": 1252,
+      "label": "V",
+      "natdex": 201
+    },
+    "0201/0022": {
+      "form_key": "0022",
+      "id": 1253,
+      "label": "W",
+      "natdex": 201
+    },
+    "0201/0023": {
+      "form_key": "0023",
+      "id": 1254,
+      "label": "X",
+      "natdex": 201
+    },
+    "0201/0024": {
+      "form_key": "0024",
+      "id": 1255,
+      "label": "Y",
+      "natdex": 201
+    },
+    "0201/0025": {
+      "form_key": "0025",
+      "id": 1256,
+      "label": "Z",
+      "natdex": 201
+    },
+    "0201/0026": {
+      "form_key": "0026",
+      "id": 1257,
+      "label": "Exclamation",
+      "natdex": 201
+    },
+    "0201/0027": {
+      "form_key": "0027",
+      "id": 1258,
+      "label": "Question",
+      "natdex": 201
+    },
+    "0208/0001": {
+      "form_key": "0001",
+      "id": 1259,
+      "label": "Mega",
+      "natdex": 208
+    },
+    "0211/0001": {
+      "form_key": "0001",
+      "id": 1260,
+      "label": "Hisui",
+      "natdex": 211
+    },
+    "0215/0001": {
+      "form_key": "0001",
+      "id": 1261,
+      "label": "Hisui",
+      "natdex": 215
+    },
+    "0222/0001": {
+      "form_key": "0001",
+      "id": 1262,
+      "label": "Galar",
+      "natdex": 222
+    },
+    "0227/0001": {
+      "form_key": "0001",
+      "id": 1263,
+      "label": "Mega",
+      "natdex": 227
+    },
+    "0229/0001": {
+      "form_key": "0001",
+      "id": 1264,
+      "label": "Mega",
+      "natdex": 229
+    },
+    "0248/0001": {
+      "form_key": "0001",
+      "id": 1265,
+      "label": "Mega",
+      "natdex": 248
+    },
+    "0249/0001": {
+      "form_key": "0001",
+      "id": 1266,
+      "label": "Shadow",
+      "natdex": 249
+    },
+    "0263/0001": {
+      "form_key": "0001",
+      "id": 1267,
+      "label": "Galar",
+      "natdex": 263
+    },
+    "0264/0001": {
+      "form_key": "0001",
+      "id": 1268,
+      "label": "Galar",
+      "natdex": 264
+    },
+    "0282/0001": {
+      "form_key": "0001",
+      "id": 1269,
+      "label": "Mega",
+      "natdex": 282
+    },
+    "0302/0001": {
+      "form_key": "0001",
+      "id": 1270,
+      "label": "Mega",
+      "natdex": 302
+    },
+    "0303/0001": {
+      "form_key": "0001",
+      "id": 1271,
+      "label": "Mega",
+      "natdex": 303
+    },
+    "0308/0001": {
+      "form_key": "0001",
+      "id": 1272,
+      "label": "Mega",
+      "natdex": 308
+    },
+    "0310/0001": {
+      "form_key": "0001",
+      "id": 1273,
+      "label": "Mega",
+      "natdex": 310
+    },
+    "0323/0001": {
+      "form_key": "0001",
+      "id": 1274,
+      "label": "Mega",
+      "natdex": 323
+    },
+    "0334/0001": {
+      "form_key": "0001",
+      "id": 1275,
+      "label": "Mega",
+      "natdex": 334
+    },
+    "0351/0001": {
+      "form_key": "0001",
+      "id": 1276,
+      "label": "Sunny",
+      "natdex": 351
+    },
+    "0351/0002": {
+      "form_key": "0002",
+      "id": 1277,
+      "label": "Rainy",
+      "natdex": 351
+    },
+    "0351/0003": {
+      "form_key": "0003",
+      "id": 1278,
+      "label": "Snowy",
+      "natdex": 351
+    },
+    "0352/0001": {
+      "form_key": "0001",
+      "id": 1279,
+      "label": "Purple",
+      "natdex": 352
+    },
+    "0354/0001": {
+      "form_key": "0001",
+      "id": 1280,
+      "label": "Mega",
+      "natdex": 354
+    },
+    "0362/0001": {
+      "form_key": "0001",
+      "id": 1281,
+      "label": "Mega",
+      "natdex": 362
+    },
+    "0380/0001": {
+      "form_key": "0001",
+      "id": 1282,
+      "label": "Mega",
+      "natdex": 380
+    },
+    "0381/0001": {
+      "form_key": "0001",
+      "id": 1283,
+      "label": "Mega",
+      "natdex": 381
+    },
+    "0384/0001": {
+      "form_key": "0001",
+      "id": 1284,
+      "label": "Mega",
+      "natdex": 384
+    },
+    "0386/0001": {
+      "form_key": "0001",
+      "id": 1285,
+      "label": "Attack",
+      "natdex": 386
+    },
+    "0386/0002": {
+      "form_key": "0002",
+      "id": 1286,
+      "label": "Defense",
+      "natdex": 386
+    },
+    "0386/0003": {
+      "form_key": "0003",
+      "id": 1287,
+      "label": "Speed",
+      "natdex": 386
+    },
+    "0412/0001": {
+      "form_key": "0001",
+      "id": 1288,
+      "label": "Sand",
+      "natdex": 412
+    },
+    "0412/0002": {
+      "form_key": "0002",
+      "id": 1289,
+      "label": "Trash",
+      "natdex": 412
+    },
+    "0413/0001": {
+      "form_key": "0001",
+      "id": 1290,
+      "label": "Sand",
+      "natdex": 413
+    },
+    "0413/0002": {
+      "form_key": "0002",
+      "id": 1291,
+      "label": "Trash",
+      "natdex": 413
+    },
+    "0421/0001": {
+      "form_key": "0001",
+      "id": 1292,
+      "label": "Sunshine",
+      "natdex": 421
+    },
+    "0422/0001": {
+      "form_key": "0001",
+      "id": 1293,
+      "label": "East",
+      "natdex": 422
+    },
+    "0423/0001": {
+      "form_key": "0001",
+      "id": 1294,
+      "label": "East",
+      "natdex": 423
+    },
+    "0428/0001": {
+      "form_key": "0001",
+      "id": 1295,
+      "label": "Mega",
+      "natdex": 428
+    },
+    "0448/0001": {
+      "form_key": "0001",
+      "id": 1296,
+      "label": "Mega",
+      "natdex": 448
+    },
+    "0475/0001": {
+      "form_key": "0001",
+      "id": 1297,
+      "label": "Mega",
+      "natdex": 475
+    },
+    "0479/0001": {
+      "form_key": "0001",
+      "id": 1298,
+      "label": "Heat",
+      "natdex": 479
+    },
+    "0479/0002": {
+      "form_key": "0002",
+      "id": 1299,
+      "label": "Wash",
+      "natdex": 479
+    },
+    "0479/0003": {
+      "form_key": "0003",
+      "id": 1300,
+      "label": "Frost",
+      "natdex": 479
+    },
+    "0479/0004": {
+      "form_key": "0004",
+      "id": 1301,
+      "label": "Fan",
+      "natdex": 479
+    },
+    "0479/0005": {
+      "form_key": "0005",
+      "id": 1302,
+      "label": "Mow",
+      "natdex": 479
+    },
+    "0479/0008": {
+      "form_key": "0008",
+      "id": 1303,
+      "label": "Drone",
+      "natdex": 479
+    },
+    "0483/0001": {
+      "form_key": "0001",
+      "id": 1304,
+      "label": "Origin",
+      "natdex": 483
+    },
+    "0484/0001": {
+      "form_key": "0001",
+      "id": 1305,
+      "label": "Origin",
+      "natdex": 484
+    },
+    "0487/0001": {
+      "form_key": "0001",
+      "id": 1306,
+      "label": "Origin",
+      "natdex": 487
+    },
+    "0491/0002": {
+      "form_key": "0002",
+      "id": 1307,
+      "label": "Mega",
+      "natdex": 491
+    },
+    "0492/0001": {
+      "form_key": "0001",
+      "id": 1308,
+      "label": "Sky",
+      "natdex": 492
+    },
+    "0493/0001": {
+      "form_key": "0001",
+      "id": 1309,
+      "label": "Bug",
+      "natdex": 493
+    },
+    "0493/0002": {
+      "form_key": "0002",
+      "id": 1310,
+      "label": "Dark",
+      "natdex": 493
+    },
+    "0493/0003": {
+      "form_key": "0003",
+      "id": 1311,
+      "label": "Dragon",
+      "natdex": 493
+    },
+    "0493/0004": {
+      "form_key": "0004",
+      "id": 1312,
+      "label": "Electric",
+      "natdex": 493
+    },
+    "0493/0005": {
+      "form_key": "0005",
+      "id": 1313,
+      "label": "Fighting",
+      "natdex": 493
+    },
+    "0493/0006": {
+      "form_key": "0006",
+      "id": 1314,
+      "label": "Fire",
+      "natdex": 493
+    },
+    "0493/0007": {
+      "form_key": "0007",
+      "id": 1315,
+      "label": "Flying",
+      "natdex": 493
+    },
+    "0493/0008": {
+      "form_key": "0008",
+      "id": 1316,
+      "label": "Ghost",
+      "natdex": 493
+    },
+    "0493/0009": {
+      "form_key": "0009",
+      "id": 1317,
+      "label": "Grass",
+      "natdex": 493
+    },
+    "0493/0010": {
+      "form_key": "0010",
+      "id": 1318,
+      "label": "Ground",
+      "natdex": 493
+    },
+    "0493/0011": {
+      "form_key": "0011",
+      "id": 1319,
+      "label": "Ice",
+      "natdex": 493
+    },
+    "0493/0012": {
+      "form_key": "0012",
+      "id": 1320,
+      "label": "Poison",
+      "natdex": 493
+    },
+    "0493/0013": {
+      "form_key": "0013",
+      "id": 1321,
+      "label": "Psychic",
+      "natdex": 493
+    },
+    "0493/0014": {
+      "form_key": "0014",
+      "id": 1322,
+      "label": "Rock",
+      "natdex": 493
+    },
+    "0493/0015": {
+      "form_key": "0015",
+      "id": 1323,
+      "label": "Steel",
+      "natdex": 493
+    },
+    "0493/0016": {
+      "form_key": "0016",
+      "id": 1324,
+      "label": "Water",
+      "natdex": 493
+    },
+    "0493/0017": {
+      "form_key": "0017",
+      "id": 1325,
+      "label": "Fairy",
+      "natdex": 493
+    },
+    "0493/0018": {
+      "form_key": "0018",
+      "id": 1326,
+      "label": "Question_Mark",
+      "natdex": 493
+    },
+    "0503/0001": {
+      "form_key": "0001",
+      "id": 1327,
+      "label": "Hisui",
+      "natdex": 503
+    },
+    "0530/0001": {
+      "form_key": "0001",
+      "id": 1328,
+      "label": "Mega",
+      "natdex": 530
+    },
+    "0549/0001": {
+      "form_key": "0001",
+      "id": 1329,
+      "label": "Hisui",
+      "natdex": 549
+    },
+    "0550/0001": {
+      "form_key": "0001",
+      "id": 1330,
+      "label": "Blue",
+      "natdex": 550
+    },
+    "0550/0002": {
+      "form_key": "0002",
+      "id": 1331,
+      "label": "White",
+      "natdex": 550
+    },
+    "0554/0001": {
+      "form_key": "0001",
+      "id": 1332,
+      "label": "Galar",
+      "natdex": 554
+    },
+    "0555/0001": {
+      "form_key": "0001",
+      "id": 1333,
+      "label": "Zen",
+      "natdex": 555
+    },
+    "0555/0002": {
+      "form_key": "0002",
+      "id": 1334,
+      "label": "Galar",
+      "natdex": 555
+    },
+    "0562/0001": {
+      "form_key": "0001",
+      "id": 1335,
+      "label": "Galar",
+      "natdex": 562
+    },
+    "0570/0001": {
+      "form_key": "0001",
+      "id": 1336,
+      "label": "Hisui",
+      "natdex": 570
+    },
+    "0571/0001": {
+      "form_key": "0001",
+      "id": 1337,
+      "label": "Hisui",
+      "natdex": 571
+    },
+    "0585/0001": {
+      "form_key": "0001",
+      "id": 1338,
+      "label": "Summer",
+      "natdex": 585
+    },
+    "0585/0002": {
+      "form_key": "0002",
+      "id": 1339,
+      "label": "Autumn",
+      "natdex": 585
+    },
+    "0585/0003": {
+      "form_key": "0003",
+      "id": 1340,
+      "label": "Winter",
+      "natdex": 585
+    },
+    "0586/0001": {
+      "form_key": "0001",
+      "id": 1341,
+      "label": "Summer",
+      "natdex": 586
+    },
+    "0586/0002": {
+      "form_key": "0002",
+      "id": 1342,
+      "label": "Autumn",
+      "natdex": 586
+    },
+    "0586/0003": {
+      "form_key": "0003",
+      "id": 1343,
+      "label": "Winter",
+      "natdex": 586
+    },
+    "0604/0001": {
+      "form_key": "0001",
+      "id": 1344,
+      "label": "Mega",
+      "natdex": 604
+    },
+    "0628/0001": {
+      "form_key": "0001",
+      "id": 1345,
+      "label": "Hisui",
+      "natdex": 628
+    },
+    "0643/0001": {
+      "form_key": "0001",
+      "id": 1346,
+      "label": "Skytemple",
+      "natdex": 643
+    },
+    "0645/0001": {
+      "form_key": "0001",
+      "id": 1347,
+      "label": "Therian",
+      "natdex": 645
+    },
+    "0646/0001": {
+      "form_key": "0001",
+      "id": 1348,
+      "label": "Black",
+      "natdex": 646
+    },
+    "0646/0002": {
+      "form_key": "0002",
+      "id": 1349,
+      "label": "White",
+      "natdex": 646
+    },
+    "0646/0006": {
+      "form_key": "0006",
+      "id": 1350,
+      "label": "White_Skytemple",
+      "natdex": 646
+    },
+    "0646/0007": {
+      "form_key": "0007",
+      "id": 1351,
+      "label": "Black_Skytemple",
+      "natdex": 646
+    },
+    "0648/0001": {
+      "form_key": "0001",
+      "id": 1352,
+      "label": "Pirouette",
+      "natdex": 648
+    },
+    "0649/0001": {
+      "form_key": "0001",
+      "id": 1353,
+      "label": "Douse",
+      "natdex": 649
+    },
+    "0649/0002": {
+      "form_key": "0002",
+      "id": 1354,
+      "label": "Shock",
+      "natdex": 649
+    },
+    "0649/0003": {
+      "form_key": "0003",
+      "id": 1355,
+      "label": "Burn",
+      "natdex": 649
+    },
+    "0649/0004": {
+      "form_key": "0004",
+      "id": 1356,
+      "label": "Chill",
+      "natdex": 649
+    },
+    "0666/0001": {
+      "form_key": "0001",
+      "id": 1357,
+      "label": "Icy_Snow",
+      "natdex": 666
+    },
+    "0666/0002": {
+      "form_key": "0002",
+      "id": 1358,
+      "label": "Polar",
+      "natdex": 666
+    },
+    "0666/0003": {
+      "form_key": "0003",
+      "id": 1359,
+      "label": "Tundra",
+      "natdex": 666
+    },
+    "0666/0004": {
+      "form_key": "0004",
+      "id": 1360,
+      "label": "Continental",
+      "natdex": 666
+    },
+    "0666/0005": {
+      "form_key": "0005",
+      "id": 1361,
+      "label": "Garden",
+      "natdex": 666
+    },
+    "0666/0006": {
+      "form_key": "0006",
+      "id": 1362,
+      "label": "Elegant",
+      "natdex": 666
+    },
+    "0666/0007": {
+      "form_key": "0007",
+      "id": 1363,
+      "label": "Modern",
+      "natdex": 666
+    },
+    "0666/0008": {
+      "form_key": "0008",
+      "id": 1364,
+      "label": "Marine",
+      "natdex": 666
+    },
+    "0666/0009": {
+      "form_key": "0009",
+      "id": 1365,
+      "label": "Archipelago",
+      "natdex": 666
+    },
+    "0666/0010": {
+      "form_key": "0010",
+      "id": 1366,
+      "label": "High_Plains",
+      "natdex": 666
+    },
+    "0666/0011": {
+      "form_key": "0011",
+      "id": 1367,
+      "label": "Sandstorm",
+      "natdex": 666
+    },
+    "0666/0012": {
+      "form_key": "0012",
+      "id": 1368,
+      "label": "River",
+      "natdex": 666
+    },
+    "0666/0013": {
+      "form_key": "0013",
+      "id": 1369,
+      "label": "Monsoon",
+      "natdex": 666
+    },
+    "0666/0014": {
+      "form_key": "0014",
+      "id": 1370,
+      "label": "Savannah",
+      "natdex": 666
+    },
+    "0666/0015": {
+      "form_key": "0015",
+      "id": 1371,
+      "label": "Sun",
+      "natdex": 666
+    },
+    "0666/0016": {
+      "form_key": "0016",
+      "id": 1372,
+      "label": "Ocean",
+      "natdex": 666
+    },
+    "0666/0017": {
+      "form_key": "0017",
+      "id": 1373,
+      "label": "Jungle",
+      "natdex": 666
+    },
+    "0666/0018": {
+      "form_key": "0018",
+      "id": 1374,
+      "label": "Fancy",
+      "natdex": 666
+    },
+    "0666/0019": {
+      "form_key": "0019",
+      "id": 1375,
+      "label": "Pokeball",
+      "natdex": 666
+    },
+    "0669/0001": {
+      "form_key": "0001",
+      "id": 1376,
+      "label": "Yellow",
+      "natdex": 669
+    },
+    "0669/0002": {
+      "form_key": "0002",
+      "id": 1377,
+      "label": "Orange",
+      "natdex": 669
+    },
+    "0669/0003": {
+      "form_key": "0003",
+      "id": 1378,
+      "label": "Blue",
+      "natdex": 669
+    },
+    "0669/0004": {
+      "form_key": "0004",
+      "id": 1379,
+      "label": "White",
+      "natdex": 669
+    },
+    "0670/0001": {
+      "form_key": "0001",
+      "id": 1380,
+      "label": "Yellow",
+      "natdex": 670
+    },
+    "0670/0002": {
+      "form_key": "0002",
+      "id": 1381,
+      "label": "Orange",
+      "natdex": 670
+    },
+    "0670/0003": {
+      "form_key": "0003",
+      "id": 1382,
+      "label": "Blue",
+      "natdex": 670
+    },
+    "0670/0004": {
+      "form_key": "0004",
+      "id": 1383,
+      "label": "White",
+      "natdex": 670
+    },
+    "0670/0005": {
+      "form_key": "0005",
+      "id": 1384,
+      "label": "Eternal",
+      "natdex": 670
+    },
+    "0670/0006": {
+      "form_key": "0006",
+      "id": 1385,
+      "label": "Mega",
+      "natdex": 670
+    },
+    "0671/0001": {
+      "form_key": "0001",
+      "id": 1386,
+      "label": "Yellow",
+      "natdex": 671
+    },
+    "0671/0002": {
+      "form_key": "0002",
+      "id": 1387,
+      "label": "Orange",
+      "natdex": 671
+    },
+    "0671/0003": {
+      "form_key": "0003",
+      "id": 1388,
+      "label": "Blue",
+      "natdex": 671
+    },
+    "0671/0004": {
+      "form_key": "0004",
+      "id": 1389,
+      "label": "White",
+      "natdex": 671
+    },
+    "0676/0008": {
+      "form_key": "0008",
+      "id": 1390,
+      "label": "Kabuki",
+      "natdex": 676
+    },
+    "0681/0001": {
+      "form_key": "0001",
+      "id": 1391,
+      "label": "Blade",
+      "natdex": 681
+    },
+    "0691/0001": {
+      "form_key": "0001",
+      "id": 1392,
+      "label": "Mega",
+      "natdex": 691
+    },
+    "0705/0001": {
+      "form_key": "0001",
+      "id": 1393,
+      "label": "Hisui",
+      "natdex": 705
+    },
+    "0706/0001": {
+      "form_key": "0001",
+      "id": 1394,
+      "label": "Hisui",
+      "natdex": 706
+    },
+    "0710/0001": {
+      "form_key": "0001",
+      "id": 1395,
+      "label": "Small",
+      "natdex": 710
+    },
+    "0710/0002": {
+      "form_key": "0002",
+      "id": 1396,
+      "label": "Large",
+      "natdex": 710
+    },
+    "0710/0003": {
+      "form_key": "0003",
+      "id": 1397,
+      "label": "Super",
+      "natdex": 710
+    },
+    "0711/0003": {
+      "form_key": "0003",
+      "id": 1398,
+      "label": "Super",
+      "natdex": 711
+    },
+    "0713/0001": {
+      "form_key": "0001",
+      "id": 1399,
+      "label": "Hisui",
+      "natdex": 713
+    },
+    "0716/0001": {
+      "form_key": "0001",
+      "id": 1400,
+      "label": "Neutral",
+      "natdex": 716
+    },
+    "0718/0001": {
+      "form_key": "0001",
+      "id": 1401,
+      "label": "10",
+      "natdex": 718
+    },
+    "0718/0002": {
+      "form_key": "0002",
+      "id": 1402,
+      "label": "Complete",
+      "natdex": 718
+    },
+    "0718/0005": {
+      "form_key": "0005",
+      "id": 1403,
+      "label": "Mega",
+      "natdex": 718
+    },
+    "0718/0006": {
+      "form_key": "0006",
+      "id": 1404,
+      "label": "Complete_Skytemple",
+      "natdex": 718
+    },
+    "0719/0001": {
+      "form_key": "0001",
+      "id": 1405,
+      "label": "Mega",
+      "natdex": 719
+    },
+    "0720/0001": {
+      "form_key": "0001",
+      "id": 1406,
+      "label": "Unbound",
+      "natdex": 720
+    },
+    "0724/0001": {
+      "form_key": "0001",
+      "id": 1407,
+      "label": "Hisui",
+      "natdex": 724
+    },
+    "0741/0001": {
+      "form_key": "0001",
+      "id": 1408,
+      "label": "Pom_Pom",
+      "natdex": 741
+    },
+    "0741/0002": {
+      "form_key": "0002",
+      "id": 1409,
+      "label": "Pa_U",
+      "natdex": 741
+    },
+    "0745/0001": {
+      "form_key": "0001",
+      "id": 1410,
+      "label": "Midnight",
+      "natdex": 745
+    },
+    "0745/0002": {
+      "form_key": "0002",
+      "id": 1411,
+      "label": "Dusk",
+      "natdex": 745
+    },
+    "0746/0001": {
+      "form_key": "0001",
+      "id": 1412,
+      "label": "School",
+      "natdex": 746
+    },
+    "0773/0001": {
+      "form_key": "0001",
+      "id": 1413,
+      "label": "Fighting",
+      "natdex": 773
+    },
+    "0773/0002": {
+      "form_key": "0002",
+      "id": 1414,
+      "label": "Flying",
+      "natdex": 773
+    },
+    "0773/0003": {
+      "form_key": "0003",
+      "id": 1415,
+      "label": "Poison",
+      "natdex": 773
+    },
+    "0773/0004": {
+      "form_key": "0004",
+      "id": 1416,
+      "label": "Ground",
+      "natdex": 773
+    },
+    "0773/0005": {
+      "form_key": "0005",
+      "id": 1417,
+      "label": "Rock",
+      "natdex": 773
+    },
+    "0773/0006": {
+      "form_key": "0006",
+      "id": 1418,
+      "label": "Bug",
+      "natdex": 773
+    },
+    "0773/0007": {
+      "form_key": "0007",
+      "id": 1419,
+      "label": "Ghost",
+      "natdex": 773
+    },
+    "0773/0008": {
+      "form_key": "0008",
+      "id": 1420,
+      "label": "Steel",
+      "natdex": 773
+    },
+    "0773/0009": {
+      "form_key": "0009",
+      "id": 1421,
+      "label": "Fire",
+      "natdex": 773
+    },
+    "0773/0010": {
+      "form_key": "0010",
+      "id": 1422,
+      "label": "Water",
+      "natdex": 773
+    },
+    "0773/0011": {
+      "form_key": "0011",
+      "id": 1423,
+      "label": "Grass",
+      "natdex": 773
+    },
+    "0773/0012": {
+      "form_key": "0012",
+      "id": 1424,
+      "label": "Electric",
+      "natdex": 773
+    },
+    "0773/0013": {
+      "form_key": "0013",
+      "id": 1425,
+      "label": "Psychic",
+      "natdex": 773
+    },
+    "0773/0014": {
+      "form_key": "0014",
+      "id": 1426,
+      "label": "Ice",
+      "natdex": 773
+    },
+    "0773/0015": {
+      "form_key": "0015",
+      "id": 1427,
+      "label": "Dragon",
+      "natdex": 773
+    },
+    "0773/0016": {
+      "form_key": "0016",
+      "id": 1428,
+      "label": "Dark",
+      "natdex": 773
+    },
+    "0773/0017": {
+      "form_key": "0017",
+      "id": 1429,
+      "label": "Fairy",
+      "natdex": 773
+    },
+    "0774/0001": {
+      "form_key": "0001",
+      "id": 1430,
+      "label": "Red",
+      "natdex": 774
+    },
+    "0774/0002": {
+      "form_key": "0002",
+      "id": 1431,
+      "label": "Orange",
+      "natdex": 774
+    },
+    "0774/0003": {
+      "form_key": "0003",
+      "id": 1432,
+      "label": "Yellow",
+      "natdex": 774
+    },
+    "0774/0004": {
+      "form_key": "0004",
+      "id": 1433,
+      "label": "Green",
+      "natdex": 774
+    },
+    "0774/0005": {
+      "form_key": "0005",
+      "id": 1434,
+      "label": "Blue",
+      "natdex": 774
+    },
+    "0774/0006": {
+      "form_key": "0006",
+      "id": 1435,
+      "label": "Indigo",
+      "natdex": 774
+    },
+    "0774/0007": {
+      "form_key": "0007",
+      "id": 1436,
+      "label": "Violet",
+      "natdex": 774
+    },
+    "0778/0001": {
+      "form_key": "0001",
+      "id": 1437,
+      "label": "Busted",
+      "natdex": 778
+    },
+    "0780/0001": {
+      "form_key": "0001",
+      "id": 1438,
+      "label": "Mega",
+      "natdex": 780
+    },
+    "0800/0003": {
+      "form_key": "0003",
+      "id": 1439,
+      "label": "Ultra",
+      "natdex": 800
+    },
+    "0801/0001": {
+      "form_key": "0001",
+      "id": 1440,
+      "label": "Original",
+      "natdex": 801
+    },
+    "0807/0001": {
+      "form_key": "0001",
+      "id": 1441,
+      "label": "Mega",
+      "natdex": 807
+    },
+    "0840/0001": {
+      "form_key": "0001",
+      "id": 1442,
+      "label": "No_Apple",
+      "natdex": 840
+    },
+    "0849/0001": {
+      "form_key": "0001",
+      "id": 1443,
+      "label": "Lowkey",
+      "natdex": 849
+    },
+    "0869/0001": {
+      "form_key": "0001",
+      "id": 1444,
+      "label": "Berry_Sweet",
+      "natdex": 869
+    },
+    "0869/0002": {
+      "form_key": "0002",
+      "id": 1445,
+      "label": "Love_Sweet",
+      "natdex": 869
+    },
+    "0869/0003": {
+      "form_key": "0003",
+      "id": 1446,
+      "label": "Star_Sweet",
+      "natdex": 869
+    },
+    "0869/0004": {
+      "form_key": "0004",
+      "id": 1447,
+      "label": "Clover_Sweet",
+      "natdex": 869
+    },
+    "0869/0005": {
+      "form_key": "0005",
+      "id": 1448,
+      "label": "Flower_Sweet",
+      "natdex": 869
+    },
+    "0869/0006": {
+      "form_key": "0006",
+      "id": 1449,
+      "label": "Ribbon_Sweet",
+      "natdex": 869
+    },
+    "0869/0007": {
+      "form_key": "0007",
+      "id": 1450,
+      "label": "Ruby_Cream_Strawberry_Sweet",
+      "natdex": 869
+    },
+    "0869/0008": {
+      "form_key": "0008",
+      "id": 1451,
+      "label": "Ruby_Cream_Berry_Sweet",
+      "natdex": 869
+    },
+    "0869/0009": {
+      "form_key": "0009",
+      "id": 1452,
+      "label": "Ruby_Cream_Love_Sweet",
+      "natdex": 869
+    },
+    "0869/0010": {
+      "form_key": "0010",
+      "id": 1453,
+      "label": "Ruby_Cream_Star_Sweet",
+      "natdex": 869
+    },
+    "0869/0011": {
+      "form_key": "0011",
+      "id": 1454,
+      "label": "Ruby_Cream_Clover_Sweet",
+      "natdex": 869
+    },
+    "0869/0012": {
+      "form_key": "0012",
+      "id": 1455,
+      "label": "Ruby_Cream_Flower_Sweet",
+      "natdex": 869
+    },
+    "0869/0013": {
+      "form_key": "0013",
+      "id": 1456,
+      "label": "Ruby_Cream_Ribbon_Sweet",
+      "natdex": 869
+    },
+    "0869/0014": {
+      "form_key": "0014",
+      "id": 1457,
+      "label": "Matcha_Cream_Strawberry_Sweet",
+      "natdex": 869
+    },
+    "0869/0015": {
+      "form_key": "0015",
+      "id": 1458,
+      "label": "Matcha_Cream_Berry_Sweet",
+      "natdex": 869
+    },
+    "0869/0016": {
+      "form_key": "0016",
+      "id": 1459,
+      "label": "Matcha_Cream_Love_Sweet",
+      "natdex": 869
+    },
+    "0869/0017": {
+      "form_key": "0017",
+      "id": 1460,
+      "label": "Matcha_Cream_Star_Sweet",
+      "natdex": 869
+    },
+    "0869/0018": {
+      "form_key": "0018",
+      "id": 1461,
+      "label": "Matcha_Cream_Clover_Sweet",
+      "natdex": 869
+    },
+    "0869/0019": {
+      "form_key": "0019",
+      "id": 1462,
+      "label": "Matcha_Cream_Flower_Sweet",
+      "natdex": 869
+    },
+    "0869/0020": {
+      "form_key": "0020",
+      "id": 1463,
+      "label": "Matcha_Cream_Ribbon_Sweet",
+      "natdex": 869
+    },
+    "0869/0021": {
+      "form_key": "0021",
+      "id": 1464,
+      "label": "Mint_Cream_Strawberry_Sweet",
+      "natdex": 869
+    },
+    "0869/0022": {
+      "form_key": "0022",
+      "id": 1465,
+      "label": "Mint_Cream_Berry_Sweet",
+      "natdex": 869
+    },
+    "0869/0023": {
+      "form_key": "0023",
+      "id": 1466,
+      "label": "Mint_Cream_Love_Sweet",
+      "natdex": 869
+    },
+    "0869/0024": {
+      "form_key": "0024",
+      "id": 1467,
+      "label": "Mint_Cream_Star_Sweet",
+      "natdex": 869
+    },
+    "0869/0025": {
+      "form_key": "0025",
+      "id": 1468,
+      "label": "Mint_Cream_Clover_Sweet",
+      "natdex": 869
+    },
+    "0869/0026": {
+      "form_key": "0026",
+      "id": 1469,
+      "label": "Mint_Cream_Flower_Sweet",
+      "natdex": 869
+    },
+    "0869/0027": {
+      "form_key": "0027",
+      "id": 1470,
+      "label": "Mint_Cream_Ribbon_Sweet",
+      "natdex": 869
+    },
+    "0869/0028": {
+      "form_key": "0028",
+      "id": 1471,
+      "label": "Lemon_Cream_Strawberry_Sweet",
+      "natdex": 869
+    },
+    "0869/0029": {
+      "form_key": "0029",
+      "id": 1472,
+      "label": "Lemon_Cream_Berry_Sweet",
+      "natdex": 869
+    },
+    "0869/0030": {
+      "form_key": "0030",
+      "id": 1473,
+      "label": "Lemon_Cream_Love_Sweet",
+      "natdex": 869
+    },
+    "0869/0031": {
+      "form_key": "0031",
+      "id": 1474,
+      "label": "Lemon_Cream_Star_Sweet",
+      "natdex": 869
+    },
+    "0869/0032": {
+      "form_key": "0032",
+      "id": 1475,
+      "label": "Lemon_Cream_Clover_Sweet",
+      "natdex": 869
+    },
+    "0869/0033": {
+      "form_key": "0033",
+      "id": 1476,
+      "label": "Lemon_Cream_Flower_Sweet",
+      "natdex": 869
+    },
+    "0869/0034": {
+      "form_key": "0034",
+      "id": 1477,
+      "label": "Lemon_Cream_Ribbon_Sweet",
+      "natdex": 869
+    },
+    "0869/0035": {
+      "form_key": "0035",
+      "id": 1478,
+      "label": "Salted_Cream_Strawberry_Sweet",
+      "natdex": 869
+    },
+    "0869/0036": {
+      "form_key": "0036",
+      "id": 1479,
+      "label": "Salted_Cream_Berry_Sweet",
+      "natdex": 869
+    },
+    "0869/0037": {
+      "form_key": "0037",
+      "id": 1480,
+      "label": "Salted_Cream_Love_Sweet",
+      "natdex": 869
+    },
+    "0869/0038": {
+      "form_key": "0038",
+      "id": 1481,
+      "label": "Salted_Cream_Star_Sweet",
+      "natdex": 869
+    },
+    "0869/0039": {
+      "form_key": "0039",
+      "id": 1482,
+      "label": "Salted_Cream_Clover_Sweet",
+      "natdex": 869
+    },
+    "0869/0040": {
+      "form_key": "0040",
+      "id": 1483,
+      "label": "Salted_Cream_Flower_Sweet",
+      "natdex": 869
+    },
+    "0869/0041": {
+      "form_key": "0041",
+      "id": 1484,
+      "label": "Salted_Cream_Ribbon_Sweet",
+      "natdex": 869
+    },
+    "0869/0042": {
+      "form_key": "0042",
+      "id": 1485,
+      "label": "Ruby_Swirl_Strawberry_Sweet",
+      "natdex": 869
+    },
+    "0869/0043": {
+      "form_key": "0043",
+      "id": 1486,
+      "label": "Ruby_Swirl_Berry_Sweet",
+      "natdex": 869
+    },
+    "0869/0044": {
+      "form_key": "0044",
+      "id": 1487,
+      "label": "Ruby_Swirl_Love_Sweet",
+      "natdex": 869
+    },
+    "0869/0045": {
+      "form_key": "0045",
+      "id": 1488,
+      "label": "Ruby_Swirl_Star_Sweet",
+      "natdex": 869
+    },
+    "0869/0046": {
+      "form_key": "0046",
+      "id": 1489,
+      "label": "Ruby_Swirl_Clover_Sweet",
+      "natdex": 869
+    },
+    "0869/0047": {
+      "form_key": "0047",
+      "id": 1490,
+      "label": "Ruby_Swirl_Flower_Sweet",
+      "natdex": 869
+    },
+    "0869/0048": {
+      "form_key": "0048",
+      "id": 1491,
+      "label": "Ruby_Swirl_Ribbon_Sweet",
+      "natdex": 869
+    },
+    "0869/0049": {
+      "form_key": "0049",
+      "id": 1492,
+      "label": "Caramel_Swirl_Strawberry_Sweet",
+      "natdex": 869
+    },
+    "0869/0050": {
+      "form_key": "0050",
+      "id": 1493,
+      "label": "Caramel_Swirl_Berry_Sweet",
+      "natdex": 869
+    },
+    "0869/0051": {
+      "form_key": "0051",
+      "id": 1494,
+      "label": "Caramel_Swirl_Love_Sweet",
+      "natdex": 869
+    },
+    "0869/0052": {
+      "form_key": "0052",
+      "id": 1495,
+      "label": "Caramel_Swirl_Star_Sweet",
+      "natdex": 869
+    },
+    "0869/0053": {
+      "form_key": "0053",
+      "id": 1496,
+      "label": "Caramel_Swirl_Clover_Sweet",
+      "natdex": 869
+    },
+    "0869/0054": {
+      "form_key": "0054",
+      "id": 1497,
+      "label": "Caramel_Swirl_Flower_Sweet",
+      "natdex": 869
+    },
+    "0869/0055": {
+      "form_key": "0055",
+      "id": 1498,
+      "label": "Caramel_Swirl_Ribbon_Sweet",
+      "natdex": 869
+    },
+    "0869/0056": {
+      "form_key": "0056",
+      "id": 1499,
+      "label": "Rainbow_Swirl_Strawberry_Sweet",
+      "natdex": 869
+    },
+    "0869/0057": {
+      "form_key": "0057",
+      "id": 1500,
+      "label": "Rainbow_Swirl_Berry_Sweet",
+      "natdex": 869
+    },
+    "0869/0058": {
+      "form_key": "0058",
+      "id": 1501,
+      "label": "Rainbow_Swirl_Love_Sweet",
+      "natdex": 869
+    },
+    "0869/0059": {
+      "form_key": "0059",
+      "id": 1502,
+      "label": "Rainbow_Swirl_Star_Sweet",
+      "natdex": 869
+    },
+    "0869/0060": {
+      "form_key": "0060",
+      "id": 1503,
+      "label": "Rainbow_Swirl_Clover_Sweet",
+      "natdex": 869
+    },
+    "0869/0061": {
+      "form_key": "0061",
+      "id": 1504,
+      "label": "Rainbow_Swirl_Flower_Sweet",
+      "natdex": 869
+    },
+    "0869/0062": {
+      "form_key": "0062",
+      "id": 1505,
+      "label": "Rainbow_Swirl_Ribbon_Sweet",
+      "natdex": 869
+    },
+    "0870/0002": {
+      "form_key": "0002",
+      "id": 1506,
+      "label": "Brass",
+      "natdex": 870
+    },
+    "0870/0003": {
+      "form_key": "0003",
+      "id": 1507,
+      "label": "Trooper",
+      "natdex": 870
+    },
+    "0875/0001": {
+      "form_key": "0001",
+      "id": 1508,
+      "label": "Noice",
+      "natdex": 875
+    },
+    "0877/0001": {
+      "form_key": "0001",
+      "id": 1509,
+      "label": "Hangry",
+      "natdex": 877
+    },
+    "0892/0001": {
+      "form_key": "0001",
+      "id": 1510,
+      "label": "Rapid_Strike",
+      "natdex": 892
+    },
+    "0901/0001": {
+      "form_key": "0001",
+      "id": 1511,
+      "label": "Bloodmoon",
+      "natdex": 901
+    },
+    "0905/0001": {
+      "form_key": "0001",
+      "id": 1512,
+      "label": "Therian",
+      "natdex": 905
+    },
+    "0924/0001": {
+      "form_key": "0001",
+      "id": 1513,
+      "label": "Shirt",
+      "natdex": 924
+    },
+    "0924/0002": {
+      "form_key": "0002",
+      "id": 1514,
+      "label": "Pants",
+      "natdex": 924
+    },
+    "0925/0001": {
+      "form_key": "0001",
+      "id": 1515,
+      "label": "Three",
+      "natdex": 925
+    },
+    "0925/0002": {
+      "form_key": "0002",
+      "id": 1516,
+      "label": "Baby",
+      "natdex": 925
+    },
+    "0964/0001": {
+      "form_key": "0001",
+      "id": 1517,
+      "label": "Hero",
+      "natdex": 964
+    },
+    "0978/0001": {
+      "form_key": "0001",
+      "id": 1518,
+      "label": "Stretchy",
+      "natdex": 978
+    },
+    "0978/0002": {
+      "form_key": "0002",
+      "id": 1519,
+      "label": "Droopy",
+      "natdex": 978
+    },
+    "0978/0003": {
+      "form_key": "0003",
+      "id": 1520,
+      "label": "Mega",
+      "natdex": 978
+    },
+    "0999/0001": {
+      "form_key": "0001",
+      "id": 1521,
+      "label": "Roaming",
+      "natdex": 999
+    },
+    "1003/0001": {
+      "form_key": "0001",
+      "id": 1522,
+      "label": "Temp",
+      "natdex": 1003
+    },
+    "1008/0001": {
+      "form_key": "0001",
+      "id": 1523,
+      "label": "Low_Power",
+      "natdex": 1008
+    },
+    "1017/0001": {
+      "form_key": "0001",
+      "id": 1524,
+      "label": "Wellspring",
+      "natdex": 1017
+    },
+    "1017/0002": {
+      "form_key": "0002",
+      "id": 1525,
+      "label": "Hearthflame",
+      "natdex": 1017
+    },
+    "1017/0003": {
+      "form_key": "0003",
+      "id": 1526,
+      "label": "Cornerstone",
+      "natdex": 1017
+    },
+    "1017/0004": {
+      "form_key": "0004",
+      "id": 1527,
+      "label": "Teal_Mask",
+      "natdex": 1017
+    },
+    "1017/0005": {
+      "form_key": "0005",
+      "id": 1528,
+      "label": "Wellspring_Mask",
+      "natdex": 1017
+    },
+    "1017/0006": {
+      "form_key": "0006",
+      "id": 1529,
+      "label": "Hearthflame_Mask",
+      "natdex": 1017
+    },
+    "1017/0007": {
+      "form_key": "0007",
+      "id": 1530,
+      "label": "Cornerstone_Mask",
+      "natdex": 1017
+    }
+  },
+  "next_form_id": 1531,
+  "schema": 1
+}

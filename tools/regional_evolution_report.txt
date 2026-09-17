@@ -1,0 +1,55 @@
+TamaPoke regional evolution audit
+Regions: Alola / Galar / Hisui (+ Paldea ambiguity guard)
+
+OK Alola Rattata -> Raticate: id 810 -> 811
+OK Pikachu -> Alola Raichu: id 25 -> 812
+OK Alola Sandshrew -> Sandslash: id 813 -> 814
+OK Alola Vulpix -> Ninetales: id 815 -> 816
+OK Alola Diglett -> Dugtrio: id 817 -> 818
+OK Alola Meowth -> Persian: id 819 -> 820
+OK Alola Geodude -> Graveler: id 821 -> 822
+OK Alola Graveler -> Golem: id 822 -> 823
+OK Alola Grimer -> Muk: id 824 -> 825
+OK Exeggcute -> Alola Exeggutor: id 102 -> 826
+OK Cubone -> Alola Marowak: id 104 -> 827
+OK Galar Meowth -> Perrserker: id 1203 -> 881
+OK Galar Ponyta -> Rapidash: id 1207 -> 1208
+OK Galar Slowpoke -> Slowbro: id 1209 -> 1210
+OK Galar Slowpoke -> Slowking: id 1209 -> 1231
+OK Galar Farfetch'd -> Sirfetch'd: id 1212 -> 883
+OK Koffing -> Galar Weezing: id 109 -> 1216
+OK Mime Jr. -> Galar Mr. Mime: id 439 -> 1218
+SKIP target sprite unavailable: Galar Mr. Mime -> Mr. Rime
+OK Galar Corsola -> Cursola: id 1262 -> 882
+OK Galar Zigzagoon -> Linoone: id 1267 -> 1268
+OK Galar Linoone -> Obstagoon: id 1268 -> 880
+OK Galar Darumaka -> Darmanitan: id 1332 -> 1334
+OK Galar Yamask -> Runerigus: id 1335 -> 885
+OK Stantler -> Wyrdeer: id 234 -> 917
+OK Scyther -> Kleavor: id 123 -> 918
+OK Ursaring -> Ursaluna: id 217 -> 919
+OK White-Striped Basculin -> Basculegion: id 1331 -> 920
+OK Hisui Sneasel -> Sneasler: id 1261 -> 921
+OK Hisui Qwilfish -> Overqwil: id 1260 -> 922
+OK Hisui Growlithe -> Arcanine: id 1204 -> 1205
+OK Hisui Voltorb -> Electrode: id 1214 -> 1215
+OK Quilava -> Hisui Typhlosion: id 156 -> 1228
+OK Petilil -> Hisui Lilligant: id 548 -> 1329
+OK Dewott -> Hisui Samurott: id 502 -> 1327
+OK Rufflet -> Hisui Braviary: id 627 -> 1345
+OK Goomy -> Hisui Sliggoo: id 704 -> 1393
+OK Hisui Sliggoo -> Goodra: id 1393 -> 1394
+OK Bergmite -> Hisui Avalugg: id 712 -> 1399
+OK Dartrix -> Hisui Decidueye: id 723 -> 1407
+OK Hisui Zorua -> Zoroark: id 1336 -> 1337
+OK Paldea Wooper -> Clodsire: id 1230 -> 998
+OK no wrong normal-parent edge nat#264->nat#862
+OK no wrong normal-parent edge nat#52->nat#863
+OK no wrong normal-parent edge nat#222->nat#864
+OK no wrong normal-parent edge nat#83->nat#865
+OK no wrong normal-parent edge nat#122->nat#866
+OK no wrong normal-parent edge nat#562->nat#867
+OK no wrong normal-parent edge nat#550->nat#902
+OK no wrong normal-parent edge nat#215->nat#903
+OK no wrong normal-parent edge nat#211->nat#904
+OK no wrong normal-parent edge nat#194->nat#980
